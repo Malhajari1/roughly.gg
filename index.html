@@ -348,8 +348,8 @@ select.chip.uc:focus-visible{outline:2px solid var(--mar);outline-offset:2px}
 .pbar{flex:1;height:4px;background:var(--line);margin:0 7px;border-radius:2px;transition:background .3s}
 .pbar.on{background:#0a7a3a}
 /* coloured play/reveal board (#9) */
-.card:not(.land){position:relative;overflow:hidden;background:linear-gradient(180deg,#fffdfe 0%,#fbf1f5 100%)}
-.card:not(.land)::before{content:"";position:absolute;left:0;right:0;top:0;height:5px;background:linear-gradient(90deg,var(--mar),var(--mar2))}
+.card:not(.land){position:relative;background:linear-gradient(180deg,#fffdfe 0%,#fbf1f5 100%)}
+.card:not(.land)::before{content:"";position:absolute;left:0;right:0;top:0;height:5px;border-radius:28px 28px 0 0;background:linear-gradient(90deg,var(--mar),var(--mar2))}
 /* reveal: player's answer hero + semantic verdict (#10) */
 .cmp .me{background:linear-gradient(135deg,var(--mar2),#650f27);color:#fff;box-shadow:0 12px 26px -10px rgba(122,18,48,.55)}
 .cmp .me small{color:rgba(255,255,255,.72)}
@@ -397,6 +397,20 @@ select.chip.uc:focus-visible{outline:2px solid var(--mar);outline-offset:2px}
 .mark{padding-bottom:0}
 .mark svg{width:24px;height:24px;stroke:#fff;fill:none;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
 @media (min-width:960px){.mark svg{width:28px;height:28px}}
+/* keep the primary action on-screen + tighten reveal/results (no-scroll) */
+.stickybtn{position:sticky;bottom:10px;z-index:6;box-shadow:0 10px 22px -6px rgba(122,18,48,.55),0 0 0 16px #fbf1f5}
+.card:not(.land){padding-top:18px;padding-bottom:14px}
+.scoreline{margin-top:12px}
+.graph{max-width:320px;margin:6px auto 0}
+.fact{margin:9px 0 0;font-size:.85rem}
+.hero{padding:18px}
+.hero .hs span{font-size:3.4rem}
+.hero .lad{margin-top:10px}
+.qres{margin:2px 0 10px}
+.qr{padding:8px 2px}
+.wk{padding:14px 16px;margin-bottom:8px}
+.days{height:52px}
+.bh{margin:16px 0 2px}
 </style>
 <meta name="roughly-api" content="">
 </head>
@@ -1162,7 +1176,7 @@ function reveal(i){
   chartSlot("q")+
   "<p class='fact'>"+q.f+"</p>"+
   "<button class='ghost' id='lg' style='width:100%;margin-top:14px'>"+ICON_CHART+"See the maths</button>"+
-  "<button class='main' id='nx'>"+(last?"See results":"Next question")+ARR+"</button>");
+  "<button class='main stickybtn' id='nx'>"+(last?"See results":"Next question")+ARR+"</button>");
   document.getElementById("lg").onclick=function(){openLogic(i)};
   document.getElementById("nx").onclick=function(){if(busy)return;busy=true;st.r=false;saveState();busy=false;render()};
   animate(s,pc);chartLater("q",ids[i],s,viewTok);
@@ -1198,7 +1212,7 @@ function done(){
   h2h(avg)+
   "<h3 class='bh'>Your three guesses</h3><div class='qres'>"+qrows+"</div>"+
   "<div class='wk'><div class='wkh'><b>Last 7 days</b><span>"+stats.streak+" day streak</span></div><div class='days'>"+w7+"</div><div class='wkft'>Next set in <b id='cdn'>"+fmtDur(nextMidnight())+"</b></div></div>"+
-  "<button class='main' id='sh'>Share result</button></div>");
+  "<button class='main stickybtn' id='sh'>Share result</button></div>");
   document.getElementById("sh").onclick=function(){openShare(tot)};
   if(cdTimer)clearInterval(cdTimer);
   cdTimer=setInterval(function(){var el=document.getElementById("cdn");if(!el){clearInterval(cdTimer);cdTimer=null;return}el.textContent=fmtDur(nextMidnight())},1000);
