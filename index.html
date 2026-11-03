@@ -1,0 +1,970 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Roughly Qatar – Daily Estimation Game</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
+<style>
+:root{--mar:#7a1230;--mar2:#9b1b3f;--ink:#1c1217;--mut:#82747a;--line:#efe7ea;--tint:#faf5f7;color-scheme:light;box-sizing:border-box}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;min-height:100vh;color:var(--ink);background:radial-gradient(120% 55% at 50% -8%,#f4dde5 0,#fff 62%) no-repeat #fff;font:400 16px/1.5 "Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums}
+button,input{font:inherit;color:inherit}
+header{padding:calc(env(safe-area-inset-top,0px) + 16px) 20px 0}
+.hd{max-width:480px;margin:0 auto;display:flex;justify-content:space-between;align-items:center}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:1.05rem;letter-spacing:-.2px}
+.mark{width:34px;height:34px;border-radius:11px;background:linear-gradient(135deg,var(--mar2),#5a0c22);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.15rem;font-weight:700;box-shadow:0 6px 16px rgba(122,18,48,.3)}
+#streak{font-size:.78rem;font-weight:700;color:var(--mar);background:#fff;border:1px solid var(--line);padding:6px 12px;border-radius:20px}
+#streak:empty{display:none}
+main{max-width:480px;margin:0 auto;padding:18px 16px calc(env(safe-area-inset-bottom,0px) + 36px)}
+.card{background:#fff;border-radius:28px;padding:26px 22px;box-shadow:0 1px 0 rgba(122,18,48,.04),0 24px 60px -20px rgba(122,18,48,.22)}
+.card.in{animation:up .45s cubic-bezier(.2,.8,.2,1) both}
+@keyframes up{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.card.in{animation:none}*{transition:none!important}}
+.tag{display:inline-block;font-size:.72rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--mar);background:var(--tint);padding:6px 12px;border-radius:20px;margin-bottom:14px}
+.eyebrow{display:flex;justify-content:space-between;align-items:center;font-size:.72rem;line-height:1;letter-spacing:1.1px;text-transform:uppercase;font-weight:700;color:var(--mar);margin-bottom:14px}
+.eyebrow span:last-child{color:var(--mut);font-weight:600}
+.seg{display:flex;gap:6px;margin-bottom:22px}
+.seg i{flex:1;height:5px;border-radius:3px;background:var(--line)}
+.seg i.on{background:linear-gradient(90deg,var(--mar),var(--mar2))}
+h1,h2{margin:0;letter-spacing:-.5px;font-weight:800}
+h1{font-size:2rem;line-height:1.15;margin-bottom:12px}
+h1 em{font-style:normal;color:var(--mar)}
+h2{font-size:1.5rem;line-height:1.25;margin-bottom:10px}
+h2.sm{font-size:1.1rem;font-weight:700;margin-bottom:16px;letter-spacing:-.2px}
+.lead{color:var(--mut);margin:0 0 18px;font-size:.95rem}
+.field{display:flex;align-items:center;background:var(--tint);border:2px solid transparent;border-radius:18px;padding:0 8px 0 18px;transition:border-color .15s,box-shadow .15s,background .15s}
+.field:focus-within{background:#fff;border-color:var(--mar);box-shadow:0 0 0 5px rgba(122,18,48,.09)}
+.field input{flex:1;min-width:0;border:0;outline:0;background:transparent;font-size:1.65rem;font-weight:800;height:66px;letter-spacing:-.5px}
+.field input::placeholder{color:#d4c8cd;font-weight:600}
+.chip{flex:none;max-width:42%;font-size:.8rem;font-weight:700;color:var(--mar);background:#fff;border-radius:12px;padding:8px 12px;text-align:center;line-height:1.2;box-shadow:0 1px 3px rgba(122,18,48,.12)}
+.hint{min-height:1.5em;margin:10px 4px 0;color:var(--mut);font-size:.85rem}
+button.main{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;margin-top:18px;background:linear-gradient(135deg,var(--mar2),#650f27);color:#fff;border:0;border-radius:18px;height:58px;font-weight:700;font-size:1rem;cursor:pointer;box-shadow:0 12px 24px -8px rgba(122,18,48,.55);transition:transform .15s,box-shadow .15s,opacity .15s}
+button.main:hover{transform:translateY(-1px);box-shadow:0 16px 28px -8px rgba(122,18,48,.6)}
+button.main:active{transform:scale(.985)}
+button.main:disabled{background:#e4dadd;box-shadow:none;cursor:not-allowed;transform:none;color:#fff}
+button.main svg{width:18px;height:18px;stroke:#fff;fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.cmp{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.cmp div{background:var(--tint);border-radius:18px;padding:14px 16px;min-width:0}
+.cmp div+div{background:linear-gradient(135deg,var(--mar2),#650f27);color:#fff}
+.cmp small{display:block;font-size:.68rem;letter-spacing:1px;text-transform:uppercase;font-weight:700;color:var(--mut);margin-bottom:4px}
+.cmp div+div small{color:rgba(255,255,255,.7)}
+.cmp b{display:block;font-size:1.3rem;font-weight:800;line-height:1.2;letter-spacing:-.4px;word-break:break-word}
+.cmp em{display:block;font-style:normal;font-size:.78rem;opacity:.7;margin-top:2px}
+.rng{position:relative;height:10px;background:var(--line);border-radius:6px;margin:16px 0 8px}
+.rng .band{position:absolute;top:0;bottom:0;background:#e3b9c8;border-radius:6px}
+.rng .tick{position:absolute;top:-4px;width:3px;height:18px;background:var(--mar);border-radius:2px;transform:translateX(-50%)}
+.rng .gd{position:absolute;top:50%;width:18px;height:18px;border-radius:50%;background:#fff;border:4px solid var(--ink);transform:translate(-50%,-50%)}
+.leg{display:flex;justify-content:space-between;gap:8px;font-size:.75rem;color:var(--mut);margin-bottom:6px;flex-wrap:wrap}
+.leg b{color:var(--ink);font-weight:700}
+.scoreline{display:flex;align-items:center;justify-content:space-between;margin-top:18px}
+.big{font-size:2.6rem;font-weight:800;color:var(--mar);line-height:1;letter-spacing:-1.5px}
+.big small{font-size:1rem;font-weight:600;color:var(--mut);letter-spacing:0;margin-left:4px}
+.pill{font-size:.78rem;font-weight:700;color:var(--mar);background:var(--tint);padding:7px 13px;border-radius:20px;text-align:right}
+.graph{margin:12px 0 2px}
+.graph svg{display:block;width:100%;height:auto;overflow:visible}
+.pct{display:flex;justify-content:space-between;align-items:baseline;font-size:.9rem;color:var(--mut)}
+.pct b{font-size:1.05rem;color:var(--mar);font-weight:800}
+.note{font-size:.75rem;color:var(--mut);margin:3px 0 0}
+.fact{color:var(--mut);font-size:.9rem;margin:14px 0 0}
+.tog{display:flex;align-items:center;gap:10px;width:100%;margin-top:16px;padding:14px 16px;background:var(--tint);border:0;border-radius:16px;font-weight:700;font-size:.9rem;color:var(--mar);cursor:pointer;text-align:left}
+.tog svg{flex:none;width:18px;height:18px;stroke:var(--mar);fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;transition:transform .3s}
+.tog[aria-expanded=true] svg{transform:rotate(180deg)}
+.bd{max-height:0;overflow:hidden;transition:max-height .4s ease}
+.bd .in{padding:10px 2px 0}
+.bd h3{font-size:.72rem;letter-spacing:1.1px;text-transform:uppercase;color:var(--mut);margin:12px 0 6px;font-weight:700}
+.st{display:flex;gap:12px;padding:8px 0;font-size:.9rem;align-items:flex-start}
+.st i{flex:none;width:22px;height:22px;border-radius:50%;background:var(--tint);color:var(--mar);font:700 .72rem "Plus Jakarta Sans",sans-serif;font-style:normal;display:flex;align-items:center;justify-content:center;margin-top:1px}
+.st.t{font-weight:800;color:var(--mar)}
+.r{display:flex;justify-content:space-between;gap:12px;padding:11px 2px;border-bottom:1px solid var(--line);font-size:.9rem;align-items:baseline}
+.r span{color:var(--mut)}
+.r b{font-weight:700;text-align:right}
+.res .r b{color:var(--mar)}
+.sw{display:flex;gap:6px;margin:16px 0 4px}
+.sw div{flex:1;text-align:center;font-size:.75rem;color:var(--mut);font-weight:600}
+.sw i{display:block;height:8px;border-radius:4px;margin-bottom:6px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:18px}
+.stats div{text-align:center;background:var(--tint);border-radius:16px;padding:12px 6px}
+.stats b{display:block;font-size:1.3rem;font-weight:800;color:var(--mar);line-height:1.2}
+.stats span{font-size:.68rem;color:var(--mut);letter-spacing:.8px;text-transform:uppercase;font-weight:700}
+.step{display:flex;gap:14px;margin:14px 0;align-items:flex-start}
+.step i{flex:none;width:32px;height:32px;border-radius:11px;background:var(--tint);color:var(--mar);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.85rem;font-style:normal}
+.step b{display:block;font-weight:700;line-height:1.3;margin-top:2px}
+.step span{display:block;color:var(--mut);font-size:.875rem;margin-top:2px}
+.small{color:var(--mut);font-size:.8rem;text-align:center;margin-top:20px}
+.small a{color:var(--mar);font-weight:700;text-decoration:none}
+.tools{display:flex;gap:10px;margin-top:14px}
+.ghost{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;height:48px;border-radius:14px;border:1.5px solid var(--line);background:#fff;color:var(--mar);font-weight:700;font-size:.85rem;cursor:pointer;transition:background .15s,border-color .15s}
+.ghost:hover:not(:disabled){background:var(--tint);border-color:#e3b9c8}
+.ghost:disabled{opacity:.45;cursor:not-allowed}
+.ghost svg,.fi svg,.x svg{width:18px;height:18px;stroke:var(--mar);fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.hintbox{background:var(--tint);border-left:4px solid var(--mar);border-radius:12px;padding:12px 14px;margin-top:12px;font-size:.9rem;animation:up .35s both}
+.hintbox b{display:block;font-size:.68rem;letter-spacing:1px;text-transform:uppercase;color:var(--mar);margin-bottom:2px}
+#scrim{position:fixed;inset:0;background:rgba(28,18,23,.45);opacity:0;pointer-events:none;transition:opacity .25s;z-index:50}
+#scrim.open{opacity:1;pointer-events:auto}
+#sheet{position:fixed;left:0;right:0;bottom:0;margin:0 auto;max-width:480px;max-height:90vh;overflow:auto;background:#fff;border-radius:28px 28px 0 0;padding:10px 20px calc(env(safe-area-inset-bottom,0px) + 20px);transform:translateY(105%);transition:transform .35s cubic-bezier(.2,.8,.2,1);z-index:51;box-shadow:0 -20px 50px rgba(28,18,23,.25)}
+#sheet.open{transform:none}
+.grab{width:40px;height:5px;border-radius:3px;background:var(--line);margin:0 auto 12px}
+.shh{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.shh b{font-size:1.05rem;font-weight:800}
+.x{width:36px;height:36px;border-radius:12px;border:0;background:var(--tint);display:flex;align-items:center;justify-content:center;cursor:pointer}
+.disp{background:var(--tint);border-radius:18px;padding:12px 16px;text-align:right;margin-bottom:10px;overflow:hidden}
+.disp .ex{font-size:.9rem;color:var(--mut);min-height:1.4em;word-break:break-all}
+.disp .rs{font-size:2rem;font-weight:800;letter-spacing:-1px;color:var(--mar);line-height:1.2;word-break:break-all}
+.keys{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.k{height:50px;border:0;border-radius:14px;background:var(--tint);font-size:1.15rem;font-weight:700;cursor:pointer;transition:transform .08s,background .15s}
+.k:active{transform:scale(.94)}
+.k.op{background:#f4e3ea;color:var(--mar)}
+.k.fn{color:var(--mar)}
+.k.eq{background:var(--mar);color:#fff}
+button.main.use{height:50px;margin-top:12px;font-size:.95rem}
+.nl{display:block;font-size:.72rem;letter-spacing:1.1px;text-transform:uppercase;font-weight:700;color:var(--mut);margin:16px 0 6px}
+#nt{width:100%;border:2px solid transparent;background:var(--tint);border-radius:16px;padding:12px 14px;font-size:.95rem;resize:vertical;outline:0;min-height:90px}
+#nt:focus{background:#fff;border-color:var(--mar)}
+.card.land{background:transparent;box-shadow:none;padding:0}
+.sec{background:#fff;border-radius:28px;padding:24px 22px;margin-bottom:14px;box-shadow:0 1px 0 rgba(122,18,48,.04),0 20px 50px -24px rgba(122,18,48,.25);animation:up .55s cubic-bezier(.2,.8,.2,1) both}
+.sec:nth-child(2){animation-delay:.06s}.sec:nth-child(3){animation-delay:.12s}.sec:nth-child(4){animation-delay:.18s}
+.sec h3{font-size:1.2rem;font-weight:800;margin:0 0 4px;letter-spacing:-.3px}
+.sub{color:var(--mut);font-size:.9rem;margin:0 0 16px}
+.eqrow{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+.eqrow span{font-weight:800;font-size:.95rem;color:var(--mar);background:var(--tint);border-radius:12px;padding:8px 13px;animation:bob 3.2s ease-in-out infinite}
+.eqrow span:nth-child(2){animation-delay:-.6s}.eqrow span:nth-child(3){animation-delay:-1.2s}.eqrow span:nth-child(4){animation-delay:-1.8s;background:var(--mar);color:#fff}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+.facts{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.facts div{background:var(--tint);border-radius:18px;padding:14px 8px;text-align:center}
+.facts b{display:block;font-size:1.5rem;font-weight:800;color:var(--mar);line-height:1.1}
+.facts span{font-size:.72rem;color:var(--mut);font-weight:600}
+.fr{display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:16px;margin-bottom:8px;font-size:.9rem;font-weight:600;background:var(--tint);animation:lit 7.5s infinite}
+.fr i{flex:none;width:26px;height:26px;border-radius:50%;background:#fff;color:var(--mar);font:800 .75rem "Plus Jakarta Sans",sans-serif;font-style:normal;display:flex;align-items:center;justify-content:center}
+.fr:nth-of-type(2){animation-delay:1.5s}.fr:nth-of-type(3){animation-delay:3s}.fr:nth-of-type(4){animation-delay:4.5s}.fr:nth-of-type(5){animation-delay:6s}
+@keyframes lit{0%,16%{background:var(--mar);color:#fff;transform:translateX(6px)}22%,100%{background:var(--tint);color:var(--ink);transform:none}}
+.sbar{position:relative;display:flex;height:16px;border-radius:8px;overflow:hidden;margin:26px 0 8px}
+.sbar i{display:block;height:100%}
+.sdot{position:absolute;top:50%;width:24px;height:24px;border-radius:50%;background:#fff;border:5px solid var(--ink);transform:translate(-50%,-50%);animation:sway 5s ease-in-out infinite alternate;box-shadow:0 4px 10px rgba(0,0,0,.2)}
+@keyframes sway{0%{left:6%}50%{left:50%}100%{left:94%}}
+.sbw{position:relative}
+.slab{display:flex;justify-content:space-between;font-size:.68rem;font-weight:700;color:var(--mut);text-align:center}
+.slab span{flex:1}
+.est{position:absolute;left:50%;top:-24px;transform:translateX(-50%);font-size:.68rem;font-weight:800;color:var(--mar);letter-spacing:.8px;text-transform:uppercase;white-space:nowrap}
+.feat{display:grid;gap:10px}
+.fc{display:flex;gap:14px;align-items:center;background:var(--tint);border-radius:18px;padding:14px 16px}
+.fi{flex:none;width:44px;height:44px;border-radius:14px;background:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(122,18,48,.14)}
+.fc b{display:block;font-weight:700}
+.fc span{font-size:.85rem;color:var(--mut)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chips span{font-size:.82rem;font-weight:700;color:var(--mar);background:var(--tint);border-radius:20px;padding:8px 14px}
+details{border-bottom:1px solid var(--line);padding:14px 0}
+details:last-child{border-bottom:0}
+summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:12px;font-weight:700}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"+";flex:none;color:var(--mar);font-size:1.4rem;font-weight:600;line-height:1}
+details[open] summary::after{content:"−"}
+details p{margin:8px 0 0;color:var(--mut);font-size:.9rem}
+.cta{background:linear-gradient(135deg,var(--mar2),#5a0c22);color:#fff;border-radius:28px;padding:28px 22px;text-align:center;animation:up .6s .2s both}
+.cta h3{margin:0 0 6px;font-size:1.4rem;font-weight:800;letter-spacing:-.4px}
+.cta p{margin:0;opacity:.8;font-size:.92rem}
+button.main.light{background:#fff;color:var(--mar);box-shadow:0 12px 24px -10px rgba(0,0,0,.4)}
+button.main.light svg{stroke:var(--mar)}
+@media (prefers-reduced-motion:reduce){.eqrow span,.fr,.sdot,.sec,.cta,.hintbox{animation:none!important}}
+.hr{display:flex;align-items:center;gap:10px}
+.mb{width:38px;height:38px;border-radius:12px;border:1px solid var(--line);background:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0}
+.mb svg{width:20px;height:20px;stroke:var(--mar);fill:none;stroke-width:2.4;stroke-linecap:round}
+.brand{cursor:pointer}
+.cmp div+div{background:linear-gradient(135deg,#22c55e,#0a7a3a);box-shadow:0 12px 26px -10px rgba(10,122,58,.65);animation:pop .7s .25s cubic-bezier(.2,.9,.3,1.3) both}
+.cmp div+div b{font-size:1.45rem}
+@keyframes pop{0%{transform:scale(.9);opacity:0}60%{transform:scale(1.04);opacity:1}100%{transform:scale(1)}}
+.rng .tick{background:#16a34a;box-shadow:0 0 0 3px rgba(34,197,94,.25)}
+.pill.v{font-size:.95rem;padding:9px 15px;background:var(--mar);color:#fff}
+.ci{flex:none;width:30px;height:30px;border-radius:10px;background:var(--tint);display:inline-flex;align-items:center;justify-content:center}
+.ci svg{width:17px;height:17px;stroke:var(--mar);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.eyebrow .cat{display:flex;align-items:center;gap:10px}
+.chips>span{display:flex;align-items:center;gap:8px;padding:6px 14px 6px 6px}
+.chips span.ci{padding:0;background:#fff;border-radius:10px;width:28px;height:28px}
+.x:disabled{opacity:.3;cursor:not-allowed}
+.mrow{display:flex;justify-content:space-between;align-items:center;margin:4px 0 12px}
+.mrow b{font-size:1rem;font-weight:800}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.wd{text-align:center;font-size:.7rem;font-weight:700;color:var(--mut);padding-bottom:4px}
+.cd{border:0;border-radius:12px;background:var(--tint);display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:700;font-size:.95rem;cursor:pointer;padding:8px 0 4px;gap:2px;color:var(--ink)}
+.cd small{font-size:.6rem;font-weight:700;color:var(--mut);height:.8rem;line-height:.8rem}
+.cd:disabled{opacity:.25;cursor:not-allowed;background:transparent}
+.cd.done{background:var(--mar);color:#fff}
+.cd.done small{color:rgba(255,255,255,.85)}
+.cd.part small{color:var(--mar)}
+.cd.sel:not(.done){background:#f4e3ea}
+.cd.today{box-shadow:inset 0 0 0 2px var(--mar)}
+@media (prefers-reduced-motion:reduce){.cmp div+div{animation:none!important}}
+.rank{background:linear-gradient(135deg,var(--mar2),#5a0c22);color:#fff;border-radius:20px;padding:18px;margin-bottom:16px;box-shadow:0 14px 30px -14px rgba(122,18,48,.6)}
+.rank small{font-size:.68rem;letter-spacing:1.2px;text-transform:uppercase;font-weight:700;opacity:.7}
+.rank h2{margin:4px 0 2px;font-size:1.7rem;letter-spacing:-.5px}
+.rank p{margin:0 0 14px;opacity:.85;font-size:.9rem}
+.lad{display:flex;gap:5px}
+.lad i{flex:1;height:6px;border-radius:3px;background:rgba(255,255,255,.25)}
+.lad i.on{background:#fff}
+.layout{display:block}
+#side,.dnav{display:none}
+.sdc{background:#fff;border-radius:24px;padding:22px;margin-bottom:16px;box-shadow:0 1px 0 rgba(122,18,48,.04),0 20px 50px -26px rgba(122,18,48,.25)}
+.sdc h4{margin:0 0 10px;font-size:.7rem;letter-spacing:1.2px;text-transform:uppercase;color:var(--mut);font-weight:700}
+.sq{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--line)}
+.sq:last-child{border-bottom:0}
+.sq b{display:block;font-size:.92rem;line-height:1.2}
+.sq .s{font-size:.78rem;color:var(--mut)}
+.sq .sc2{margin-left:auto;font-weight:800;color:var(--mar)}
+.sq.done .ci{background:#e3b9c8}
+.sq.cur .ci{background:var(--mar)}.sq.cur .ci svg{stroke:#fff}
+.sq.up{opacity:.45}
+#side .stats{margin-top:0}
+.sdc.tipcard{background:linear-gradient(135deg,var(--mar2),#5a0c22);color:#fff}
+.tipcard h4{color:rgba(255,255,255,.7)}
+.tipcard p{margin:0;font-size:.92rem;line-height:1.5}
+@media (min-width:960px){
+ header{padding:calc(env(safe-area-inset-top,0px) + 22px) 40px 0}
+ .hd{max-width:1120px}
+ .brand{font-size:1.2rem}
+ .mark{width:40px;height:40px;border-radius:13px;font-size:1.3rem}
+ .hr{gap:20px}
+ .dnav{display:flex;gap:4px}
+ .dnav a{font-weight:700;font-size:.9rem;color:var(--ink);text-decoration:none;padding:9px 16px;border-radius:12px}
+ .dnav a:hover{background:#fff;color:var(--mar)}
+ #menu{display:none}
+ #streak{font-size:.85rem;padding:8px 14px}
+ main{max-width:1120px;padding:28px 40px 56px}
+ .layout{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:28px;align-items:start}
+ #side{display:block;position:sticky;top:20px}
+ body[data-view=land] .layout{grid-template-columns:minmax(0,1fr)}
+ body[data-view=land] #side{display:none}
+ .card{padding:40px 44px;border-radius:32px}
+ .seg{margin-bottom:28px}
+ h1{font-size:3.1rem;letter-spacing:-1.2px}
+ h2{font-size:2rem}
+ h2.sm{font-size:1.25rem}
+ .lead{font-size:1.05rem}
+ .field input{font-size:2rem;height:78px}
+ .chip{font-size:.9rem;padding:10px 16px}
+ button.main{height:62px;font-size:1.05rem}
+ .cmp b{font-size:1.6rem}
+ .big{font-size:3.2rem}
+ .graph{max-width:560px;margin-left:auto;margin-right:auto}
+ .grab{display:none}
+ #sheet{left:50%;right:auto;bottom:auto;top:50%;margin:0;width:480px;max-height:86vh;border-radius:28px;transform:translate(-50%,-44%);opacity:0;pointer-events:none;transition:transform .3s cubic-bezier(.2,.8,.2,1),opacity .25s;box-shadow:0 30px 80px rgba(28,18,23,.35);padding-top:22px}
+ #sheet.open{transform:translate(-50%,-50%);opacity:1;pointer-events:auto}
+ .card.land{padding:0;border-radius:0;display:grid;grid-template-columns:1fr 1fr;gap:20px}
+ .card.land>.sec,.card.land>.cta{margin-bottom:0}
+ .card.land>.sec:nth-child(1),.card.land>.sec:nth-child(2),.card.land>.sec:nth-child(7),.card.land>.cta{grid-column:1/-1}
+ .card.land>.sec:nth-child(1){display:grid;grid-template-columns:1.15fr 1fr;column-gap:48px;align-items:center;padding:56px 52px}
+ .card.land>.sec:nth-child(1)>*{grid-column:1;justify-self:start}
+ .card.land>.sec:nth-child(1)>.eqrow{grid-column:2;grid-row:1/6;justify-self:center;justify-content:center;gap:14px;margin:0}
+ .card.land>.sec:nth-child(1) button.main{width:auto;padding:0 40px;margin-top:10px}
+ .card.land h1{font-size:3.7rem}
+ .eqrow span{font-size:1.6rem;padding:16px 24px;border-radius:20px}
+ .facts b{font-size:2.1rem}
+ .sec{padding:30px 32px}
+ .cta{padding:44px 32px}
+ .cta h3{font-size:1.9rem}
+ .cta button.main{width:auto;margin:20px auto 0;padding:0 48px}
+ .card.land>.sec:nth-child(4),.card.land>.sec:nth-child(6){display:flex;flex-direction:column}
+ .card.land>.sec:nth-child(4) .sbw,.card.land>.sec:nth-child(6) .chips{margin:auto 0}
+ .chips span{font-size:.95rem}
+}
+.brand em{font-style:normal;color:var(--mar)}
+.mark{font-size:1.4rem;padding-bottom:2px}
+html,body{overscroll-behavior-y:none}
+#sheet{visibility:hidden}
+#sheet.open{visibility:visible}
+@media (max-width:959px){
+ #sheet{transition:transform .35s cubic-bezier(.2,.8,.2,1),visibility 0s linear .35s}
+ #sheet.open{transition:transform .35s cubic-bezier(.2,.8,.2,1),visibility 0s}
+}
+@media (min-width:960px){
+ #sheet{transition:transform .3s cubic-bezier(.2,.8,.2,1),opacity .25s,visibility 0s linear .3s}
+ #sheet.open{transition:transform .3s cubic-bezier(.2,.8,.2,1),opacity .25s,visibility 0s}
+}
+.enc{margin:12px 0 0;padding:10px 14px;background:var(--tint);border-radius:12px;font-size:.88rem;font-weight:600;color:var(--mar)}
+.bh{font-size:.72rem;letter-spacing:1.1px;text-transform:uppercase;color:var(--mut);margin:24px 0 2px;font-weight:700}
+.brow{padding:14px 0;border-bottom:1px solid var(--line)}
+.bt{display:flex;align-items:center;gap:10px}
+.bt b{display:block;font-size:.92rem;line-height:1.2}
+.bt .vs{font-size:.78rem;color:var(--mut)}
+.bval{margin-left:auto;font-weight:800;color:var(--mar);font-size:1.15rem}
+.btrack{height:10px;border-radius:6px;background:var(--line);margin:10px 0 8px;overflow:hidden}
+.bfill{display:block;height:100%;width:0;border-radius:6px;background:linear-gradient(90deg,var(--mar),var(--mar2))}
+.bq{font-size:.8rem;color:var(--mut);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.shp{background:linear-gradient(135deg,var(--mar2),#5a0c22);color:#fff;border-radius:20px;padding:18px;margin-bottom:14px}
+.shp small{font-size:.68rem;letter-spacing:1.2px;text-transform:uppercase;font-weight:700;opacity:.7}
+.shp b{display:block;font-size:1.3rem;margin:4px 0 0;letter-spacing:-.3px}
+.shp span{font-size:.9rem;opacity:.9}
+.shp .mb2{display:flex;gap:6px;margin:14px 0 12px}
+.shp .mb2 i{flex:1;height:8px;border-radius:4px;background:rgba(255,255,255,.22);overflow:hidden;position:relative}
+.shp .mb2 u{position:absolute;left:0;top:0;bottom:0;background:#fff;border-radius:4px}
+.shp em{font-style:normal;font-weight:700;font-size:.85rem;opacity:.9}
+.shg{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px}
+a.shl{display:flex;align-items:center;justify-content:center;height:48px;border-radius:14px;border:1.5px solid var(--line);background:#fff;color:var(--mar);font-weight:700;font-size:.85rem;text-decoration:none}
+a.shl:hover{background:var(--tint)}
+select.chip.uc{appearance:none;-webkit-appearance:none;border:0;cursor:pointer;font-family:inherit;padding-right:30px;text-align:left;text-align-last:left;background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%237a1230' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat right 10px center/12px;transition:box-shadow .15s}
+select.chip.uc:hover{box-shadow:0 0 0 3px rgba(122,18,48,.12)}
+select.chip.uc:focus-visible{outline:2px solid var(--mar);outline-offset:2px}
+#nt.sr{position:absolute!important;left:-9999px;top:0;width:1px!important;min-height:0!important;height:1px;opacity:0;padding:0;border:0}
+.mis{display:grid;gap:8px;margin-bottom:6px}
+.mi{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:var(--tint);border:0;border-radius:16px;padding:12px 14px;cursor:pointer;font-family:inherit;color:var(--ink);transition:background .15s}
+.mi.static{cursor:default}
+.mi:hover:not(.static){background:#f4e3ea}
+.mi>svg{flex:none;width:22px;height:22px;stroke:var(--mar);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.mi>svg:last-child:not(:first-child){width:16px;height:16px;stroke:var(--mut);stroke-width:2.4}
+.mi div{flex:1;min-width:0}
+.mi b{display:block;font-size:.92rem}
+.mi span{display:block;font-size:.78rem;color:var(--mut);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lnk{border:0;background:none;color:var(--mar);font-weight:700;font-size:.82rem;cursor:pointer;font-family:inherit}
+.inp{width:100%;border:2px solid transparent;background:var(--tint);border-radius:14px;padding:14px;font-size:1rem;outline:0;font-family:inherit;color:var(--ink);box-sizing:border-box}
+.inp:focus{background:#fff;border-color:var(--mar)}
+.err{color:#b3261e;font-size:.82rem;min-height:1.2em;margin:6px 2px 0}
+.chb{background:var(--tint);border-radius:16px;padding:12px 14px;margin:0 0 16px;border-left:4px solid var(--mar)}
+.chb b{display:block}
+.chb span{font-size:.85rem;color:var(--mut)}
+.h2h{display:flex;align-items:center;justify-content:center;gap:16px;margin-top:8px}
+.h2h div{text-align:center;background:var(--tint);border-radius:18px;padding:12px 20px;min-width:110px}
+.h2h small{display:block;font-size:.7rem;letter-spacing:1px;text-transform:uppercase;color:var(--mut);font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:120px}
+.h2h b{font-size:1.6rem;color:var(--mar);font-weight:800}
+.h2h>span{color:var(--mut);font-weight:700}
+.bal{position:relative;height:12px;border-radius:7px;background:linear-gradient(90deg,#e3b9c8,#a8456a 50%,#e3b9c8);margin:22px 0 8px}
+.bal i{position:absolute;top:50%;width:22px;height:22px;border-radius:50%;background:#fff;border:5px solid var(--mar);transform:translate(-50%,-50%);box-shadow:0 3px 8px rgba(0,0,0,.2);box-sizing:border-box}
+.cr{display:flex;justify-content:space-between;gap:10px;padding:9px 2px;border-bottom:1px solid var(--line);font-size:.88rem}
+.cr span{color:var(--mut)}
+.cr b{color:var(--mar)}
+.srcl{font-size:.82rem;color:var(--mut);margin:0 0 10px}
+.src{display:inline-block;font-weight:800;font-size:.68rem;letter-spacing:.8px;text-transform:uppercase;border-radius:20px;padding:4px 10px;margin-right:8px}
+.src.sO{background:var(--mar);color:#fff}
+.src.sD{background:#e3b9c8;color:var(--mar)}
+.src.sR{background:var(--tint);color:var(--mar);border:1px solid #e3b9c8}
+.gbox{min-height:60px}
+.ovl{font-weight:700;color:var(--mar);margin:8px 0 0;font-size:.9rem}
+</style>
+<meta name="roughly-api" content="">
+</head>
+<body>
+<header><div class="hd"><div class="brand"><div class="mark">≈</div><span>Roughly <em class="cn">Qatar</em></span></div><div class="hr"><nav class="dnav"><a href="#" id="nhow">How to play</a><a href="#" id="narch">Archive</a></nav><div id="streak"></div><button id="menu" class="mb" aria-label="Open menu"><svg viewBox='0 0 24 24'><path d='M4 7h16M4 12h16M4 17h16'/></svg></button></div></div></header>
+<main>
+  <div class="layout"><div id="app" class="card"></div><aside id="side" aria-label="Today"></aside></div>
+  <p class="small"><a href="#" id="how">How to play</a> &middot; A new set of three every day</p>
+</main>
+<div id="scrim"></div><div id="sheet" role="dialog" aria-modal="true" aria-label="Calculator and notes"></div>
+<script>
+var COUNTRY="Qatar";
+document.title="Roughly "+COUNTRY+" – Daily Estimation Game";
+document.querySelector(".brand .cn").textContent=COUNTRY;
+var Q=[
+{c:"Everyday Qatar",t:"How many mobile phones are in use in Qatar?",u:"phones",m:4.2e6,lo:3e6,hi:7e6,s:["About 3 million residents","× roughly 1.4 phones each, counting work phones and second SIMs","≈ 4.2 million phones"],f:"Plenty of people carry two, and at least one of them has a cracked screen."},
+{c:"Everyday Qatar",t:"How many light bulbs are switched on across Qatar at 9 pm?",u:"bulbs",m:2e7,lo:8e6,hi:5e7,s:["About 750,000 homes × roughly 15 lights each ≈ 11 million","+ offices, malls, streets and stadiums ≈ 9 million","Total ≈ 20 million bulbs"],f:"Doha after dark is basically a very efficient lightshow."},
+{c:"Everyday Qatar",t:"How many WhatsApp voice notes are sent in Qatar every day?",u:"voice notes",m:3.7e7,lo:1e7,hi:1.5e8,s:["About 3 million residents","× roughly 85% use WhatsApp ≈ 2.5 million people","× about 15 voice notes each ≈ 37 million"],f:"Most of them are three minutes long and could have been a text."},
+{c:"Food & drink",t:"How many loaves and flatbreads does Qatar eat every day?",u:"pieces of bread",m:2.4e6,lo:1e6,hi:5e6,s:["About 3 million residents","× roughly 0.8 pieces of bread each a day, from samoon to Arabic bread to toast","≈ 2.4 million pieces"],f:"Bread is quietly the most dependable food in the country."},
+{c:"Food & drink",t:"How many bottles of water does Qatar drink every day?",u:"bottles",m:4.5e6,lo:2e6,hi:1e7,s:["About 3 million residents","× roughly 1.5 bottles each a day, counting small ones, big ones and the office cooler","≈ 4.5 million bottles"],f:"It’s hot enough that nobody has ever been caught without one."},
+{c:"Food & drink",t:"How many pizzas does Qatar order on a typical Friday?",u:"pizzas",m:2e5,lo:6e4,hi:6e5,s:["About 3 million residents","× roughly 1 in 5 orders pizza on a Friday ≈ 600,000 people","÷ about 3 people sharing each pizza ≈ 200,000 pizzas"],f:"Friday night is basically a national pizza holiday."},
+{c:"Food & drink",t:"How many kilograms of rice does Qatar eat every day?",u:"kg",m:4.5e5,lo:2e5,hi:1e6,s:["About 3 million residents","× roughly 150 g of dry rice each a day, from biryani to machboos to plain white","≈ 450,000 kg"],f:"Biryani, machboos, kabsa. Rice rarely misses a meal."},
+{c:"Money",t:"How many riyals does Qatar spend on coffee every day?",u:"QAR",m:1.8e7,lo:6e6,hi:5e7,s:["About 3 million residents","× roughly 1 in 3 buys a coffee on a typical day ≈ 1 million cups","× about QAR 18 a cup ≈ QAR 18 million"],f:"A lot of it is the extra shot nobody needed."},
+{c:"Money",t:"How many riyals of cash are sitting in people’s wallets across Qatar right now?",u:"QAR",m:5e8,lo:1.5e8,hi:1.5e9,s:["About 3 million residents","× roughly 70% carry some cash ≈ 2.1 million wallets","× about QAR 250 each ≈ QAR 525 million"],f:"Digital payments are winning, but the QAR 5 note in the car door lives on."},
+{c:"Roads",t:"How many litres of petrol and diesel do Qatar’s cars burn every day?",u:"litres",m:8e6,lo:3e6,hi:2e7,s:["About 1.8 million cars","× roughly 35 km a day = 63 million km","÷ about 8 km per litre ≈ 8 million litres"],f:"Big engines, long roundabouts and the AC on full."},
+{c:"Roads",t:"How many people ride the Doha Metro on a typical weekday?",u:"riders",m:2e5,lo:8e4,hi:5e5,s:["About 3 million residents","× roughly 1 in 15 uses the metro on a weekday ≈ 200,000 riders"],f:"During the Arab Cup in December 2025, the metro and tram together averaged about 270,000 riders a day."},
+{c:"Roads",t:"How many cars are washed in Qatar every day?",u:"cars",m:2.5e5,lo:8e4,hi:6e5,s:["About 1.8 million cars","÷ roughly 7, since most get washed about once a week ≈ 250,000 cars a day"],f:"The sand is back on the bonnet by lunchtime anyway."},
+{c:"Travel",t:"How many flights take off or land at Hamad Airport every day?",u:"flights",m:880,lo:450,hi:1700,s:["About 54 million passengers a year (Hamad handled 54.3 million in 2025) ÷ 365 ≈ 149,000 a day","÷ roughly 170 passengers per flight ≈ 880 flights, counting arrivals and departures"],f:"That’s a plane roughly every minute and a half, all day and all night."},
+{c:"Geography",t:"How many hours would it take to drive the whole Qatar coastline at 80 km/h?",u:"hours",m:7,lo:4,hi:14,s:["Qatar’s coastline is roughly 560 km","÷ 80 km/h ≈ 7 hours"],f:"In reality the road doesn’t follow the coast, so you’d need a boat for some of it."},
+{c:"Geography",t:"If everyone in the world stood in Qatar with one square metre each, how many people would fit?",u:"people",m:1.16e10,lo:5e9,hi:2e10,s:["Qatar covers about 11,600 km²","= 11.6 billion m²","÷ 1 m² per person ≈ 11.6 billion people"],f:"More than the entire planet, standing very, very close."},
+{c:"Resources",t:"How many Olympic swimming pools would Qatar’s daily water use fill?",u:"pools",m:540,lo:280,hi:1100,s:["About 3 million residents × roughly 450 litres per person per day ≈ 1.35 billion litres","÷ one Olympic pool at about 2.5 million litres","≈ 540 pools"],f:"A new pool’s worth of water roughly every three minutes."},
+{c:"Resources",t:"How many kilowatt-hours of electricity does Qatar use every day?",u:"kWh",m:1.2e8,lo:6e7,hi:3e8,s:["About 3 million residents","× roughly 40 kWh per person per day, among the highest in the world","≈ 120 million kWh a day"],f:"Air conditioning is the quiet giant behind most of it."},
+{c:"Resources",t:"How many plastic bags does Qatar go through in a day?",u:"bags",m:3e6,lo:1e6,hi:8e6,s:["About 3 million residents","× roughly 1 bag each a day, from groceries, takeaways and shops ≈ 3 million bags"],f:"Single-use bags are fading, but the bag inside a bag habit is hard to kill."},
+{c:"Resources",t:"How many tonnes of rubbish does Qatar produce every day?",u:"tonnes",m:5e3,lo:2.5e3,hi:1.2e4,s:["About 3 million residents","× roughly 1.7 kg of waste per person per day ≈ 5,000 tonnes"],f:"Roughly the weight of 800 elephants, every single day."},
+{c:"Sport",t:"How many kilometres do people run and walk along the Corniche on a cool Friday morning, combined?",u:"km",m:7500,lo:2e3,hi:3e4,s:["Roughly 1,500 runners and walkers on a cool morning","× about 5 km each ≈ 7,500 km"],f:"More than the distance from Doha to Beijing, before breakfast."},
+{c:"Sport",t:"How many gym memberships are active in Qatar?",u:"memberships",m:3.75e5,lo:1.5e5,hi:8e5,s:["About 3 million residents","× roughly 1 in 8 has a gym membership ≈ 375,000"],f:"Whether they use them is a different question entirely."},
+{c:"Doha life",t:"How many times a week does a driver in Doha get cut off at a roundabout?",u:"times",m:8,lo:3,hi:25,s:["About 20 roundabouts a week on a normal commute","× roughly 2 in 5 involve someone who either didn’t see you or did and didn’t care","≈ 8 times"],f:"Indicators are treated as an optional extra."},
+{c:"Doha life",t:"How many times does the average person say “habibi” or “habibti” in a day?",u:"times",m:12,lo:4,hi:40,s:["Roughly 36 chats, calls and messages a day","× about 1 in 3 includes a habibi, habibti or ya habibi ≈ 12 times"],f:"Both a greeting and an apology, and occasionally a warning."},
+{c:"Doha life",t:"A friend says they’re “two minutes away.” How many minutes does it actually take?",u:"minutes",m:20,lo:8,hi:60,s:["Promised: 2 minutes","× the Doha conversion factor of roughly 10, for traffic, parking and one more errand","≈ 20 minutes"],f:"The first ten of those are spent “almost there” while still getting ready."},
+{c:"Doha life",t:"How many people head out to the desert on a winter Thursday night?",u:"people",m:1.5e5,lo:5e4,hi:4e5,s:["About 3 million residents","× roughly 1 in 20 goes camping, drives the dunes or sits around a fire ≈ 150,000 people"],f:"With a full dallah, a speaker and a worrying amount of sand in the car."},
+{c:"Doha life",t:"How many stray cats live in Doha?",u:"cats",m:3e4,lo:1e4,hi:1e5,s:["About 2.5 million people live in and around Doha","÷ roughly 80 people per cat ≈ 31,000 cats"],f:"Every petrol station has a mayor, and the mayor is a cat."},
+{c:"Doha life",t:"How many people are on the Corniche on the first properly cool evening of the year?",u:"people",m:4.2e4,lo:1.5e4,hi:1.2e5,s:["The Corniche is about 7 km long","× roughly 6,000 people per km when the weather finally breaks ≈ 42,000 people"],f:"Winter in Doha lasts about six weeks, and everyone is out for every minute of it."},
+{c:"Doha life",t:"How many “where are you?” messages are sent in Qatar every day?",u:"messages",m:1e6,lo:3e5,hi:4e6,s:["About 3 million residents","× roughly 1 in 3 sends one on a typical day ≈ 1 million messages"],f:"The reply is always “almost there.”"},
+{c:"Doha life",t:"How many horn honks are there on Doha’s roads on a normal weekday?",u:"honks",m:2.4e6,lo:6e5,hi:8e6,s:["About 1.8 million cars","× roughly 1 in 3 honks at least once ≈ 600,000 cars","× about 4 honks each ≈ 2.4 million"],f:"Most of them land a tenth of a second after the light turns green."},
+{c:"Doha life",t:"How many Instagram stories of the West Bay skyline are posted every sunset?",u:"stories",m:5e4,lo:1.5e4,hi:2e5,s:["About 3 million residents","× roughly 1 in 60 posts one on a given evening ≈ 50,000 stories"],f:"The skyline has no bad angles, apparently."},
+{c:"Doha life",t:"How many delivery riders are on Doha’s roads at 9 pm on a Friday?",u:"riders",m:1e4,lo:4e3,hi:3e4,s:["Assume about 300,000 orders a day, with roughly 20% landing in the 3 hours around Friday dinner ≈ 60,000 orders","÷ 3 hours ≈ 20,000 orders an hour","÷ about 2 orders per rider per hour ≈ 10,000 riders"],f:"They know every shortcut and every service road in the city."},
+{c:"Doha life",t:"How many kilometres do people walk inside air-conditioned malls on a 45°C summer day?",u:"km",m:4.5e5,lo:1.5e5,hi:1.5e6,s:["About 3 million residents","× roughly 1 in 10 heads to a mall ≈ 300,000 people","× about 1.5 km of walking each ≈ 450,000 km"],f:"More than the distance to the Moon, just to avoid the heat."},
+{c:"Doha life",t:"How many times a day does a delivery driver call to ask “where exactly is your house?”",u:"calls",m:2e5,lo:8e4,hi:5e5,s:["Assume about 300,000 orders a day","× roughly 2 in 3 end with a “where exactly are you?” call ≈ 200,000 calls"],f:"The answer is always “next to the other building.”"}
+];
+var HINTS=[
+["Good to know","Plenty of people carry two phones, one for work and one personal, and many have a spare SIM too."],
+["Good to know","Most homes have somewhere around 10 to 20 light fittings, before you count streets, malls and towers."],
+["Good to know","Voice notes are rarely sent alone. A burst of three to five in a row is normal."],
+["Good to know","Samoon, Arabic bread, paratha and toast all count. A single meal often involves something you tear, dip or wrap."],
+["Good to know","In summer, one person can easily get through two litres or more of water a day."],
+["Good to know","Pineapple on pizza is a matter of national debate. It does not change the number of pizzas."],
+["Good to know","A generous plate of biryani uses about 100 g of dry rice, and not everyone eats rice every day."],
+["Good to know","A specialty coffee in Doha costs roughly QAR 18 to 22."],
+["Good to know","Cards and phone payments are everywhere, so lots of people carry very little cash."],
+["Good to know","A big SUV does maybe 6 to 8 km per litre. A small sedan does far better."],
+["Good to know","Most people get around by car, so only a small share ride the metro in any given week."],
+["Good to know","Dust and sand settle fast, so a clean car in Qatar rarely stays clean for long."],
+["Good to know","A typical plane carries 150 to 300 passengers, and Hamad handles about 54 million travellers a year."],
+["Good to know","It all comes down to distance divided by speed. The only unknown is how long the coastline really is."],
+["Good to know","A square kilometre is a million square metres, not a thousand."],
+["Good to know","One Olympic pool holds about 2.5 million litres."],
+["Good to know","Air conditioning runs for much of the year and is the biggest single use of electricity."],
+["Good to know","Bags often come inside other bags, which adds up quickly."],
+["Good to know","A full household bin bag weighs a few kilograms."],
+["Good to know","The Corniche is about 7 km long. A typical run is 5 km and a typical stroll is 3 km."],
+["Good to know","January is the busiest month for sign-ups. February is a different story."],
+["Good to know","The biggest car on the road usually assumes it has the right of way. It is not in the rulebook."],
+["Good to know","If you have to ask, you’re probably under-counting."],
+["Good to know","Whatever time they say, multiply by something between 5 and 15."],
+["Good to know","Desert trips are mostly a winter thing, and they usually involve a 4x4 and a folding chair."],
+["Good to know","Cats gather around petrol stations, restaurants and anywhere with a bin."],
+["Good to know","Once it drops below 28°C, the jackets come out."],
+["Good to know","The same person tends to send the message more than once. Count how many you sent yesterday."],
+["Good to know","Honks cluster at traffic lights, especially the second the light turns green."],
+["Good to know","Golden hour lasts about twenty minutes. The stories last twenty-four hours."],
+["Good to know","At busy times, a rider can usually complete about two orders an hour."],
+["Good to know","A full lap of a big mall, with a stop for coffee, is about 1 to 2 km."],
+["Good to know","The pin you dropped is often two streets away, which is why the phone rings."]
+];
+var ICON_CALC="<svg viewBox='0 0 24 24'><rect x='5' y='3' width='14' height='18' rx='3'/><path d='M8.5 7.5h7M8.5 12h.01M12 12h.01M15.5 12h.01M8.5 16h.01M12 16h.01M15.5 16h.01'/></svg>";
+var ICON_BULB="<svg viewBox='0 0 24 24'><path d='M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2V16h5v-.1c0-.8.4-1.5 1-2A6 6 0 0 0 12 3z'/></svg>";
+var ICON_CHART="<svg viewBox='0 0 24 24'><path d='M6 20v-6M12 20V6M18 20v-9'/></svg>";
+var ICON_X="<svg viewBox='0 0 24 24'><path d='M6 6l12 12M18 6L6 18'/></svg>";
+var ARR="<svg viewBox='0 0 24 24'><path d='M5 12h14M13 6l6 6-6 6'/></svg>";
+var app=document.getElementById("app"),raf=0,busy=false,day,today,cm,ids,st,stats,intro;
+var reduce=window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches;
+function dayNum(){var d=new Date();return Math.floor(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate())/864e5)}
+function rng(s){return function(){s|=0;s=s+0x6D2B79F5|0;var t=Math.imul(s^s>>>15,1|s);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+function pick(d){var r=rng(d*104729+4231),H=[],O=[];Q.forEach(function(q,i){(q.c==="Doha life"?H:O).push(i)});
+  function sh(a){for(var i=a.length-1;i>0;i--){var j=Math.floor(r()*(i+1)),x=a[i];a[i]=a[j];a[j]=x}return a}
+  sh(O);sh(H);return [O[0],O[1],H[0]]}
+function load(k,d){try{var v=JSON.parse(localStorage.getItem(k));return v&&typeof v==="object"?v:d}catch(e){return d}}
+function save(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+var START=Math.floor(Date.UTC(2026,9,1)/864e5);
+function blank(d){return {day:d,ids:pick(d),g:[],s:[],un:[],r:false,hu:[0,0,0],nt:["","",""]}}
+function loadState(d){
+  var x=load("tk8-s"+d,null);
+  if(!x||x.day!==d||!Array.isArray(x.g)||!Array.isArray(x.s)||x.g.length!==x.s.length||x.g.length>3)return blank(d);
+  if(!Array.isArray(x.hu)||x.hu.length!==3)x.hu=[0,0,0];
+  if(!Array.isArray(x.un))x.un=[];
+  if(!Array.isArray(x.nt)||x.nt.length!==3)x.nt=["","",""];
+  if(!Array.isArray(x.ids)||x.ids.length!==3||x.ids.some(function(i){return !Q[i]})||(x.g.length===0&&!x.hu.some(Boolean)))x.ids=pick(d);
+  return x}
+function saveState(){save("tk8-s"+day,st)}
+function selectDay(d){day=d;st=loadState(d);ids=st.ids}
+function init(){
+  today=dayNum();selectDay(today);
+  stats=load("tk7-stats",null);
+  if(!stats||typeof stats.streak!=="number")stats={streak:0,last:0,played:0,total:0};
+  if(stats.last<today-1&&stats.last!==today)stats.streak=0;
+  var d=new Date(today*864e5);cm={y:d.getUTCFullYear(),m:d.getUTCMonth()};
+  intro=true;
+  if(parseChallenge())intro=false;
+}
+var UNITS={
+"kg":[["kg",1],["lb",.45359237],["tonnes",1000]],
+"km":[["km",1],["miles",1.609344]],
+"litres":[["litres",1],["US gallons",3.785411784],["UK gallons",4.54609]],
+"tonnes":[["tonnes",1],["US tons",.90718474],["kg",.001]],
+"hours":[["hours",1],["minutes",1/60]],
+"QAR":[["QAR",1],["USD",3.64],["EUR",4.2],["GBP",4.8],["INR",.0435],["PKR",.0131],["PHP",.0627]]
+};
+function unitList(u){return UNITS[u]||[[u,1]]}
+function unitByLabel(u,l){var a=unitList(u),i;for(i=0;i<a.length;i++)if(a[i][0]===l)return a[i];return a[0]}
+function unitOf(q,i){return unitByLabel(q.u,st.un&&st.un[i])}
+function fmt(n){if(n>0&&n<1)return String(parseFloat(n.toPrecision(2)));if(n>=100)return Math.round(n).toLocaleString("en-US");if(n>=10)return String(Math.round(n*10)/10);return String(Math.round(n*100)/100)}
+function short(n){if(n>=1e9)return (Math.round(n/1e8)/10)+" billion";if(n>=1e6)return (Math.round(n/1e5)/10)+" million";return fmt(n)}
+function words(n){return n>=1e4?"About "+short(n):""}
+function L(x){return Math.log10(x)}
+function ratio(g,q){return g>=q.m?g/q.m:q.m/g}
+function score(g,q){var d=L(ratio(g,q));return Math.max(1,Math.round(100/(1+d*d/.36)))}
+function times(x){return x<10?(Math.round(x*10)/10):Math.round(x)}
+function verdict(g,q){var x=ratio(g,q);if(x<=1.05)return "Spot on";return times(x)+"× too "+(g>q.m?"high":"low")}
+function erf(x){var s=x<0?-1:1;x=Math.abs(x);var t=1/(1+.3275911*x);return s*(1-(((((1.061405429*t-1.453152027)*t)+1.421413741)*t-.284496736)*t+.254829592)*t*Math.exp(-x*x))}
+var DEMO=[38,52,61,58,66,71,79,74,88,83,92,85,79,71,64,52,41,33,24,29],DEMO_N=DEMO.reduce(function(a,b){return a+b},0);
+function demoDist(){return {bins:DEMO,n:DEMO_N,demo:true}}
+function binSum(b){return b.reduce(function(a,c){return a+c},0)}
+function pctile(s){var B=CD.bins,N=binSum(B)||1,i=Math.max(0,Math.min(19,Math.floor(s/5))),f=Math.min(1,(s-i*5)/5),c=0,k;for(k=0;k<i;k++)c+=B[k];c+=B[i]*f;return Math.max(1,Math.min(99,Math.round(100*c/N)))}
+function dens(s){var B=CD.bins,a=0,b=0,i,w;for(i=0;i<20;i++){w=Math.exp(-Math.pow((s-(i*5+2.5))/7,2)/2);a+=w*B[i];b+=w}return a/b}
+function ymax(){var m=Math.max.apply(null,CD.bins)||1,p=Math.pow(10,Math.floor(Math.log10(m))),r=m/p;return (r<=1?1:r<=2?2:r<=5?5:10)*p}
+function tierColor(s){return s>=85?"#7a1230":s>=70?"#a8456a":s>=35?"#cf9aaf":"#ead9df"}
+function seg(n){var h="<div class='seg'>";for(var i=0;i<3;i++)h+="<i class='"+(i<=n?"on":"")+"'></i>";return h+"</div>"}
+function step(i,t,d){return "<div class='step'><i>"+i+"</i><div><b>"+t+"</b><span>"+d+"</span></div></div>"}
+function mount(html){closeSheet();app.classList.remove("in","land");app.innerHTML=html;void app.offsetWidth;app.classList.add("in")}
+var ex="";
+function calcEval(s){
+  s=s.replace(/×/g,"*").replace(/÷/g,"/").replace(/−/g,"-").replace(/,/g,"");
+  var i=0;
+  function num(){var m=/^(\d+\.?\d*|\.\d+)/.exec(s.slice(i));if(!m)return NaN;i+=m[0].length;return parseFloat(m[0])}
+  function fac(){
+    if(s[i]==="-"){i++;return -fac()}
+    if(s[i]==="("){i++;var v=expr();if(s[i]!==")")return NaN;i++;return v}
+    return num()}
+  function term(){var v=fac();while(s[i]==="*"||s[i]==="/"){var o=s[i++],r=fac();v=o==="*"?v*r:v/r}return v}
+  function expr(){var v=term();while(s[i]==="+"||s[i]==="-"){var o=s[i++],r=term();v=o==="+"?v+r:v-r}return v}
+  if(!s)return NaN;
+  var v=expr();return i===s.length?v:NaN}
+function fmtR(v){return Math.abs(v)>=1000?Math.round(v).toLocaleString("en-US"):String(Math.round(v*1e4)/1e4)}
+function calcUpd(){
+  var s=ex.replace(/[+−×÷]+$/,""),o=(s.match(/\(/g)||[]).length-(s.match(/\)/g)||[]).length;
+  var v=s?calcEval(s+Array(Math.max(0,o)+1).join(")")):NaN;
+  document.getElementById("ex").textContent=ex||"\u00a0";
+  document.getElementById("rs").textContent=isFinite(v)?fmtR(v):"0";
+  document.getElementById("use").disabled=!(v>0&&v<1e15);
+  return v}
+function press(k){
+  if(k==="C")ex="";
+  else if(k==="⌫")ex=ex.slice(0,-1);
+  else if(k==="="){var v=calcUpd();if(isFinite(v))ex=String(Math.round(v*1e6)/1e6)}
+  else if(ex.length>=60){}
+  else if(/[+−×÷]/.test(k)&&/[+−×÷]$/.test(ex))ex=ex.slice(0,-1)+k;
+  else ex+=k;
+  calcUpd()}
+function closeSheet(){
+  var sh=document.getElementById("sheet"),sc=document.getElementById("scrim");
+  if(sh)sh.classList.remove("open");if(sc)sc.classList.remove("open");document.body.style.overflow=""}
+function openSheet(n,inp){
+  var sh=document.getElementById("sheet"),sc=document.getElementById("scrim");
+  var keys=["C","(",")","÷","7","8","9","×","4","5","6","−","1","2","3","+","0",".","⌫","="];
+  sh.innerHTML="<div class='grab'></div><div class='shh'><b>Calculator &amp; notes</b><button class='x' id='sx' aria-label='Close'>"+ICON_X+"</button></div>"+
+  "<div class='disp'><div class='ex' id='ex'></div><div class='rs' id='rs'>0</div></div><div class='keys'>"+
+  keys.map(function(k){var c=/[÷×−+]/.test(k)?" op":k==="="?" eq":(k==="C"||k==="⌫")?" fn":"";return "<button class='k"+c+"' data-k='"+k+"'>"+k+"</button>"}).join("")+"</div>"+
+  "<button class='main use' id='use' disabled>Use result as my answer</button><label class='nl' for='nt'>Notes</label>"+
+  "<textarea id='nt' placeholder='Jot down your logic, like homes × windows per home…'></textarea>";
+  var nt=document.getElementById("nt");nt.value=st.nt[n]||"";
+  nt.oninput=function(){st.nt[n]=nt.value.slice(0,500);saveState()};
+  sh.onclick=function(e){var b=e.target.closest&&e.target.closest("button[data-k]");if(b)press(b.getAttribute("data-k"))};
+  document.getElementById("sx").onclick=closeSheet;sc.onclick=closeSheet;
+  document.getElementById("use").onclick=function(){var v=calcUpd();if(v>0&&v<1e15){inp.value=String(v>=100?Math.round(v):Math.round(v*100)/100);inp.oninput();closeSheet();try{inp.focus({preventScroll:true})}catch(e){}}};
+  calcUpd();sh.classList.add("open");sc.classList.add("open");document.body.style.overflow="hidden";
+}
+document.addEventListener("keydown",function(e){
+  var sh=document.getElementById("sheet");if(!sh||!sh.classList.contains("open"))return;
+  if(e.key==="Escape"){closeSheet();return}
+  if(!document.getElementById("rs")||(e.target&&e.target.tagName==="TEXTAREA"))return;
+  var k=e.key,map={"*":"×","/":"÷","-":"−"};
+  if(/^[0-9.()+]$/.test(k)||map[k]){e.preventDefault();press(map[k]||k)}
+  else if(k==="Enter"||k==="="){e.preventDefault();press("=")}
+  else if(k==="Backspace"){press("⌫")}
+});
+function toolsHtml(n){
+  var h=HINTS[ids[n]],shown=st.hu[n]>0?"<div class='hintbox'><b>"+h[0]+"</b>"+h[1]+"</div>":"";
+  return "<div id='hb'>"+shown+"</div><div class='tools'><button class='ghost' id='bc'>"+ICON_CALC+"Calculator &amp; notes</button><button class='ghost' id='bh'>"+ICON_BULB+"<span></span></button></div>";
+}
+function wireTools(n,inp){
+  var bh=document.getElementById("bh"),hb=document.getElementById("hb");
+  function lab(){bh.disabled=st.hu[n]>0;bh.querySelector("span").textContent=st.hu[n]>0?"Good to know shown":"Good to know"}
+  bh.onclick=function(){
+    if(st.hu[n]>0)return;st.hu[n]=1;saveState();
+    var h=HINTS[ids[n]],d=document.createElement("div");d.className="hintbox";d.innerHTML="<b>"+h[0]+"</b>"+h[1];hb.appendChild(d);lab()};
+  document.getElementById("bc").onclick=function(){openSheet(n,inp)};
+  lab();
+}
+function landing(){
+  var cats=["Sport","Food & drink","Roads","Geography","Travel","Money","Resources","Everyday Qatar","Doha life"];
+  var faq=[
+    ["Is there a right answer?","No. Every question is an estimate. We show a logical estimate and a plausible range around it, and you score by landing close."],
+    ["Can I use a calculator?","Yes. Tap Calculator &amp; notes on any question to crunch numbers and jot down your logic."],
+    ["Does Good to know cost points?","No, it’s free. Each question has one Good to know note. Sometimes it’s a solid starting number, sometimes a rule of thumb, sometimes local colour that may or may not help."],
+    ["How is my score worked out?","We compare your guess to our estimate and work out how many times too high or low you were. Spot on scores 100, being 2× off scores about 80, and 10× off about 26. It never drops to zero."],
+    ["What are the ranks?","Your three scores are averaged into an accuracy percentage. It earns a rank, from Fresh Off the Plane up to Desert Oracle."],
+    ["Where do the numbers come from?","Every estimate is tagged. Derived means it’s built from published figures plus simple maths. Rough estimate means it rests on rounded assumptions. The full logic is shown after every question."],
+    ["Is the percentile real?","Yes. It’s worked out from real players’ answers once at least 30 people have answered that question. Until then we say so instead of making a number up."],
+    ["When do new questions arrive?","Every day at midnight, local time. Everyone gets the same three."],
+    ["Can I play past days?","Yes. Open the menu in the top corner, pick any earlier date on the calendar, and play it. Archive days don’t count toward your streak."],
+    ["Can I challenge a friend?","Yes. After you finish, tap Share result to send a challenge link. It opens straight into the same three questions, and your friend only sees your score after they’ve answered."],
+    ["Do I need an account?","No. Signing in is optional. Open the menu if you want your streak and stats to follow you between devices."]
+  ];
+  var lab=["10× low","3× low","Spot on","3× high","10× high"];
+  var cta=(st.g.length>=3&&!st.r?"See today’s results":st.g.length?"Continue today’s game":"Play today’s game");
+  mount(
+  "<div class='sec'><div class='eqrow'><span>3M</span><span>÷ 4</span><span>× 8</span><span>≈ 8M</span></div><span class='tag'>Daily estimation game</span><h1>Guess smart.<br><em>Win with logic.</em></h1><p class='lead'>Three questions about Qatar with no exact answer. Reason your way to a number, like a quick back-of-the-envelope calculation.</p>"+
+  "<button class='main' id='pl'>"+cta+ARR+"</button></div>"+
+  "<div class='sec'><div class='facts'><div><b>3</b><span>questions a day</span></div><div><b>2</b><span>minutes to play</span></div><div><b>0</b><span>right answers</span></div></div></div>"+
+  "<div class='sec'><h3>See it in action</h3><p class='sub'>“How many windows are there in Qatar?” Here’s how to think it through.</p>"+
+  "<div class='fr'><i>1</i>About 3 million residents</div><div class='fr'><i>2</i>÷ 4 people per home = 750,000 homes</div><div class='fr'><i>3</i>× 8 windows each = 6 million</div><div class='fr'><i>4</i>+ offices, malls, schools = 2 million</div><div class='fr'><i>5</i>Estimate: about 8 million windows</div></div>"+
+  "<div class='sec'><h3>How you score</h3><p class='sub'>We measure how many times too high or low you guessed. The closer to our estimate, the better.</p>"+
+  "<div class='sbw'><div class='est'>Our estimate</div><div class='sbar'><i style='width:14%;background:#f1e4e9'></i><i style='width:18%;background:#e3b9c8'></i><i style='width:36%;background:#a8456a'></i><i style='width:18%;background:#e3b9c8'></i><i style='width:14%;background:#f1e4e9'></i><div class='sdot'></div></div>"+
+  "<div class='slab'>"+lab.map(function(l){return "<span>"+l+"</span>"}).join("")+"</div></div></div>"+
+  "<div class='sec'><h3>Your toolkit</h3><p class='sub'>Everything you need to think it through.</p><div class='feat'>"+
+  "<div class='fc'><div class='fi'>"+ICON_CALC+"</div><div><b>Calculator &amp; notes</b><span>Crunch numbers and jot down your logic.</span></div></div>"+
+  "<div class='fc'><div class='fi'>"+ICON_BULB+"</div><div><b>One Good to know per question</b><span>A useful fact or a bit of Doha colour. Free.</span></div></div>"+
+  "<div class='fc'><div class='fi'>"+ICON_CHART+"</div><div><b>Instant breakdown</b><span>See the full logic and where you rank.</span></div></div><div class='fc'><div class='fi'>"+ICON_CAL+"</div><div><b>Play the archive</b><span>Missed a day? Catch up from the calendar menu.</span></div></div></div></div>"+
+  "<div class='sec'><h3>What you’ll be guessing</h3><p class='sub'>From WhatsApp voice notes to petrol. The third question is always a Doha life one.</p><div class='chips'>"+cats.map(function(c){return "<span>"+catIcon(c)+c+"</span>"}).join("")+"</div></div>"+
+  "<div class='sec'><h3>Questions, answered</h3>"+faq.map(function(f){return "<details><summary>"+f[0]+"</summary><p>"+f[1]+"</p></details>"}).join("")+"</div>"+
+  "<div class='cta'><h3>Ready? Today’s three are waiting.</h3><p>Trust your logic. Commit to a number.</p><button class='main light' id='pl2'>"+cta+ARR+"</button></div>");
+  app.classList.add("land");
+  var go=function(){intro=false;render();window.scrollTo(0,0)};
+  document.getElementById("pl").onclick=go;document.getElementById("pl2").onclick=go;
+}
+var MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],MONL=["January","February","March","April","May","June","July","August","September","October","November","December"];
+var ICON_CAL="<svg viewBox='0 0 24 24'><rect x='4' y='5' width='16' height='15' rx='3'/><path d='M8 3v4M16 3v4M4 10h16'/></svg>";
+var ICON_L="<svg viewBox='0 0 24 24'><path d='M15 6l-6 6 6 6'/></svg>",ICON_R="<svg viewBox='0 0 24 24'><path d='M9 6l6 6-6 6'/></svg>";
+var ICONS={
+"Sport":"<svg viewBox='0 0 24 24'><circle cx='12' cy='12' r='9'/><path d='M12 7.5l3.5 2.5-1.3 4.1H9.8L8.5 10zM12 7.5V3M15.5 10l4.3-1.4M14.2 14.1l2.6 3.6M9.8 14.1l-2.6 3.6M8.5 10L4.2 8.6'/></svg>",
+"Food & drink":"<svg viewBox='0 0 24 24'><path d='M5 9h12v5a5 5 0 0 1-5 5h-2a5 5 0 0 1-5-5V9zM17 10h1.5a2.5 2.5 0 0 1 0 5H17M9 3v2M13 3v2'/></svg>",
+"Roads":"<svg viewBox='0 0 24 24'><path d='M5 16l1.5-5.5A2 2 0 0 1 8.4 9h7.2a2 2 0 0 1 1.9 1.5L19 16M4 16h16v3H4zM7 19v1.5M17 19v1.5M8 13h8'/></svg>",
+"Geography":"<svg viewBox='0 0 24 24'><path d='M12 21s7-6.1 7-11a7 7 0 0 0-14 0c0 4.9 7 11 7 11z'/><circle cx='12' cy='10' r='2.5'/></svg>",
+"Travel":"<svg viewBox='0 0 24 24'><path d='M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z'/></svg>",
+"Money":"<svg viewBox='0 0 24 24'><circle cx='12' cy='12' r='9'/><path d='M14.8 9.2A3.2 3.2 0 0 0 12 8c-1.7 0-3 .9-3 2.2 0 3 6 1.6 6 4.6 0 1.3-1.3 2.2-3 2.2a3.3 3.3 0 0 1-3-1.4M12 6.5V8M12 16v1.5'/></svg>",
+"Resources":"<svg viewBox='0 0 24 24'><path d='M12 3s6 6.2 6 10.5a6 6 0 0 1-12 0C6 9.2 12 3 12 3z'/></svg>",
+"Doha life":"<svg viewBox='0 0 24 24'><circle cx='12' cy='12' r='9'/><path d='M8 14.5a5 5 0 0 0 8 0M9 9.5h.01M15 9.5h.01'/></svg>",
+"Everyday Qatar":"<svg viewBox='0 0 24 24'><path d='M4 20V10l8-6 8 6v10M4 20h16M10 20v-5h4v5'/></svg>"
+};
+function catIcon(c){return "<span class='ci'>"+(ICONS[c]||ICONS["Everyday Qatar"])+"</span>"}
+function dlabel(d){var x=new Date(d*864e5);return x.getUTCDate()+" "+MON[x.getUTCMonth()]}
+function qlab(n){return "Question "+(n+1)+" of 3"+(day!==today?" · "+dlabel(day):"")}
+function dayInfo(d){var x=load("tk8-s"+d,null);if(!x||x.day!==d||!Array.isArray(x.s))return{n:0,t:0};return{n:x.s.length,t:x.s.reduce(function(a,b){return a+b},0)}}
+function openMenu(){
+  var sh=document.getElementById("sheet"),sc=document.getElementById("scrim");
+  var first=Date.UTC(cm.y,cm.m,1)/864e5,off=new Date(first*864e5).getUTCDay(),dim=new Date(Date.UTC(cm.y,cm.m+1,0)).getUTCDate();
+  var sd=new Date(START*864e5),td=new Date(today*864e5),cur=cm.y*12+cm.m;
+  var canPrev=cur>sd.getUTCFullYear()*12+sd.getUTCMonth(),canNext=cur<td.getUTCFullYear()*12+td.getUTCMonth();
+  var cells="",i,k;for(i=0;i<off;i++)cells+="<i></i>";
+  for(k=1;k<=dim;k++){
+    var d=first+k-1,dis=d>today||d<START,inf=dis?{n:0,t:0}:dayInfo(d);
+    var cls="cd"+(d===today?" today":"")+(d===day?" sel":"")+(inf.n>=3?" done":inf.n>0?" part":"");
+    cells+="<button class='"+cls+"' data-d='"+d+"'"+(dis?" disabled":"")+"><span>"+k+"</span><small>"+(inf.n>=3?Math.round(inf.t/3)+"%":inf.n>0?inf.n+"/3":"")+"</small></button>"}
+  sh.innerHTML="<div class='grab'></div><div class='shh'><b>Menu</b><button class='x' id='sx' aria-label='Close'>"+ICON_X+"</button></div>"+menuRows()+"<h3 class='bh' style='margin-top:20px'>Play archive</h3>"+
+  "<div class='mrow'><button class='x' data-nav='-1' aria-label='Previous month'"+(canPrev?"":" disabled")+">"+ICON_L+"</button><b>"+MONL[cm.m]+" "+cm.y+"</b><button class='x' data-nav='1' aria-label='Next month'"+(canNext?"":" disabled")+">"+ICON_R+"</button></div>"+
+  "<div class='cal' style='margin-bottom:6px'>"+"SMTWTFS".split("").map(function(c){return "<span class='wd'>"+c+"</span>"}).join("")+"</div><div class='cal'>"+cells+"</div>"+
+  "<p class='note' style='margin-top:14px'>Tap any day up to today to play it. Archive days don’t count toward your streak.</p>";
+  sh.onclick=function(e){
+    var b=e.target.closest?e.target.closest("button"):null;if(!b||b.disabled)return;
+    if(b.hasAttribute("data-d")){selectDay(parseInt(b.getAttribute("data-d"),10));intro=false;closeSheet();render();window.scrollTo(0,0)}
+    else if(b.hasAttribute("data-nav")){var v=cm.y*12+cm.m+parseInt(b.getAttribute("data-nav"),10);cm={y:Math.floor(v/12),m:v%12};openMenu()}
+    else if(b.hasAttribute("data-home")){closeSheet();selectDay(today);intro=true;render();window.scrollTo(0,0)}
+    else if(b.hasAttribute("data-act")){var a=b.getAttribute("data-act");if(a==="signin")openSignIn(1,"");else if(a==="calib")openCalib();else if(a==="signout"){setAcct(null);openMenu()}}
+    else if(b.id==="sx")closeSheet()};
+  sc.onclick=closeSheet;sh.classList.add("open");sc.classList.add("open");document.body.style.overflow="hidden";
+}
+/* ===== config, api, helpers ===== */
+var API=((document.querySelector("meta[name=roughly-api]")||{}).content||"").replace(/\/+$/,"");
+var MINN=30,MINCAL=6,viewTok=0,pendingSend=null,CD=null;
+function esc(t){return String(t).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]})}
+function acct(){try{return {t:localStorage.getItem("rq-tok")||"",e:localStorage.getItem("rq-email")||""}}catch(x){return {t:"",e:""}}}
+function setAcct(t,e){try{if(t){localStorage.setItem("rq-tok",t);localStorage.setItem("rq-email",e)}else{localStorage.removeItem("rq-tok");localStorage.removeItem("rq-email")}}catch(x){}}
+function pid(){var p="";try{p=localStorage.getItem("rq-pid")||""}catch(e){}
+  if(!/^[a-f0-9]{24}$/.test(p)){var a=new Uint8Array(12),i;try{crypto.getRandomValues(a)}catch(e){for(i=0;i<12;i++)a[i]=Math.floor(Math.random()*256)}
+    p=Array.prototype.map.call(a,function(b){return ("0"+b.toString(16)).slice(-2)}).join("");try{localStorage.setItem("rq-pid",p)}catch(e){}}
+  return p}
+function api(path,o){
+  o=o||{};
+  if(!API||typeof fetch!=="function")return Promise.reject(new Error("Not available yet"));
+  var ctl=typeof AbortController!=="undefined"?new AbortController():null,t=setTimeout(function(){if(ctl)ctl.abort()},o.timeout||6000),h={"Content-Type":"application/json"},tk=acct().t;
+  if(tk)h.Authorization="Bearer "+tk;
+  return fetch(API+path,{method:o.method||"GET",headers:h,body:o.body?JSON.stringify(o.body):undefined,signal:ctl?ctl.signal:undefined}).then(function(r){
+    clearTimeout(t);return r.json().then(function(j){if(!r.ok)throw new Error((j&&j.error)||"Something went wrong");return j})},function(){clearTimeout(t);throw new Error("Couldn’t reach the server")})}
+function sendAnswer(i){
+  if(!API)return Promise.resolve();
+  var q=Q[ids[i]];
+  return api("/answer",{method:"POST",body:{pid:pid(),day:day,qi:ids[i],r:Math.round(L(st.g[i]/q.m)*1000)/1000,s:st.s[i]}}).catch(function(){})}
+function getStats(d){return api("/stats?day="+d)}
+
+/* ===== charts: demo data locally, real data once the backend is on ===== */
+function chartInner(kind){
+  var D=CD,ov="";
+  if(kind==="q"&&!D.demo&&D.n>0){
+    var po=Math.round(100*(D.over||0)/D.n),pu=Math.round(100*(D.under||0)/D.n);
+    ov="<p class='ovl'>"+(Math.max(po,pu)<50?"Players were split on this one.":po>=pu?po+"% of players guessed too high.":pu+"% of players guessed too low.")+"</p>"}
+  return "<div class='graph'>"+graph()+"</div><div class='pct'><span>Better than</span><b><span id='pn'>0</span>% of players</b></div>"+ov+
+    (D.demo?"<p class='note'>Demo data from "+D.n.toLocaleString("en-US")+" sample players. Real results replace it once the game is live.</p>"
+            :"<p class='note'>Based on "+D.n.toLocaleString("en-US")+" players who answered "+(kind==="q"?"this question":"today’s three")+".</p>")}
+function chartSlot(kind){
+  if(!API){CD=demoDist();return chartInner(kind)}
+  return "<div id='gbox' class='gbox'><p class='note'>Loading how other players did…</p></div>"}
+function chartLater(kind,qi,s,tok){
+  if(!API)return;
+  Promise.resolve(pendingSend).then(function(){return getStats(day)}).then(function(S){
+    if(tok!==viewTok)return;
+    var box=document.getElementById("gbox");if(!box)return;
+    var o=kind==="q"?(S.q&&S.q[qi]):S.avg,n=o?o.n:0;
+    if(!o||n<MINN){box.innerHTML="<p class='note'>Comparison with other players unlocks once "+MINN+" people have answered"+(n?" ("+n+" so far)":"")+". You’re early.</p>";return}
+    CD={bins:o.dist,n:n,demo:false,over:o.over||0,under:o.under||0};
+    var pc=pctile(s);box.innerHTML=chartInner(kind);
+    if(kind==="day"){var pl=document.getElementById("pill");if(pl){pl.textContent="Top "+(100-pc)+"%";pl.style.display=""}}
+    animate(s,pc,"graph")
+  }).catch(function(){
+    if(tok!==viewTok)return;var b=document.getElementById("gbox");
+    if(b)b.innerHTML="<p class='note'>Couldn’t load the comparison right now. Your score still counts.</p>"})}
+
+/* ===== source tags ===== */
+var KINDS={O:["Official","Taken straight from a published figure."],D:["Derived","Built from published figures plus simple maths."],R:["Rough estimate","Built on rounded assumptions, not published data."]};
+["How many flights take off","How many hours would it take to drive","If everyone in the world stood"].forEach(function(p){Q.forEach(function(q){if(q.t.indexOf(p)===0)q.k="D"})});
+function srcTag(q){var k=q.k||"R";return "<p class='srcl'><span class='src s"+k+"'>"+KINDS[k][0]+"</span>"+KINDS[k][1]+"</p>"}
+
+/* ===== personal calibration (computed on this device) ===== */
+function playLog(){
+  var out=[],i,k,m,x,j,q;
+  try{for(i=0;i<localStorage.length;i++){k=localStorage.key(i);m=/^tk8-s(\d+)$/.exec(k||"");if(!m)continue;x=load(k,null);
+    if(!x||!Array.isArray(x.g)||!Array.isArray(x.ids)||!Array.isArray(x.s))continue;
+    for(j=0;j<x.g.length&&j<3;j++){q=Q[x.ids[j]];if(!q||!(x.g[j]>0))continue;out.push({d:parseInt(m[1],10),c:q.c,r:L(x.g[j]/q.m),s:x.s[j]})}}}catch(e){}
+  out.sort(function(a,b){return a.d-b.d});return out}
+function mean(a){return a.reduce(function(x,y){return x+y},0)/(a.length||1)}
+function calib(){
+  var h=playLog(),n=h.length,o={n:n,bias:0,cats:[],trend:null},by={};
+  if(!n)return o;
+  o.bias=mean(h.map(function(e){return e.r}));
+  h.forEach(function(e){(by[e.c]=by[e.c]||[]).push(e.r)});
+  Object.keys(by).forEach(function(c){if(by[c].length>=3)o.cats.push({c:c,n:by[c].length,b:mean(by[c])})});
+  o.cats.sort(function(a,b){return Math.abs(b.b)-Math.abs(a.b)});
+  if(n>=14)o.trend={a:Math.round(mean(h.slice(-7).map(function(e){return e.s}))),b:Math.round(mean(h.slice(0,-7).map(function(e){return e.s})))};
+  return o}
+function biasText(b){var f=Math.pow(10,Math.abs(b));return f<1.25?"well balanced":times(f)+"× too "+(b>0?"high":"low")}
+function calibHtml(full){
+  var c=calib(),h="<h3 class='bh'>Your calibration</h3>";
+  if(c.n<MINCAL)return h+"<p class='note'>Answer "+(MINCAL-c.n)+" more question"+(MINCAL-c.n===1?"":"s")+" and we’ll show whether you tend to guess too high or too low.</p>";
+  var pos=50+Math.max(-1,Math.min(1,c.bias/.6))*44,f=Math.pow(10,Math.abs(c.bias)),bal=f<1.25,
+    msg=bal?"Your guesses are well balanced. Nice calibration.":"You tend to guess about "+times(f)+"× too "+(c.bias>0?"high":"low")+". Try nudging your first instinct "+(c.bias>0?"down":"up")+".";
+  var rows=c.cats.slice(0,full?9:2).map(function(x){return "<div class='cr'><span>"+esc(x.c)+"</span><b>"+biasText(x.b)+"</b></div>"}).join("");
+  return h+"<div class='bal'><i style='left:"+pos.toFixed(1)+"%'></i></div><div class='slab'><span>Too low</span><span>Balanced</span><span>Too high</span></div>"+
+    "<p class='ovl' style='margin-top:14px'>"+msg+"</p>"+rows+
+    (c.trend?"<p class='note' style='margin-top:10px'>Your last 7 answers average "+c.trend.a+"% against "+c.trend.b+"% before that.</p>":"")+
+    "<p class='note'>Based on "+c.n+" answers on this device.</p>"}
+
+/* ===== challenge links ===== */
+function cleanName(t){return String(t||"").replace(/[^\p{L}\p{N} _.'-]/gu,"").replace(/^\s+|\s+$/g,"").slice(0,20)}
+function chInfo(){var x=load("rq-ch-"+day,null);if(!x||!Array.isArray(x.s)||x.s.length!==3)return null;return {s:x.s,n:cleanName(x.n)||"A friend"}}
+function parseChallenge(){
+  var m=/[?&]c=(\d{4,6})\.(\d{1,3})-(\d{1,3})-(\d{1,3})(?:\.([^&#]*))?/.exec(location.search||"");if(!m)return false;
+  var d=parseInt(m[1],10),s=[m[2],m[3],m[4]].map(function(v){return parseInt(v,10)}),n="";
+  if(!(d>=START&&d<=today)||s.some(function(v){return v<1||v>100}))return false;
+  try{n=cleanName(decodeURIComponent(m[5]||""))}catch(e){}
+  save("rq-ch-"+d,{s:s,n:n});selectDay(d);
+  try{window.history.replaceState(null,"",location.pathname)}catch(e){}
+  return true}
+function chBanner(n){var c=n===0&&st.g.length===0?chInfo():null;
+  return c?"<div class='chb'><b>"+esc(c.n)+" challenged you</b><span>Same three questions. Guess first, then see how you stack up.</span></div>":""}
+function h2h(avg){
+  var c=chInfo();if(!c)return "";
+  var th=Math.round((c.s[0]+c.s[1]+c.s[2])/3),d=avg-th,nm=esc(c.n),
+    msg=Math.abs(d)<=1?"Dead heat with "+nm+".":d>0?"You beat "+nm+" by "+d+" points.":nm+" edges you by "+(-d)+" points. Rematch tomorrow?";
+  return "<h3 class='bh'>Head to head</h3><div class='h2h'><div><small>You</small><b>"+avg+"%</b></div><span>vs</span><div><small>"+nm+"</small><b>"+th+"%</b></div></div><p class='note' style='text-align:center;margin-top:10px'>"+msg+"</p>"}
+
+/* ===== sign in (optional) and sync ===== */
+var ICON_USER="<svg viewBox='0 0 24 24'><circle cx='12' cy='8' r='4'/><path d='M4 21c0-4 4-6 8-6s8 2 8 6'/></svg>",
+ICON_BAL="<svg viewBox='0 0 24 24'><path d='M12 4v16M6 20h12M5 8h14M7 8l-3 7a3 3 0 0 0 6 0L7 8zM17 8l-3 7a3 3 0 0 0 6 0l-3-7z'/></svg>",
+ICON_HOME="<svg viewBox='0 0 24 24'><path d='M4 20V10l8-6 8 6v10M4 20h16M10 20v-5h4v5'/></svg>";
+function menuRows(){
+  var a=acct();
+  return "<div class='mis'>"+
+  (a.t?"<div class='mi static'>"+ICON_USER+"<div><b>Signed in</b><span>"+esc(a.e)+"</span></div><button class='lnk' data-act='signout'>Sign out</button></div>"
+      :"<button class='mi' data-act='signin'>"+ICON_USER+"<div><b>Sign in</b><span>Optional. Keep your streak across devices.</span></div>"+ICON_R+"</button>")+
+  "<button class='mi' data-act='calib'>"+ICON_BAL+"<div><b>My calibration</b><span>Do you guess high or low?</span></div>"+ICON_R+"</button>"+
+  "<button class='mi' data-home='1'>"+ICON_HOME+"<div><b>Back to home</b><span>How to play and the FAQ</span></div>"+ICON_R+"</button></div>"}
+function sheetShell(title,body){
+  var sh=document.getElementById("sheet"),sc=document.getElementById("scrim");
+  sh.innerHTML="<div class='grab'></div><div class='shh'><b>"+title+"</b><button class='x' id='sx' aria-label='Close'>"+ICON_X+"</button></div>"+body;
+  sh.onclick=null;document.getElementById("sx").onclick=closeSheet;sc.onclick=closeSheet;
+  sh.classList.add("open");sc.classList.add("open");document.body.style.overflow="hidden";return sh}
+function openCalib(){sheetShell("My calibration",calibHtml(true)+"<button class='ghost' id='bk' style='width:100%;margin-top:16px'>Back to menu</button>");document.getElementById("bk").onclick=openMenu}
+function openSignIn(step,email,msg){
+  var body,g=function(i){return document.getElementById(i)};
+  if(!API)body="<p class='sub'>Sign-in isn’t switched on yet. It arrives when the game goes live, so your streak and stats can follow you between your phone and your laptop. You never need an account to play.</p>";
+  else if(step===3)body="<p class='sub'>You’re signed in as <b>"+esc(email)+"</b>. Your progress now follows you between devices.</p><button class='main' id='sd'>Done</button>";
+  else if(step===2)body="<p class='sub'>"+esc(msg||"We emailed a 6-digit code to "+email+".")+"</p><input id='sc' class='inp' inputmode='numeric' maxlength='6' autocomplete='one-time-code' placeholder='6-digit code'><p class='err' id='se'></p><button class='main' id='sv' style='margin-top:12px'>Verify and sign in</button>";
+  else body="<p class='sub'>Optional. Sign in to keep your streak, stats and calibration when you switch devices. No password, we just email you a one-time code.</p><input id='s1' class='inp' type='email' autocomplete='email' placeholder='you@example.com'><p class='err' id='se'></p><button class='main' id='ss' style='margin-top:12px'>Send my code</button>";
+  sheetShell("Sign in",body+(step===3?"":"<button class='ghost' id='bk' style='width:100%;margin-top:12px'>Back to menu</button>"));
+  if(g("bk"))g("bk").onclick=openMenu;
+  function fail(e){if(g("se"))g("se").textContent=e.message;var b=g("ss")||g("sv");if(b)b.disabled=false}
+  if(g("ss"))g("ss").onclick=function(){
+    var em=g("s1").value.trim().toLowerCase();
+    if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em)){g("se").textContent="That email doesn’t look right.";return}
+    g("ss").disabled=true;
+    api("/auth/start",{method:"POST",body:{email:em}}).then(function(r){openSignIn(2,em,r.devCode?"Dev mode: your code is "+r.devCode:"")},fail)};
+  if(g("sv"))g("sv").onclick=function(){
+    var code=g("sc").value.trim();if(!/^\d{6}$/.test(code)){g("se").textContent="Enter the 6-digit code.";return}
+    g("sv").disabled=true;
+    api("/auth/verify",{method:"POST",body:{email:email,code:code}}).then(function(r){
+      setAcct(r.token,email);
+      return pullSync().then(pushAll,function(){}).then(function(){openSignIn(3,email)})},fail)};
+  if(g("sd"))g("sd").onclick=function(){closeSheet();streak();selectDay(day);render()};
+  if(g("s1"))setTimeout(function(){try{g("s1").focus()}catch(e){}},300)}
+function dayPayload(x){return {ids:x.ids,g:x.g,s:x.s,un:x.un||[],hu:x.hu||[0,0,0],pd:x.pd||0}}
+function pushDay(d){
+  if(!API||!acct().t)return;var x=load("tk8-s"+d,null);if(!x||!x.g||!x.g.length)return;
+  var days={};days[d]=dayPayload(x);api("/sync",{method:"PUT",body:{days:days}}).catch(function(){})}
+function pushAll(){
+  if(!API||!acct().t)return Promise.resolve();
+  var days={},i,k,m,x;try{for(i=0;i<localStorage.length;i++){k=localStorage.key(i);m=/^tk8-s(\d+)$/.exec(k||"");if(!m)continue;x=load(k,null);if(x&&Array.isArray(x.g)&&x.g.length&&Array.isArray(x.ids)&&Array.isArray(x.s))days[m[1]]=dayPayload(x)}}catch(e){}
+  return Object.keys(days).length?api("/sync",{method:"PUT",body:{days:days}}).catch(function(){}):Promise.resolve()}
+function pullSync(){
+  return api("/sync").then(function(r){
+    var days=r.days||{},changed=false;
+    Object.keys(days).forEach(function(k){
+      var d=parseInt(k,10),p=days[k];
+      if(!(d>=START&&d<=today)||!p||!Array.isArray(p.g)||!Array.isArray(p.s)||p.g.length!==p.s.length||p.g.length>3||!Array.isArray(p.ids)||p.ids.length!==3||p.ids.some(function(i){return !Q[i]}))return;
+      var local=load("tk8-s"+d,null);if(local&&local.day===d&&Array.isArray(local.g)&&local.g.length>=p.g.length)return;
+      save("tk8-s"+d,{day:d,ids:p.ids,g:p.g,s:p.s,un:p.un||[],r:false,hu:p.hu||[0,0,0],nt:["","",""],pd:p.pd||0});changed=true});
+    if(changed)rebuildStats();return changed})}
+function rebuildStats(){
+  var played=0,total=0,set={},i,k,m,x,d;
+  try{for(i=0;i<localStorage.length;i++){k=localStorage.key(i);m=/^tk8-s(\d+)$/.exec(k||"");if(!m)continue;x=load(k,null);
+    if(!x||!Array.isArray(x.s)||x.s.length!==3)continue;played++;total+=x.s[0]+x.s[1]+x.s[2];d=parseInt(m[1],10);if(!x.pd||x.pd===d)set[d]=1}}catch(e){}
+  var last=0,run=0;d=set[today]?today:today-1;if(set[d]){last=d;while(set[d]){run++;d--}}
+  if(played>=stats.played){stats.played=played;stats.total=total}
+  if(run>stats.streak){stats.streak=run;stats.last=last}
+  save("tk7-stats",stats)}
+var SITE="roughly.gg/"+COUNTRY;
+function myName(){return cleanName((load("rq-name",{})||{}).n)}
+function chLink(){var n=myName();return "https://"+SITE+"?c="+day+"."+st.s.join("-")+(n?"."+encodeURIComponent(n):"")}
+function shareText(tot){var avg=Math.round(tot/3);return "Roughly "+COUNTRY+" · "+dlabel(day)+"\n"+rankOf(avg)[0]+" · "+avg+"% accuracy\n"+st.s.map(function(x){return x+"%"}).join(" · ")+"\nWhat would you have guessed?\n"+chLink()}
+function copyText(t,ta,cb){
+  function legacy(){var ok=false;try{ta.focus();ta.select();ta.setSelectionRange(0,t.length);ok=document.execCommand("copy")}catch(x){}cb(ok)}
+  try{if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(function(){cb(true)},legacy);return}}catch(x){}
+  legacy()
+}
+function openShare(tot){
+  var sh=document.getElementById("sheet"),sc=document.getElementById("scrim"),avg=Math.round(tot/3),e=encodeURIComponent,g=function(i){return document.getElementById(i)};
+  var mini=st.s.map(function(s){return "<i><u style='width:"+s+"%'></u></i>"}).join("");
+  sh.innerHTML="<div class='grab'></div><div class='shh'><b>Challenge a friend</b><button class='x' id='sx' aria-label='Close'>"+ICON_X+"</button></div>"+
+  "<div class='shp'><small>Roughly "+COUNTRY+" · "+dlabel(day)+"</small><b>"+rankOf(avg)[0]+"</b><span>"+avg+"% accuracy</span><div class='mb2'>"+mini+"</div><em>"+SITE+"</em></div>"+
+  "<label class='nl' for='shn' style='margin-top:0'>Your name on the challenge (optional)</label><input id='shn' class='inp' maxlength='20' autocomplete='off' placeholder='e.g. Sam'>"+
+  "<p class='note' style='margin:6px 2px 12px'>Friends play the same three questions. They see your score only after they’ve answered.</p>"+
+  "<div class='shg'><a class='shl' id='wa' target='_blank' rel='noopener noreferrer'>WhatsApp</a><a class='shl' id='tg' target='_blank' rel='noopener noreferrer'>Telegram</a><a class='shl' id='tw' target='_blank' rel='noopener noreferrer'>X</a></div>"+
+  "<button class='main' id='cp2' style='margin-top:0'>Copy challenge</button>"+
+  (navigator.share?"<button class='ghost' id='nat' style='width:100%;margin-top:10px'>More options</button>":"")+
+  "<textarea id='nt' class='sr' readonly rows='4'></textarea>";
+  var ta=g("nt"),cp=g("cp2"),nat=g("nat"),ni=g("shn"),t="";
+  function refresh(){t=shareText(tot);var body=t.split("\n").slice(0,-1).join("\n");ta.value=t;
+    g("wa").href="https://wa.me/?text="+e(t);g("tg").href="https://t.me/share/url?url="+e(chLink())+"&text="+e(body);g("tw").href="https://twitter.com/intent/tweet?text="+e(t)}
+  ni.value=myName();refresh();
+  ni.oninput=function(){save("rq-name",{n:cleanName(ni.value)});cp.textContent="Copy challenge";refresh()};
+  sh.onclick=null;g("sx").onclick=closeSheet;sc.onclick=closeSheet;
+  cp.onclick=function(){copyText(t,ta,function(ok){cp.textContent=ok?"Copied":"Select the text below and copy it";if(!ok){ta.classList.remove("sr");try{ta.focus();ta.select()}catch(x){}}})};
+  if(nat)nat.onclick=function(){try{navigator.share({text:t}).catch(function(){})}catch(x){}};
+  sh.classList.add("open");sc.classList.add("open");document.body.style.overflow="hidden";
+}
+function shareResult(tot){openShare(tot)}
+var TIPS=["Break big numbers into things you can picture: homes, people, cars, days.","Round to friendly numbers. 3 million people, 4 per home, 8 windows each. Good enough.","Sanity check: is your answer more than everyone in Qatar? Less than one per person?","Being off by 2× still scores well. Don’t agonise over the last digit.","Not sure where to start? Begin with the population, then ask how many do it in a day."];
+function side(){
+  var el=document.getElementById("side");if(!el)return;
+  var n=st.g.length,rows="",i,q,state;
+  for(i=0;i<3;i++){
+    q=Q[ids[i]];state=i<n?"done":i===n?"cur":"up";
+    rows+="<div class='sq "+state+"'>"+catIcon(q.c)+"<div><b>Question "+(i+1)+"</b><span class='s'>"+q.c+"</span></div>"+(i<n?"<span class='sc2'>"+st.s[i]+"%</span>":"")+"</div>"}
+  var avg=stats.played?Math.round(stats.total/stats.played/3)+"%":"–";
+  el.innerHTML="<div class='sdc'><h4>"+(day===today?"Today":"Archive")+" · "+dlabel(day)+"</h4>"+rows+"</div>"+
+  "<div class='sdc'><h4>Your stats</h4><div class='stats'><div><b>"+stats.streak+"</b><span>Streak</span></div><div><b>"+stats.played+"</b><span>Played</span></div><div><b>"+avg+"</b><span>Accuracy</span></div></div></div>"+
+  "<div class='sdc tipcard'><h4>Pro tip</h4><p>"+TIPS[(day+n)%TIPS.length]+"</p></div>"+
+  "<button class='ghost' id='sa' style='width:100%;background:#fff'>"+ICON_CAL+"Play the archive</button>";
+  document.getElementById("sa").onclick=function(){var d=new Date(day*864e5);cm={y:d.getUTCFullYear(),m:d.getUTCMonth()};openMenu()};
+}
+function render(){
+  cancelAnimationFrame(raf);viewTok++;
+  var n=st.g.length;
+  document.body.setAttribute("data-view",intro?"land":"play");side();
+  if(intro)return landing();
+  if(n>=3&&!st.r)return done();
+  if(st.r&&n>=1)return reveal(n-1);
+  ask(n);
+}
+function unitChip(q){
+  var a=unitList(q.u);if(a.length<2)return "<div class='chip'>"+q.u+"</div>";
+  var pu=unitByLabel(q.u,load("rq-units",{})[q.u])[0];
+  return "<select class='chip uc' id='un' aria-label='Choose your unit'>"+a.map(function(x){return "<option value='"+x[0]+"'"+(x[0]===pu?" selected":"")+">"+x[0]+"</option>"}).join("")+"</select>"}
+function emptyHint(q,c){return "Enter a number in "+c[0]+(c[1]!==1?" · converted to "+q.u+" for scoring (× "+fmt(c[1])+")":"")}
+function ask(n){
+  var q=Q[ids[n]];var tools=toolsHtml(n);ex="";
+  mount(seg(n)+"<div class='eyebrow'><span class='cat'>"+catIcon(q.c)+q.c+"</span><span>"+qlab(n)+"</span></div>"+chBanner(n)+"<h2>"+q.t+"</h2><p class='lead' style='margin-bottom:20px'>"+(q.c==="Doha life"?"No exact answer. Funny Doha logic encouraged.":"No exact answer. Use logic, then commit.")+"</p>"+
+  "<div class='field'><input id='in' inputmode='decimal' autocomplete='off' placeholder='Your estimate' aria-label='Your estimate'>"+unitChip(q)+"</div>"+
+  "<div class='hint' id='h'>"+emptyHint(q,unitByLabel(q.u,load("rq-units",{})[q.u]))+"</div>"+tools+"<button class='main' id='go' disabled>Lock in estimate"+ARR+"</button>");
+  var inp=document.getElementById("in"),go=document.getElementById("go"),h=document.getElementById("h"),un=document.getElementById("un");wireTools(n,inp);
+  function cur(){return un?unitByLabel(q.u,un.value):unitList(q.u)[0]}
+  function val(){return parseFloat(inp.value.replace(/,/g,""))}
+  function ok(x){return x>0&&x*cur()[1]<1e15}
+  inp.oninput=function(){
+    var v=inp.value.replace(/[^0-9.]/g,""),p=v.split(".");
+    p[0]=p[0].slice(0,15).replace(/\B(?=(\d{3})+(?!\d))/g,",");
+    inp.value=p.length>1?p[0]+"."+p.slice(1).join("").slice(0,4):p[0];
+    var x=val();go.disabled=!ok(x);h.textContent=ok(x)?(words(x)||"\u00a0"):emptyHint(q,cur())};
+  if(un)un.onchange=function(){var p=load("rq-units",{});p[q.u]=un.value;save("rq-units",p);inp.oninput();try{inp.focus({preventScroll:true})}catch(e){}};
+  function lock(){
+    var x=val();if(busy||!ok(x)||st.g.length!==n)return;busy=true;
+    var c=cur(),bx=x*c[1];st.un=st.un||[];st.un[n]=c[0];st.g.push(bx);st.s.push(score(bx,q));st.r=true;if(st.g.length===3)st.pd=today;
+    if(st.g.length===3){stats.played++;stats.total+=st.s.reduce(function(a,b){return a+b},0);if(day===today&&stats.last!==today){stats.streak=(stats.last===today-1)?stats.streak+1:1;stats.last=today}save("tk7-stats",stats);streak()}
+    saveState();pendingSend=sendAnswer(n);if(st.g.length===3)pushDay(day);busy=false;render()}
+  go.onclick=lock;inp.onkeydown=function(e){if(e.key==="Enter"&&!e.repeat)lock()};
+  setTimeout(function(){try{inp.focus({preventScroll:true})}catch(e){}},80);
+}
+function gx(s){return 30+s*2.56}
+function gy(s){return 92-70*dens(Math.max(0,Math.min(100,s)))/ymax()}
+function graph(){
+  var p="",i,bars="",grid="",bw=(gx(5)-gx(0))-3,YM=ymax(),B=CD.bins;
+  for(i=0;i<=100;i+=2)p+=(i?"L":"M")+gx(i).toFixed(1)+","+gy(i).toFixed(1);
+  for(i=0;i<20;i++){var hh=70*B[i]/YM;bars+="<rect x='"+(gx(i*5)+1.5).toFixed(1)+"' y='"+(92-hh).toFixed(1)+"' width='"+bw.toFixed(1)+"' height='"+hh.toFixed(1)+"' rx='2.5'><title>"+(i*5)+" to "+(i*5+5)+"%: "+B[i]+" players</title></rect>"}
+  [0,YM/2,YM].forEach(function(v){var y=92-70*v/YM;grid+="<line x1='30' x2='286' y1='"+y+"' y2='"+y+"' stroke='#f0e6ea' stroke-width='1'/><text x='24' y='"+(y+3)+"' text-anchor='end'>"+Math.round(v)+"</text>"});
+  return "<svg viewBox='0 0 300 124' role='img' aria-label='How many players scored in each band, with a smoothed curve'><defs><clipPath id='cp'><rect id='cr' x='0' y='0' width='0' height='124'/></clipPath></defs>"+
+  "<g font-size='8' fill='#a79aa0'>"+grid+"</g>"+
+  "<g fill='#f1dde4'>"+bars+"</g><g fill='#d9a0b4' clip-path='url(#cp)'>"+bars+"</g>"+
+  "<path d='"+p+"' fill='none' stroke='#7a1230' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/><line x1='30' y1='92' x2='286' y2='92' stroke='#e6dade'/>"+
+  "<line id='dl' x1='30' x2='30' y1='92' y2='92' stroke='#7a1230' stroke-dasharray='3 3'/><circle id='dt' cx='30' cy='92' r='7' fill='#7a1230' stroke='#fff' stroke-width='3'/>"+
+  "<text id='yt' x='30' y='20' text-anchor='middle' font-size='10' font-weight='800' fill='#7a1230'>You</text>"+
+  "<g font-size='9' fill='#82747a' text-anchor='middle'><text x='"+gx(0)+"' y='105'>0</text><text x='"+gx(25)+"' y='105'>25</text><text x='"+gx(50)+"' y='105'>50</text><text x='"+gx(75)+"' y='105'>75</text><text x='"+gx(100)+"' y='105'>100</text></g>"+
+  "<g font-size='8' fill='#a79aa0' text-anchor='middle'><text x='"+gx(50)+"' y='118'>Accuracy score (%)</text></g>"+
+  "<text x='8' y='57' font-size='8' fill='#a79aa0' text-anchor='middle' transform='rotate(-90 8 57)'>Players</text></svg>";
+}
+function rangeBar(q,g,f){
+  f=f||1;
+  var a=Math.min(q.lo,g)/1.8,b=Math.max(q.hi,g)*1.8,la=L(a),w=L(b)-la;
+  function p(v){return ((L(v)-la)/w*100).toFixed(1)}
+  return "<div class='rng'><div class='band' style='left:"+p(q.lo)+"%;width:"+(p(q.hi)-p(q.lo)).toFixed(1)+"%'></div><div class='tick' style='left:"+p(q.m)+"%'></div><div class='gd' style='left:"+p(g)+"%'></div></div>"+
+  "<div class='leg'><span>Plausible range <b>"+short(q.lo/f)+" to "+short(q.hi/f)+"</b></span><span>Dot is you</span></div>";
+}
+function reveal(i){
+  var q=Q[ids[i]],g=st.g[i],s=st.s[i],pc=API?0:(CD=demoDist(),pctile(s)),last=st.g.length>=3,inR=g>=q.lo&&g<=q.hi,U=unitOf(q,i),f=U[1],ul=U[0];
+  var steps=q.s.map(function(x,k){var t=k===q.s.length-1&&q.s.length>1&&/^(Total|≈)/.test(x);return "<div class='st"+(t?" t":"")+"'><i>"+(k+1)+"</i><span>"+x+"</span></div>"}).join("");
+  mount(seg(i)+"<div class='eyebrow'><span class='cat'>"+catIcon(q.c)+q.c+"</span><span>"+qlab(i)+"</span></div><h2 class='sm'>"+q.t+"</h2>"+
+  "<div class='cmp'><div><small>Your estimate</small><b>"+short(g/f)+"</b><em>"+ul+"</em></div><div><small>Our estimate</small><b>"+short(q.m/f)+"</b><em>"+ul+"</em></div></div>"+rangeBar(q,g,f)+
+  "<div class='scoreline'><div class='big'><span id='sn'>0</span><small>% accurate</small></div><div class='pill v'>"+verdict(g,q)+"</div></div>"+
+  chartSlot("q")+
+  (s<25?"<p class='enc'>Way off this time. Open the logic below to see how the maths works out.</p>":"")+"<p class='fact'>"+q.f+"</p>"+
+  "<button class='tog' id='tg' aria-expanded='false'><svg viewBox='0 0 24 24'><path d='M12 19V5M5 12l7-7 7 7'/></svg>How we got this number</button>"+
+  "<div class='bd' id='bd'><div class='in'><h3>The logic</h3>"+srcTag(q)+(f!==1?"<p class='note' style='margin:0 0 8px'>Our working is shown in "+q.u+". "+(q.u==="QAR"?"Exchange rates are approximate.":"1 "+ul+" = "+fmt(f)+" "+q.u+".")+"</p>":"")+steps+
+  "<h3>How you were scored</h3>"+
+  "<div class='r'><span>Your estimate</span><b>"+fmt(g/f)+" "+ul+"</b></div><div class='r'><span>Our estimate</span><b>"+fmt(q.m/f)+" "+ul+"</b></div><div class='r'><span>You were</span><b>"+verdict(g,q)+"</b></div><div class='r'><span>Plausible range</span><b>"+fmt(q.lo/f)+" to "+fmt(q.hi/f)+" "+ul+"</b></div><div class='r'><span>Good to know opened</span><b>"+(st.hu[i]?"Yes":"No")+"</b></div><div class='r'><span>Accuracy = 100 ÷ (1 + (log₁₀("+times(ratio(g,q))+") ÷ 0.6)²)</span><b>"+s+"%</b></div>"+
+  "<p class='note' style='margin-top:10px'>Spot on scores 100. Twice too high or low scores about 80, ten times off about 26, and a guess is never worth zero.</p></div></div>"+
+  "<button class='main' id='nx'>"+(last?"See results":"Next question")+ARR+"</button>");
+  var tg=document.getElementById("tg"),bd=document.getElementById("bd");
+  tg.onclick=function(){var o=tg.getAttribute("aria-expanded")==="true";tg.setAttribute("aria-expanded",String(!o));bd.style.maxHeight=o?"0":bd.scrollHeight+"px"};
+  document.getElementById("nx").onclick=function(){if(busy)return;busy=true;st.r=false;saveState();busy=false;render()};
+  animate(s,pc);chartLater("q",ids[i],s,viewTok);
+}
+var TIERS=[[0,"Fresh Off the Plane","Welcome to Qatar. It’s hot."],[15,"Karak Rookie","Warming up. Needs more sugar."],[35,"Corniche Regular","Solid. Bring karak next time."],[55,"Souq Veteran","You could haggle with a spreadsheet."],[72,"Majlis Elder","Everyone waits for your estimate."],[88,"Desert Oracle","You don’t guess. You just know."]];
+function rankIdx(a){var k=0;TIERS.forEach(function(t,i){if(a>=t[0])k=i});return k}
+function rankOf(a){return TIERS[rankIdx(a)].slice(1)}
+function animate(s,pc,mode){
+  var g=function(i){return document.getElementById(i)},sn=g("sn"),pn=g("pn"),dt=g("dt"),dl=g("dl"),yt=g("yt"),cr=g("cr"),
+    only=mode==="graph",fl=only?[]:document.querySelectorAll(".bfill"),vl=only?[]:document.querySelectorAll(".bval");
+  function frame(k){var v=s*k,i,w,x,y;
+    if(sn&&!only)sn.textContent=Math.round(v);
+    if(pn)pn.textContent=Math.round(pc*k);
+    if(dt&&CD){x=gx(v);y=gy(v);dt.setAttribute("cx",x);dt.setAttribute("cy",y);dl.setAttribute("x1",x);dl.setAttribute("x2",x);dl.setAttribute("y1",y);yt.setAttribute("x",x);yt.setAttribute("y",Math.max(12,y-14));cr.setAttribute("width",x)}
+    for(i=0;i<fl.length;i++){w=parseFloat(fl[i].getAttribute("data-w"));fl[i].style.width=(w*k).toFixed(1)+"%";vl[i].textContent=Math.round(w*k)+"%"}}
+  if(reduce){frame(1);return}
+  var t0=null;frame(0);
+  function tick(t){if(t0===null)t0=t;var p=Math.min(1,(t-t0)/1900),k=1-Math.pow(1-p,3);frame(k);if(p<1)raf=requestAnimationFrame(tick)}
+  raf=requestAnimationFrame(tick);
+}
+function done(){
+  var tot=st.s.reduce(function(a,b){return a+b},0),avg=Math.round(tot/3),pc=API?0:(CD=demoDist(),pctile(avg)),rk=rankOf(avg),lv=rankIdx(avg),lad="<div class='lad'>",rows="",i,q;
+  for(i=0;i<6;i++)lad+="<i class='"+(i<=lv?"on":"")+"'></i>";lad+="</div>";
+  for(i=0;i<3;i++){q=Q[ids[i]];rows+="<div class='brow'><div class='bt'>"+catIcon(q.c)+"<div><b>Question "+(i+1)+"</b><span class='vs'>"+verdict(st.g[i],q)+(chInfo()?" · "+esc(chInfo().n)+" "+chInfo().s[i]+"%":"")+"</span></div><span class='bval'>0%</span></div><div class='btrack'><i class='bfill' data-w='"+st.s[i]+"'></i></div><div class='bq'>"+q.t+"</div></div>"}
+  mount("<div class='res'>"+seg(2)+"<div class='eyebrow'><span>"+(day===today?"Today’s result":"Archive result")+"</span><span>"+dlabel(day)+"</span></div>"+
+  "<div class='rank'><small>Your rank</small><h2>"+rk[0]+"</h2><p>"+rk[1]+"</p>"+lad+"</div>"+
+  "<div class='scoreline' style='margin-top:0'><div class='big'><span id='sn'>0</span><small>% accuracy</small></div><div class='pill' id='pill'"+(API?" style='display:none'":"")+">Top "+(100-pc)+"%</div></div>"+
+  chartSlot("day")+
+  h2h(avg)+"<h3 class='bh'>Your three guesses</h3>"+rows+calibHtml(false)+
+  "<div class='stats'><div><b>"+stats.streak+"</b><span>Streak</span></div><div><b>"+stats.played+"</b><span>Played</span></div><div><b>"+(stats.played?Math.round(stats.total/stats.played/3)+"%":"–")+"</b><span>Avg accuracy</span></div></div>"+
+  "<button class='main' id='sh'>Share result</button></div>");
+  document.getElementById("sh").onclick=function(){openShare(tot)};
+  animate(avg,pc);chartLater("day",0,avg,viewTok);
+}
+function streak(){document.getElementById("streak").textContent=stats.streak?stats.streak+" day streak":""}
+document.getElementById("how").onclick=function(e){e.preventDefault();selectDay(today);intro=true;render();window.scrollTo(0,0)};
+document.getElementById("menu").onclick=function(){var d=new Date(day*864e5);cm={y:d.getUTCFullYear(),m:d.getUTCMonth()};openMenu()};
+document.getElementById("narch").onclick=function(e){e.preventDefault();document.getElementById("menu").onclick()};
+document.getElementById("nhow").onclick=function(e){e.preventDefault();document.getElementById("how").onclick(e)};
+document.querySelector(".brand").onclick=function(){selectDay(today);intro=true;render();window.scrollTo(0,0)};
+document.addEventListener("visibilitychange",function(){if(!document.hidden&&dayNum()!==day){init();streak();render()}});
+init();streak();render();
+if(API&&acct().t)pullSync().then(function(c){if(c){streak();selectDay(day);if(!busy)render()}},function(){});
+</script>
+</body>
+</html>

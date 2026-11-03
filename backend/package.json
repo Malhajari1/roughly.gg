@@ -1,0 +1,9 @@
+{
+  "name": "roughly-backend",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Stats and optional sign-in for Roughly",
+  "main": "server.js",
+  "scripts": { "start": "node server.js" },
+  "engines": { "node": ">=18" }
+}
