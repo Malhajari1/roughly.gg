@@ -37,7 +37,7 @@ h2.sm{font-size:1.1rem;font-weight:700;margin-bottom:16px;letter-spacing:-.2px}
 .field{display:flex;align-items:center;background:var(--tint);border:2px solid transparent;border-radius:18px;padding:0 8px 0 18px;transition:border-color .15s,box-shadow .15s,background .15s}
 .field:focus-within{background:#fff;border-color:var(--mar);box-shadow:0 0 0 5px rgba(122,18,48,.09)}
 .field input{flex:1;min-width:0;border:0;outline:0;background:transparent;font-size:1.65rem;font-weight:800;height:66px;letter-spacing:-.5px}
-.field input::placeholder{color:#d4c8cd;font-weight:600}
+.field input::placeholder{color:#d4c8cd;font-weight:600;font-size:1.05rem}
 .chip{flex:none;max-width:42%;font-size:.8rem;font-weight:700;color:var(--mar);background:#fff;border-radius:12px;padding:8px 12px;text-align:center;line-height:1.2;box-shadow:0 1px 3px rgba(122,18,48,.12)}
 .hint{min-height:1.5em;margin:10px 4px 0;color:var(--mut);font-size:.85rem}
 button.main{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;margin-top:18px;background:linear-gradient(135deg,var(--mar2),#650f27);color:#fff;border:0;border-radius:18px;height:58px;font-weight:700;font-size:1rem;cursor:pointer;box-shadow:0 12px 24px -8px rgba(122,18,48,.55);transition:transform .15s,box-shadow .15s,opacity .15s}
@@ -99,8 +99,11 @@ button.main svg{width:18px;height:18px;stroke:#fff;fill:none;stroke-width:2.4;st
 .ghost:hover:not(:disabled){background:var(--tint);border-color:#e3b9c8}
 .ghost:disabled{opacity:.45;cursor:not-allowed}
 .ghost svg,.fi svg,.x svg{width:18px;height:18px;stroke:var(--mar);fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
-.hintbox{background:var(--tint);border-left:4px solid var(--mar);border-radius:12px;padding:12px 14px;margin-top:12px;font-size:.9rem;animation:up .35s both}
-.hintbox b{display:block;font-size:.68rem;letter-spacing:1px;text-transform:uppercase;color:var(--mar);margin-bottom:2px}
+.hintbox{display:flex;gap:12px;align-items:flex-start;background:linear-gradient(135deg,#fbeef3,#f6e1ea);border:1px solid #efc9d8;border-radius:16px;padding:13px 15px;margin-top:12px;font-size:.92rem;line-height:1.45;animation:up .35s both;box-shadow:0 8px 22px -14px rgba(122,18,48,.4)}
+.hintbox .hi{flex:none;width:34px;height:34px;border-radius:11px;background:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(122,18,48,.14)}
+.hintbox .hi svg{width:19px;height:19px;stroke:var(--mar);fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.hintbox .ht{flex:1;min-width:0}
+.hintbox b{display:block;font-size:.66rem;letter-spacing:1.1px;text-transform:uppercase;color:var(--mar);margin-bottom:2px}
 #scrim{position:fixed;inset:0;background:rgba(28,18,23,.45);opacity:0;pointer-events:none;transition:opacity .25s;z-index:50}
 #scrim.open{opacity:1;pointer-events:auto}
 #sheet{position:fixed;left:0;right:0;bottom:0;margin:0 auto;max-width:480px;max-height:90vh;overflow:auto;background:#fff;border-radius:28px 28px 0 0;padding:10px 20px calc(env(safe-area-inset-bottom,0px) + 20px);transform:translateY(105%);transition:transform .35s cubic-bezier(.2,.8,.2,1);z-index:51;box-shadow:0 -20px 50px rgba(28,18,23,.25)}
@@ -230,10 +233,8 @@ button.main.light svg{stroke:var(--mar)}
  #menu{display:none}
  #streak{font-size:.85rem;padding:8px 14px}
  main{max-width:1120px;padding:28px 40px 56px}
- .layout{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:28px;align-items:start}
- #side{display:block;position:sticky;top:20px}
- body[data-view=land] .layout{grid-template-columns:minmax(0,1fr)}
- body[data-view=land] #side{display:none}
+ .layout{display:block}
+ body:not([data-view=land]) .layout{max-width:600px;margin:0 auto}
  .card{padding:40px 44px;border-radius:32px}
  .seg{margin-bottom:28px}
  h1{font-size:3.1rem;letter-spacing:-1.2px}
@@ -338,13 +339,71 @@ select.chip.uc:focus-visible{outline:2px solid var(--mar);outline-offset:2px}
 .src.sR{background:var(--tint);color:var(--mar);border:1px solid #e3b9c8}
 .gbox{min-height:60px}
 .ovl{font-weight:700;color:var(--mar);margin:8px 0 0;font-size:.9rem}
+/* progress stepper (#5) */
+.prog{display:flex;align-items:center;margin-bottom:22px}
+.pstep{flex:none;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.85rem;background:var(--line);color:var(--mut);transition:transform .3s,background .3s}
+.pstep svg{width:15px;height:15px;stroke:#fff;fill:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.pstep.pnow{background:linear-gradient(135deg,var(--mar2),#650f27);color:#fff;box-shadow:0 6px 16px -4px rgba(122,18,48,.5);transform:scale(1.12)}
+.pstep.pdone{background:#0a7a3a;color:#fff}
+.pbar{flex:1;height:4px;background:var(--line);margin:0 7px;border-radius:2px;transition:background .3s}
+.pbar.on{background:#0a7a3a}
+/* coloured play/reveal board (#9) */
+.card:not(.land){position:relative;overflow:hidden;background:linear-gradient(180deg,#fffdfe 0%,#fbf1f5 100%)}
+.card:not(.land)::before{content:"";position:absolute;left:0;right:0;top:0;height:5px;background:linear-gradient(90deg,var(--mar),var(--mar2))}
+/* reveal: player's answer hero + semantic verdict (#10) */
+.cmp .me{background:linear-gradient(135deg,var(--mar2),#650f27);color:#fff;box-shadow:0 12px 26px -10px rgba(122,18,48,.55)}
+.cmp .me small{color:rgba(255,255,255,.72)}
+.cmp .me b{font-size:1.7rem;letter-spacing:-.6px}
+.pill.v{font-weight:800;font-size:1rem}
+.pill.v.good{background:#0a7a3a;color:#fff}
+.pill.v.mid{background:#d98324;color:#fff}
+.pill.v.bad{background:#c0362c;color:#fff}
+/* results hero + weekly board (#12,#13) */
+.hero{background:linear-gradient(145deg,#9b1b3f 0%,#5a0c22 72%);color:#fff;border-radius:24px;padding:22px 20px;text-align:center;box-shadow:0 18px 40px -16px rgba(122,18,48,.7);margin-bottom:14px}
+.hero>small{font-size:.68rem;letter-spacing:1.2px;text-transform:uppercase;font-weight:700;opacity:.72}
+.hs{font-weight:800;line-height:1;margin:8px 0 4px;letter-spacing:-2px}
+.hs span{font-size:4rem}
+.hs i{font-size:1.2rem;font-style:normal;font-weight:700;opacity:.82;margin-left:4px;letter-spacing:0}
+.hrank{font-size:1.3rem;font-weight:800;letter-spacing:-.3px}
+.hdesc{margin:3px 0 0;opacity:.82;font-size:.86rem}
+.hpill{display:inline-block;margin-top:12px;background:rgba(255,255,255,.16);border-radius:20px;padding:6px 14px;font-size:.8rem;font-weight:700}
+.hero .lad{margin-top:14px}
+.qres{margin:2px 0 14px}
+.qr{display:flex;align-items:center;gap:10px;padding:10px 2px;border-bottom:1px solid var(--line)}
+.qr:last-child{border-bottom:0}
+.qr .qt{flex:1;min-width:0}
+.qr .qt b{font-size:.85rem;font-weight:700;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.qr .qt span{font-size:.72rem;color:var(--mut)}
+.qr .qs{display:block;font-weight:800;color:var(--mar);font-size:1.05rem;text-align:right;line-height:1}
+.qr .qv{display:block;font-size:.66rem;color:var(--mut);font-weight:600;text-align:right;margin-top:2px}
+.wk{background:#fff;border-radius:24px;padding:18px;box-shadow:0 1px 0 rgba(122,18,48,.04),0 16px 40px -26px rgba(122,18,48,.3);margin-bottom:14px}
+.wkh{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px}
+.wkh b{font-size:.95rem;font-weight:800}
+.wkh span{font-size:.8rem;color:var(--mar);font-weight:700}
+.days{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;align-items:end;height:66px}
+.dayc{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;gap:5px}
+.dayc .bar{width:100%;max-width:22px;border-radius:5px 5px 2px 2px;background:linear-gradient(180deg,var(--mar2),var(--mar));min-height:4px}
+.dayc .bar.empty{background:var(--line)}
+.dayc .bar.today{background:linear-gradient(180deg,#22c55e,#0a7a3a)}
+.dayc small{font-size:.6rem;color:var(--mut);font-weight:700}
+.wkft{text-align:center;margin-top:12px;font-size:.82rem;color:var(--mut);font-weight:600}
+.wkft b{color:var(--mar);font-variant-numeric:tabular-nums}
+/* subtle top-right sign in (#14) */
+.signin-top{border:1px solid var(--line);background:#fff;color:var(--mar);font-weight:700;font-size:.8rem;cursor:pointer;font-family:inherit;padding:7px 14px;border-radius:20px;white-space:nowrap;transition:background .15s,border-color .15s}
+.signin-top:hover{background:var(--tint);border-color:#e3b9c8}
+@media (min-width:960px){.signin-top{font-size:.85rem;padding:8px 16px}}
+/* home-page diagrams + custom wave logo */
+.dgm{display:block;width:100%;max-width:330px;height:auto;margin:10px auto 2px}
+.mark{padding-bottom:0}
+.mark svg{width:24px;height:24px;stroke:#fff;fill:none;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+@media (min-width:960px){.mark svg{width:28px;height:28px}}
 </style>
 <meta name="roughly-api" content="">
 </head>
 <body>
-<header><div class="hd"><div class="brand"><div class="mark">≈</div><span>Roughly <em class="cn">Qatar</em></span></div><div class="hr"><nav class="dnav"><a href="#" id="nhow">How to play</a><a href="#" id="narch">Archive</a></nav><div id="streak"></div><button id="menu" class="mb" aria-label="Open menu"><svg viewBox='0 0 24 24'><path d='M4 7h16M4 12h16M4 17h16'/></svg></button></div></div></header>
+<header><div class="hd"><div class="brand"><div class="mark"><svg viewBox='0 0 24 24'><path d='M3 12c3-5 6-5 9 0s6 5 9 0'/></svg></div><span>Roughly <em class="cn">Qatar</em></span></div><div class="hr"><nav class="dnav"><a href="#" id="nhow">How to play</a><a href="#" id="narch">Archive</a></nav><div id="streak"></div><button id="acct" class="signin-top" aria-label="Sign in">Sign in</button><button id="menu" class="mb" aria-label="Open menu"><svg viewBox='0 0 24 24'><path d='M4 7h16M4 12h16M4 17h16'/></svg></button></div></div></header>
 <main>
-  <div class="layout"><div id="app" class="card"></div><aside id="side" aria-label="Today"></aside></div>
+  <div class="layout"><div id="app" class="card"></div></div>
   <p class="small"><a href="#" id="how">How to play</a> &middot; A new set of three every day</p>
 </main>
 <div id="scrim"></div><div id="sheet" role="dialog" aria-modal="true" aria-label="Calculator and notes"></div>
@@ -385,7 +444,32 @@ var Q=[
 {c:"Doha life",t:"How many Instagram stories of the West Bay skyline are posted every sunset?",u:"stories",m:5e4,lo:1.5e4,hi:2e5,s:["About 3 million residents","× roughly 1 in 60 posts one on a given evening ≈ 50,000 stories"],f:"The skyline has no bad angles, apparently."},
 {c:"Doha life",t:"How many delivery riders are on Doha’s roads at 9 pm on a Friday?",u:"riders",m:1e4,lo:4e3,hi:3e4,s:["Assume about 300,000 orders a day, with roughly 20% landing in the 3 hours around Friday dinner ≈ 60,000 orders","÷ 3 hours ≈ 20,000 orders an hour","÷ about 2 orders per rider per hour ≈ 10,000 riders"],f:"They know every shortcut and every service road in the city."},
 {c:"Doha life",t:"How many kilometres do people walk inside air-conditioned malls on a 45°C summer day?",u:"km",m:4.5e5,lo:1.5e5,hi:1.5e6,s:["About 3 million residents","× roughly 1 in 10 heads to a mall ≈ 300,000 people","× about 1.5 km of walking each ≈ 450,000 km"],f:"More than the distance to the Moon, just to avoid the heat."},
-{c:"Doha life",t:"How many times a day does a delivery driver call to ask “where exactly is your house?”",u:"calls",m:2e5,lo:8e4,hi:5e5,s:["Assume about 300,000 orders a day","× roughly 2 in 3 end with a “where exactly are you?” call ≈ 200,000 calls"],f:"The answer is always “next to the other building.”"}
+{c:"Doha life",t:"How many times a day does a delivery driver call to ask “where exactly is your house?”",u:"calls",m:2e5,lo:8e4,hi:5e5,s:["Assume about 300,000 orders a day","× roughly 2 in 3 end with a “where exactly are you?” call ≈ 200,000 calls"],f:"The answer is always “next to the other building.”"},
+{c:"Food & drink",t:"How many cups of karak are sold across Qatar every day?",u:"cups",m:2e6,lo:8e5,hi:5e6,s:["About 3 million residents","× roughly 2 in 3 grab at least one karak on a normal day ≈ 2 million cups"],f:"The number jumps the moment the weather dips below 25°C."},
+{c:"Food & drink",t:"How many shawarmas does Qatar wrap on a typical weekend day?",u:"shawarmas",m:4e5,lo:1.5e5,hi:1e6,s:["About 3 million residents","× roughly 1 in 8 has a shawarma on a weekend day ≈ 375,000","rounded to about 400,000 wraps"],f:"The garlic sauce to meat ratio remains a national debate."},
+{c:"Food & drink",t:"How many dates does Qatar eat on a single day of Ramadan?",u:"dates",m:9e6,lo:3e6,hi:2e7,s:["About 3 million residents","× roughly 3 dates each to break the fast ≈ 9 million dates"],f:"Odd numbers are traditional, which is why three is the classic opener."},
+{c:"Everyday Qatar",t:"How many air-conditioning units are running in Qatar on a summer afternoon?",u:"AC units",m:3e6,lo:1.5e6,hi:7e6,s:["About 750,000 homes × roughly 3 units each ≈ 2.2 million","+ offices, shops, mosques and malls ≈ 0.8 million","Total ≈ 3 million units"],f:"In July, turning them all off at once is not a plan anyone will entertain."},
+{c:"Everyday Qatar",t:"How many SIM cards are active in Qatar?",u:"SIM cards",m:5e6,lo:3e6,hi:8e6,s:["About 3 million residents","× roughly 1.7 SIMs each, counting work lines, data SIMs and spares ≈ 5 million"],f:"The spare SIM in the drawer counts too, technically."},
+{c:"Everyday Qatar",t:"How many screens are switched on across Qatar during a big Qatar football match?",u:"screens",m:8e5,lo:3e5,hi:2e6,s:["About 750,000 homes × roughly 1 screen each tuned in ≈ 750,000","+ cafes and majlis screens ≈ 800,000"],f:"Half of them are muted while the group chat does the commentary."},
+{c:"Money",t:"How many riyals does Qatar spend on fuel at the pump every day?",u:"QAR",m:1.2e7,lo:5e6,hi:3e7,s:["About 8 million litres of fuel a day","× roughly QAR 1.5 per litre ≈ QAR 12 million"],f:"Cheap fuel is one quiet reason the engines stay big."},
+{c:"Money",t:"How many riyals of gold are bought in Qatar in a day?",u:"QAR",m:6e6,lo:2e6,hi:2e7,s:["Roughly 2,000 gold purchases a day across the souqs and malls","× about QAR 3,000 each ≈ QAR 6 million"],f:"The Gold Souq windows are basically a national savings account."},
+{c:"Roads",t:"How many Toyota Land Cruisers are on Qatar's roads?",u:"Land Cruisers",m:2.5e5,lo:1e5,hi:6e5,s:["About 1.8 million cars","× roughly 1 in 7 is a Land Cruiser ≈ 250,000"],f:"Less a car, more the unofficial national vehicle."},
+{c:"Roads",t:"How many traffic lights are there in Doha?",u:"traffic lights",m:900,lo:400,hi:2000,s:["Doha has roughly 300 signalled junctions","× about 3 light heads per junction ≈ 900"],f:"Several of them turn green the exact second you reach for your phone."},
+{c:"Roads",t:"How many parking spaces does a big Doha mall have?",u:"spaces",m:6000,lo:2500,hi:12000,s:["A large mall stacks several parking levels","roughly 6 levels × about 1,000 spaces each ≈ 6,000"],f:"On a Friday evening it still feels like there are none left."},
+{c:"Travel",t:"How many suitcases pass through Hamad International Airport every day?",u:"suitcases",m:1.5e5,lo:6e4,hi:4e5,s:["About 149,000 passengers a day","× roughly 1 checked bag each ≈ 150,000 suitcases"],f:"A few of them are, at any moment, on the wrong carousel."},
+{c:"Travel",t:"How many taxis and ride-hail cars are working in Doha right now?",u:"cars",m:3e4,lo:1e4,hi:8e4,s:["About 3 million residents","× roughly 1 taxi or ride-hail car active per 100 people ≈ 30,000"],f:"Surge pricing has a sixth sense for the minute it starts to rain."},
+{c:"Geography",t:"How many kilometres of track would you cover riding all three Doha Metro lines end to end?",u:"km",m:76,lo:40,hi:130,s:["The Red, Green and Gold lines total roughly 76 km of track"],f:"That is further than the drive from Doha to the Saudi border."},
+{c:"Geography",t:"How many football pitches would fit inside Hamad International Airport?",u:"pitches",m:4000,lo:1500,hi:9000,s:["The airport covers roughly 29 square kilometres","= 29 million m²","÷ about 7,000 m² per pitch ≈ 4,000 pitches"],f:"One of the few airports you can pick out clearly from space."},
+{c:"Resources",t:"How many litres of water does a single Doha household use in a day?",u:"litres",m:1800,lo:700,hi:4000,s:["About 4 people per household","× roughly 450 litres each a day ≈ 1,800 litres"],f:"Among the highest anywhere, and the garden hose is a big part of it."},
+{c:"Sport",t:"How many steps does the average Doha office worker take in a day?",u:"steps",m:5000,lo:2000,hi:12000,s:["Car to lift to desk to lift to car","roughly 5,000 steps once you add the coffee runs and an evening mall lap"],f:"The 10,000 target is mostly hit inside air-conditioned malls."},
+{c:"Sport",t:"How many padel courts are there in Qatar?",u:"courts",m:500,lo:200,hi:1200,s:["Padel has boomed, with dozens of venues","roughly 80 venues × about 6 courts each ≈ 500 courts"],f:"The fastest-growing way to pull a muscle in the country."},
+{c:"Everyday Qatar",t:"How many small cups of Arabic coffee are poured at majlis gatherings on a Friday?",u:"cups",m:1.5e6,lo:5e5,hi:4e6,s:["Roughly 300,000 gatherings and visits on a Friday","× about 5 small cups poured each ≈ 1.5 million"],f:"The cup is small on purpose, so the refills never stop."},
+{c:"Food & drink",t:"How many kilograms of chicken does Qatar cook every day?",u:"kg",m:6e5,lo:2.5e5,hi:1.5e6,s:["About 3 million residents","× roughly 200 g of chicken each a day, across biryani, grills and shawarma ≈ 600,000 kg"],f:"Chicken quietly outworks every other meat in the country."},
+{c:"Doha life",t:"How many times a week does someone in Doha say 'inshallah' when they really mean 'probably not'?",u:"times",m:9,lo:3,hi:30,s:["Roughly 40 plans and commitments a week","× about 1 in 5 that quietly will not happen ≈ 8 to 9 times"],f:"A lovely word that also works as the gentlest possible no."},
+{c:"Doha life",t:"How many selfies are taken at The Pearl on a pleasant weekend?",u:"selfies",m:8e4,lo:3e4,hi:2e5,s:["Roughly 40,000 visitors across the weekend","× about 2 photos each with the marina behind them ≈ 80,000"],f:"The yachts are props and they know it."},
+{c:"Doha life",t:"How many times a week does a Doha driver get flashed from behind to move over?",u:"times",m:12,lo:4,hi:40,s:["Roughly 10 highway drives a week","× a little more than one impatient flash each ≈ 12 times"],f:"The fast lane is treated as a private runway."},
+{c:"Doha life",t:"How many photos do tourists take of the camels at Souq Waqif in a day?",u:"photos",m:1.5e4,lo:5e3,hi:4e4,s:["Roughly 5,000 visitors near the stables a day","× about 3 photos each of the camels and horses ≈ 15,000"],f:"The camels have perfected the unbothered pose."},
+{c:"Doha life",t:"How many laps does a driver do around a packed mall car park before finding a space?",u:"laps",m:3,lo:1,hi:8,s:["On a busy Friday the obvious rows are already full","so it takes roughly 3 laps, plus someone trailing you to your old spot"],f:"The perfect space opens up the instant you give up and park far away."}
 ];
 var HINTS=[
 ["Good to know","Plenty of people carry two phones, one for work and one personal, and many have a spare SIM too."],
@@ -420,13 +504,39 @@ var HINTS=[
 ["Good to know","Golden hour lasts about twenty minutes. The stories last twenty-four hours."],
 ["Good to know","At busy times, a rider can usually complete about two orders an hour."],
 ["Good to know","A full lap of a big mall, with a stop for coffee, is about 1 to 2 km."],
-["Good to know","The pin you dropped is often two streets away, which is why the phone rings."]
+["Good to know","The pin you dropped is often two streets away, which is why the phone rings."],
+["Good to know","A karak costs a riyal or two, and most people have more than one favourite spot."],
+["Good to know","Shawarma is the default late-night order, so weekends run busier than weekdays."],
+["Good to know","Many people break their fast with an odd number of dates, often three."],
+["Good to know","A typical flat runs two or three AC units, and almost nothing is left uncooled in summer."],
+["Good to know","Plenty of people keep a second line for work or a cheaper data plan."],
+["Good to know","Think one main screen per home watching, plus cafes and gatherings."],
+["Good to know","Petrol is priced in small change per litre, so it is the volume that adds up."],
+["Good to know","Gold is bought for weddings, gifts and saving, so a few thousand buyers a day adds up fast."],
+["Good to know","The Land Cruiser is everywhere, from family car to desert workhorse."],
+["Good to know","Count signalled junctions, then multiply by the directions each one controls."],
+["Good to know","Big malls stack several parking floors, each holding around a thousand cars."],
+["Good to know","Hamad handles about 149,000 passengers a day, most with a bag to check."],
+["Good to know","Picture the fleet against the whole population, not just the cars you can see."],
+["Good to know","The Doha Metro runs three lines; add their lengths together."],
+["Good to know","A football pitch is about 7,000 square metres, and the airport is enormous."],
+["Good to know","Per-person water use here is very high, and a household is a few people's worth."],
+["Good to know","When most trips are by car, daily steps lean low unless a mall walk is involved."],
+["Good to know","Padel venues usually run several courts each, and new ones keep opening."],
+["Good to know","Gahwa is served in tiny cups and refilled often, so the count climbs fast."],
+["Good to know","Chicken turns up in biryani, grills and shawarma, so the daily total is large."],
+["Good to know","Count the plans you half-agreed to this week, then be honest about how many happened."],
+["Good to know","Think visitors times a couple of marina photos each."],
+["Good to know","It happens most in the fast lane, often more than once per trip."],
+["Good to know","The Souq Waqif stables draw a few thousand camera-happy visitors a day."],
+["Good to know","On a busy evening it is rarely the first lap; count a few before the lucky spot."]
 ];
 var ICON_CALC="<svg viewBox='0 0 24 24'><rect x='5' y='3' width='14' height='18' rx='3'/><path d='M8.5 7.5h7M8.5 12h.01M12 12h.01M15.5 12h.01M8.5 16h.01M12 16h.01M15.5 16h.01'/></svg>";
 var ICON_BULB="<svg viewBox='0 0 24 24'><path d='M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2V16h5v-.1c0-.8.4-1.5 1-2A6 6 0 0 0 12 3z'/></svg>";
 var ICON_CHART="<svg viewBox='0 0 24 24'><path d='M6 20v-6M12 20V6M18 20v-9'/></svg>";
 var ICON_X="<svg viewBox='0 0 24 24'><path d='M6 6l12 12M18 6L6 18'/></svg>";
 var ARR="<svg viewBox='0 0 24 24'><path d='M5 12h14M13 6l6 6-6 6'/></svg>";
+var CHECK="<svg viewBox='0 0 24 24'><path d='M5 12l5 5 9-10'/></svg>";
 var app=document.getElementById("app"),raf=0,busy=false,day,today,cm,ids,st,stats,intro;
 var reduce=window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches;
 function dayNum(){var d=new Date();return Math.floor(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate())/864e5)}
@@ -467,6 +577,8 @@ var UNITS={
 };
 function unitList(u){return UNITS[u]||[[u,1]]}
 function unitByLabel(u,l){var a=unitList(u),i;for(i=0;i<a.length;i++)if(a[i][0]===l)return a[i];return a[0]}
+var USYM={kg:1,km:1,kWh:1,QAR:1,lb:1,USD:1,EUR:1,GBP:1,INR:1,PKR:1,PHP:1};
+function uCap(u){u=String(u);return USYM[u]?u:u.charAt(0).toUpperCase()+u.slice(1)}
 function unitOf(q,i){return unitByLabel(q.u,st.un&&st.un[i])}
 function fmt(n){if(n>0&&n<1)return String(parseFloat(n.toPrecision(2)));if(n>=100)return Math.round(n).toLocaleString("en-US");if(n>=10)return String(Math.round(n*10)/10);return String(Math.round(n*100)/100)}
 function short(n){if(n>=1e9)return (Math.round(n/1e8)/10)+" billion";if(n>=1e6)return (Math.round(n/1e5)/10)+" million";return fmt(n)}
@@ -476,6 +588,7 @@ function ratio(g,q){return g>=q.m?g/q.m:q.m/g}
 function score(g,q){var d=L(ratio(g,q));return Math.max(1,Math.round(100/(1+d*d/.36)))}
 function times(x){return x<10?(Math.round(x*10)/10):Math.round(x)}
 function verdict(g,q){var x=ratio(g,q);if(x<=1.05)return "Spot on";return times(x)+"× too "+(g>q.m?"high":"low")}
+function vClass(g,q,s){return (g>=q.lo&&g<=q.hi)||s>=80?"good":s>=40?"mid":"bad"}
 function erf(x){var s=x<0?-1:1;x=Math.abs(x);var t=1/(1+.3275911*x);return s*(1-(((((1.061405429*t-1.453152027)*t)+1.421413741)*t-.284496736)*t+.254829592)*t*Math.exp(-x*x))}
 var DEMO=[38,52,61,58,66,71,79,74,88,83,92,85,79,71,64,52,41,33,24,29],DEMO_N=DEMO.reduce(function(a,b){return a+b},0);
 function demoDist(){return {bins:DEMO,n:DEMO_N,demo:true}}
@@ -485,6 +598,7 @@ function dens(s){var B=CD.bins,a=0,b=0,i,w;for(i=0;i<20;i++){w=Math.exp(-Math.po
 function ymax(){var m=Math.max.apply(null,CD.bins)||1,p=Math.pow(10,Math.floor(Math.log10(m))),r=m/p;return (r<=1?1:r<=2?2:r<=5?5:10)*p}
 function tierColor(s){return s>=85?"#7a1230":s>=70?"#a8456a":s>=35?"#cf9aaf":"#ead9df"}
 function seg(n){var h="<div class='seg'>";for(var i=0;i<3;i++)h+="<i class='"+(i<=n?"on":"")+"'></i>";return h+"</div>"}
+function prog(n){var h="<div class='prog'>",i;for(i=0;i<3;i++){var cls=i<n?"pdone":i===n?"pnow":"";h+="<div class='pstep "+cls+"'>"+(i<n?CHECK:(i+1))+"</div>";if(i<2)h+="<div class='pbar "+(i<n?"on":"")+"'></div>"}return h+"</div>"}
 function step(i,t,d){return "<div class='step'><i>"+i+"</i><div><b>"+t+"</b><span>"+d+"</span></div></div>"}
 function mount(html){closeSheet();app.classList.remove("in","land");app.innerHTML=html;void app.offsetWidth;app.classList.add("in")}
 var ex="";
@@ -522,7 +636,7 @@ function closeSheet(){
 function openSheet(n,inp){
   var sh=document.getElementById("sheet"),sc=document.getElementById("scrim");
   var keys=["C","(",")","÷","7","8","9","×","4","5","6","−","1","2","3","+","0",".","⌫","="];
-  sh.innerHTML="<div class='grab'></div><div class='shh'><b>Calculator &amp; notes</b><button class='x' id='sx' aria-label='Close'>"+ICON_X+"</button></div>"+
+  sh.innerHTML="<div class='grab'></div><div class='shh'><b>Calculator &amp; Notes</b><button class='x' id='sx' aria-label='Close'>"+ICON_X+"</button></div>"+
   "<div class='disp'><div class='ex' id='ex'></div><div class='rs' id='rs'>0</div></div><div class='keys'>"+
   keys.map(function(k){var c=/[÷×−+]/.test(k)?" op":k==="="?" eq":(k==="C"||k==="⌫")?" fn":"";return "<button class='k"+c+"' data-k='"+k+"'>"+k+"</button>"}).join("")+"</div>"+
   "<button class='main use' id='use' disabled>Use result as my answer</button><label class='nl' for='nt'>Notes</label>"+
@@ -543,16 +657,17 @@ document.addEventListener("keydown",function(e){
   else if(k==="Enter"||k==="="){e.preventDefault();press("=")}
   else if(k==="Backspace"){press("⌫")}
 });
+function hintCard(h){return "<div class='hi'>"+ICON_BULB+"</div><div class='ht'><b>"+h[0]+"</b>"+h[1]+"</div>"}
 function toolsHtml(n){
-  var h=HINTS[ids[n]],shown=st.hu[n]>0?"<div class='hintbox'><b>"+h[0]+"</b>"+h[1]+"</div>":"";
-  return "<div id='hb'>"+shown+"</div><div class='tools'><button class='ghost' id='bc'>"+ICON_CALC+"Calculator &amp; notes</button><button class='ghost' id='bh'>"+ICON_BULB+"<span></span></button></div>";
+  var h=HINTS[ids[n]],shown=st.hu[n]>0?"<div class='hintbox'>"+hintCard(h)+"</div>":"";
+  return "<div id='hb'>"+shown+"</div><div class='tools'><button class='ghost' id='bc'>"+ICON_CALC+"Calculator &amp; Notes</button><button class='ghost' id='bh'>"+ICON_BULB+"<span></span></button></div>";
 }
 function wireTools(n,inp){
   var bh=document.getElementById("bh"),hb=document.getElementById("hb");
   function lab(){bh.disabled=st.hu[n]>0;bh.querySelector("span").textContent=st.hu[n]>0?"Good to know shown":"Good to know"}
   bh.onclick=function(){
     if(st.hu[n]>0)return;st.hu[n]=1;saveState();
-    var h=HINTS[ids[n]],d=document.createElement("div");d.className="hintbox";d.innerHTML="<b>"+h[0]+"</b>"+h[1];hb.appendChild(d);lab()};
+    var h=HINTS[ids[n]],d=document.createElement("div");d.className="hintbox";d.innerHTML=hintCard(h);hb.appendChild(d);lab()};
   document.getElementById("bc").onclick=function(){openSheet(n,inp)};
   lab();
 }
@@ -560,7 +675,7 @@ function landing(){
   var cats=["Sport","Food & drink","Roads","Geography","Travel","Money","Resources","Everyday Qatar","Doha life"];
   var faq=[
     ["Is there a right answer?","No. Every question is an estimate. We show a logical estimate and a plausible range around it, and you score by landing close."],
-    ["Can I use a calculator?","Yes. Tap Calculator &amp; notes on any question to crunch numbers and jot down your logic."],
+    ["Can I use a calculator?","Yes. Tap Calculator &amp; Notes on any question to crunch numbers and jot down your logic."],
     ["Does Good to know cost points?","No, it’s free. Each question has one Good to know note. Sometimes it’s a solid starting number, sometimes a rule of thumb, sometimes local colour that may or may not help."],
     ["How is my score worked out?","We compare your guess to our estimate and work out how many times too high or low you were. Spot on scores 100, being 2× off scores about 80, and 10× off about 26. It never drops to zero."],
     ["What are the ranks?","Your three scores are averaged into an accuracy percentage. It earns a rank, from Fresh Off the Plane up to Desert Oracle."],
@@ -580,10 +695,11 @@ function landing(){
   "<div class='sec'><h3>See it in action</h3><p class='sub'>“How many windows are there in Qatar?” Here’s how to think it through.</p>"+
   "<div class='fr'><i>1</i>About 3 million residents</div><div class='fr'><i>2</i>÷ 4 people per home = 750,000 homes</div><div class='fr'><i>3</i>× 8 windows each = 6 million</div><div class='fr'><i>4</i>+ offices, malls, schools = 2 million</div><div class='fr'><i>5</i>Estimate: about 8 million windows</div></div>"+
   "<div class='sec'><h3>How you score</h3><p class='sub'>We measure how many times too high or low you guessed. The closer to our estimate, the better.</p>"+
+  "<svg class='dgm' viewBox='0 0 300 150' role='img' aria-label='Scoring curve: the closer your guess to the estimate, the higher the score, and it never hits zero'><line x1='20' y1='120' x2='280' y2='120' stroke='#e6dade'/><path d='M20 118 C 95 118, 120 32, 150 32 S 205 118, 280 118' fill='none' stroke='#7a1230' stroke-width='2.6' stroke-linecap='round'/><line x1='150' y1='32' x2='150' y2='120' stroke='#0a7a3a' stroke-width='2' stroke-dasharray='3 3'/><circle cx='150' cy='32' r='6' fill='#0a7a3a' stroke='#fff' stroke-width='2.5'/><text x='150' y='20' text-anchor='middle' font-size='10' font-weight='800' fill='#0a7a3a'>Spot on · 100</text><text x='95' y='106' text-anchor='middle' font-size='8.5' font-weight='700' fill='#a8456a'>2× off ≈ 80</text><text x='205' y='106' text-anchor='middle' font-size='8.5' font-weight='700' fill='#a8456a'>10× off ≈ 26</text><g font-size='9' fill='#a79aa0' text-anchor='middle'><text x='40' y='136'>Too low</text><text x='150' y='136'>Closer is better</text><text x='262' y='136'>Too high</text></g></svg>"+
   "<div class='sbw'><div class='est'>Our estimate</div><div class='sbar'><i style='width:14%;background:#f1e4e9'></i><i style='width:18%;background:#e3b9c8'></i><i style='width:36%;background:#a8456a'></i><i style='width:18%;background:#e3b9c8'></i><i style='width:14%;background:#f1e4e9'></i><div class='sdot'></div></div>"+
   "<div class='slab'>"+lab.map(function(l){return "<span>"+l+"</span>"}).join("")+"</div></div></div>"+
   "<div class='sec'><h3>Your toolkit</h3><p class='sub'>Everything you need to think it through.</p><div class='feat'>"+
-  "<div class='fc'><div class='fi'>"+ICON_CALC+"</div><div><b>Calculator &amp; notes</b><span>Crunch numbers and jot down your logic.</span></div></div>"+
+  "<div class='fc'><div class='fi'>"+ICON_CALC+"</div><div><b>Calculator &amp; Notes</b><span>Crunch numbers and jot down your logic.</span></div></div>"+
   "<div class='fc'><div class='fi'>"+ICON_BULB+"</div><div><b>One Good to know per question</b><span>A useful fact or a bit of Doha colour. Free.</span></div></div>"+
   "<div class='fc'><div class='fi'>"+ICON_CHART+"</div><div><b>Instant breakdown</b><span>See the full logic and where you rank.</span></div></div><div class='fc'><div class='fi'>"+ICON_CAL+"</div><div><b>Play the archive</b><span>Missed a day? Catch up from the calendar menu.</span></div></div></div></div>"+
   "<div class='sec'><h3>What you’ll be guessing</h3><p class='sub'>From WhatsApp voice notes to petrol. The third question is always a Doha life one.</p><div class='chips'>"+cats.map(function(c){return "<span>"+catIcon(c)+c+"</span>"}).join("")+"</div></div>"+
@@ -624,13 +740,14 @@ function openMenu(){
   sh.innerHTML="<div class='grab'></div><div class='shh'><b>Menu</b><button class='x' id='sx' aria-label='Close'>"+ICON_X+"</button></div>"+menuRows()+"<h3 class='bh' style='margin-top:20px'>Play archive</h3>"+
   "<div class='mrow'><button class='x' data-nav='-1' aria-label='Previous month'"+(canPrev?"":" disabled")+">"+ICON_L+"</button><b>"+MONL[cm.m]+" "+cm.y+"</b><button class='x' data-nav='1' aria-label='Next month'"+(canNext?"":" disabled")+">"+ICON_R+"</button></div>"+
   "<div class='cal' style='margin-bottom:6px'>"+"SMTWTFS".split("").map(function(c){return "<span class='wd'>"+c+"</span>"}).join("")+"</div><div class='cal'>"+cells+"</div>"+
-  "<p class='note' style='margin-top:14px'>Tap any day up to today to play it. Archive days don’t count toward your streak.</p>";
+  "<p class='note' style='margin-top:14px'>Tap any day up to today to play it. Archive days don’t count toward your streak.</p>"+
+  "<div class='mis' style='margin-top:14px'><button class='mi' data-home='1'>"+ICON_HOME+"<div><b>Back to home</b><span>How to play and the FAQ</span></div>"+ICON_R+"</button></div>";
   sh.onclick=function(e){
     var b=e.target.closest?e.target.closest("button"):null;if(!b||b.disabled)return;
     if(b.hasAttribute("data-d")){selectDay(parseInt(b.getAttribute("data-d"),10));intro=false;closeSheet();render();window.scrollTo(0,0)}
     else if(b.hasAttribute("data-nav")){var v=cm.y*12+cm.m+parseInt(b.getAttribute("data-nav"),10);cm={y:Math.floor(v/12),m:v%12};openMenu()}
     else if(b.hasAttribute("data-home")){closeSheet();selectDay(today);intro=true;render();window.scrollTo(0,0)}
-    else if(b.hasAttribute("data-act")){var a=b.getAttribute("data-act");if(a==="signin")openSignIn(1,"");else if(a==="calib")openCalib();else if(a==="signout"){setAcct(null);openMenu()}}
+    else if(b.hasAttribute("data-act")){var a=b.getAttribute("data-act");if(a==="signin")openSignIn(1,"");else if(a==="signout"){setAcct(null);openMenu()}}
     else if(b.id==="sx")closeSheet()};
   sc.onclick=closeSheet;sh.classList.add("open");sc.classList.add("open");document.body.style.overflow="hidden";
 }
@@ -689,34 +806,6 @@ var KINDS={O:["Official","Taken straight from a published figure."],D:["Derived"
 ["How many flights take off","How many hours would it take to drive","If everyone in the world stood"].forEach(function(p){Q.forEach(function(q){if(q.t.indexOf(p)===0)q.k="D"})});
 function srcTag(q){var k=q.k||"R";return "<p class='srcl'><span class='src s"+k+"'>"+KINDS[k][0]+"</span>"+KINDS[k][1]+"</p>"}
 
-/* ===== personal calibration (computed on this device) ===== */
-function playLog(){
-  var out=[],i,k,m,x,j,q;
-  try{for(i=0;i<localStorage.length;i++){k=localStorage.key(i);m=/^tk8-s(\d+)$/.exec(k||"");if(!m)continue;x=load(k,null);
-    if(!x||!Array.isArray(x.g)||!Array.isArray(x.ids)||!Array.isArray(x.s))continue;
-    for(j=0;j<x.g.length&&j<3;j++){q=Q[x.ids[j]];if(!q||!(x.g[j]>0))continue;out.push({d:parseInt(m[1],10),c:q.c,r:L(x.g[j]/q.m),s:x.s[j]})}}}catch(e){}
-  out.sort(function(a,b){return a.d-b.d});return out}
-function mean(a){return a.reduce(function(x,y){return x+y},0)/(a.length||1)}
-function calib(){
-  var h=playLog(),n=h.length,o={n:n,bias:0,cats:[],trend:null},by={};
-  if(!n)return o;
-  o.bias=mean(h.map(function(e){return e.r}));
-  h.forEach(function(e){(by[e.c]=by[e.c]||[]).push(e.r)});
-  Object.keys(by).forEach(function(c){if(by[c].length>=3)o.cats.push({c:c,n:by[c].length,b:mean(by[c])})});
-  o.cats.sort(function(a,b){return Math.abs(b.b)-Math.abs(a.b)});
-  if(n>=14)o.trend={a:Math.round(mean(h.slice(-7).map(function(e){return e.s}))),b:Math.round(mean(h.slice(0,-7).map(function(e){return e.s})))};
-  return o}
-function biasText(b){var f=Math.pow(10,Math.abs(b));return f<1.25?"well balanced":times(f)+"× too "+(b>0?"high":"low")}
-function calibHtml(full){
-  var c=calib(),h="<h3 class='bh'>Your calibration</h3>";
-  if(c.n<MINCAL)return h+"<p class='note'>Answer "+(MINCAL-c.n)+" more question"+(MINCAL-c.n===1?"":"s")+" and we’ll show whether you tend to guess too high or too low.</p>";
-  var pos=50+Math.max(-1,Math.min(1,c.bias/.6))*44,f=Math.pow(10,Math.abs(c.bias)),bal=f<1.25,
-    msg=bal?"Your guesses are well balanced. Nice calibration.":"You tend to guess about "+times(f)+"× too "+(c.bias>0?"high":"low")+". Try nudging your first instinct "+(c.bias>0?"down":"up")+".";
-  var rows=c.cats.slice(0,full?9:2).map(function(x){return "<div class='cr'><span>"+esc(x.c)+"</span><b>"+biasText(x.b)+"</b></div>"}).join("");
-  return h+"<div class='bal'><i style='left:"+pos.toFixed(1)+"%'></i></div><div class='slab'><span>Too low</span><span>Balanced</span><span>Too high</span></div>"+
-    "<p class='ovl' style='margin-top:14px'>"+msg+"</p>"+rows+
-    (c.trend?"<p class='note' style='margin-top:10px'>Your last 7 answers average "+c.trend.a+"% against "+c.trend.b+"% before that.</p>":"")+
-    "<p class='note'>Based on "+c.n+" answers on this device.</p>"}
 
 /* ===== challenge links ===== */
 function cleanName(t){return String(t||"").replace(/[^\p{L}\p{N} _.'-]/gu,"").replace(/^\s+|\s+$/g,"").slice(0,20)}
@@ -745,21 +834,18 @@ function menuRows(){
   var a=acct();
   return "<div class='mis'>"+
   (a.t?"<div class='mi static'>"+ICON_USER+"<div><b>Signed in</b><span>"+esc(a.e)+"</span></div><button class='lnk' data-act='signout'>Sign out</button></div>"
-      :"<button class='mi' data-act='signin'>"+ICON_USER+"<div><b>Sign in</b><span>Optional. Keep your streak across devices.</span></div>"+ICON_R+"</button>")+
-  "<button class='mi' data-act='calib'>"+ICON_BAL+"<div><b>My calibration</b><span>Do you guess high or low?</span></div>"+ICON_R+"</button>"+
-  "<button class='mi' data-home='1'>"+ICON_HOME+"<div><b>Back to home</b><span>How to play and the FAQ</span></div>"+ICON_R+"</button></div>"}
+      :"<button class='mi' data-act='signin'>"+ICON_USER+"<div><b>Sign in</b><span>Optional. Keep your streak across devices.</span></div>"+ICON_R+"</button>")+"</div>"}
 function sheetShell(title,body){
   var sh=document.getElementById("sheet"),sc=document.getElementById("scrim");
   sh.innerHTML="<div class='grab'></div><div class='shh'><b>"+title+"</b><button class='x' id='sx' aria-label='Close'>"+ICON_X+"</button></div>"+body;
   sh.onclick=null;document.getElementById("sx").onclick=closeSheet;sc.onclick=closeSheet;
   sh.classList.add("open");sc.classList.add("open");document.body.style.overflow="hidden";return sh}
-function openCalib(){sheetShell("My calibration",calibHtml(true)+"<button class='ghost' id='bk' style='width:100%;margin-top:16px'>Back to menu</button>");document.getElementById("bk").onclick=openMenu}
 function openSignIn(step,email,msg){
   var body,g=function(i){return document.getElementById(i)};
   if(!API)body="<p class='sub'>Sign-in isn’t switched on yet. It arrives when the game goes live, so your streak and stats can follow you between your phone and your laptop. You never need an account to play.</p>";
   else if(step===3)body="<p class='sub'>You’re signed in as <b>"+esc(email)+"</b>. Your progress now follows you between devices.</p><button class='main' id='sd'>Done</button>";
   else if(step===2)body="<p class='sub'>"+esc(msg||"We emailed a 6-digit code to "+email+".")+"</p><input id='sc' class='inp' inputmode='numeric' maxlength='6' autocomplete='one-time-code' placeholder='6-digit code'><p class='err' id='se'></p><button class='main' id='sv' style='margin-top:12px'>Verify and sign in</button>";
-  else body="<p class='sub'>Optional. Sign in to keep your streak, stats and calibration when you switch devices. No password, we just email you a one-time code.</p><input id='s1' class='inp' type='email' autocomplete='email' placeholder='you@example.com'><p class='err' id='se'></p><button class='main' id='ss' style='margin-top:12px'>Send my code</button>";
+  else body="<p class='sub'>Optional. Sign in to keep your streak and stats when you switch devices. No password, we just email you a one-time code.</p><input id='s1' class='inp' type='email' autocomplete='email' placeholder='you@example.com'><p class='err' id='se'></p><button class='main' id='ss' style='margin-top:12px'>Send my code</button>";
   sheetShell("Sign in",body+(step===3?"":"<button class='ghost' id='bk' style='width:100%;margin-top:12px'>Back to menu</button>"));
   if(g("bk"))g("bk").onclick=openMenu;
   function fail(e){if(g("se"))g("se").textContent=e.message;var b=g("ss")||g("sv");if(b)b.disabled=false}
@@ -856,13 +942,13 @@ function render(){
   ask(n);
 }
 function unitChip(q){
-  var a=unitList(q.u);if(a.length<2)return "<div class='chip'>"+q.u+"</div>";
+  var a=unitList(q.u);if(a.length<2)return "<div class='chip'>"+uCap(q.u)+"</div>";
   var pu=unitByLabel(q.u,load("rq-units",{})[q.u])[0];
-  return "<select class='chip uc' id='un' aria-label='Choose your unit'>"+a.map(function(x){return "<option value='"+x[0]+"'"+(x[0]===pu?" selected":"")+">"+x[0]+"</option>"}).join("")+"</select>"}
-function emptyHint(q,c){return "Enter a number in "+c[0]+(c[1]!==1?" · converted to "+q.u+" for scoring (× "+fmt(c[1])+")":"")}
+  return "<select class='chip uc' id='un' aria-label='Choose your unit'>"+a.map(function(x){return "<option value='"+x[0]+"'"+(x[0]===pu?" selected":"")+">"+uCap(x[0])+"</option>"}).join("")+"</select>"}
+function emptyHint(q,c){return "Enter a number in "+uCap(c[0])+(c[1]!==1?" · converted to "+q.u+" for scoring (× "+fmt(c[1])+")":"")}
 function ask(n){
   var q=Q[ids[n]];var tools=toolsHtml(n);ex="";
-  mount(seg(n)+"<div class='eyebrow'><span class='cat'>"+catIcon(q.c)+q.c+"</span><span>"+qlab(n)+"</span></div>"+chBanner(n)+"<h2>"+q.t+"</h2><p class='lead' style='margin-bottom:20px'>"+(q.c==="Doha life"?"No exact answer. Funny Doha logic encouraged.":"No exact answer. Use logic, then commit.")+"</p>"+
+  mount(prog(n)+"<div class='eyebrow'><span class='cat'>"+catIcon(q.c)+q.c+"</span><span>"+qlab(n)+"</span></div>"+chBanner(n)+"<h2>"+q.t+"</h2><p class='lead' style='margin-bottom:20px'>"+(q.c==="Doha life"?"No exact answer. Funny Doha logic encouraged.":"No exact answer. Use logic, then commit.")+"</p>"+
   "<div class='field'><input id='in' inputmode='decimal' autocomplete='off' placeholder='Your estimate' aria-label='Your estimate'>"+unitChip(q)+"</div>"+
   "<div class='hint' id='h'>"+emptyHint(q,unitByLabel(q.u,load("rq-units",{})[q.u]))+"</div>"+tools+"<button class='main' id='go' disabled>Lock in estimate"+ARR+"</button>");
   var inp=document.getElementById("in"),go=document.getElementById("go"),h=document.getElementById("h"),un=document.getElementById("un");wireTools(n,inp);
@@ -894,8 +980,8 @@ function graph(){
   "<g font-size='8' fill='#a79aa0'>"+grid+"</g>"+
   "<g fill='#f1dde4'>"+bars+"</g><g fill='#d9a0b4' clip-path='url(#cp)'>"+bars+"</g>"+
   "<path d='"+p+"' fill='none' stroke='#7a1230' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/><line x1='30' y1='92' x2='286' y2='92' stroke='#e6dade'/>"+
-  "<line id='dl' x1='30' x2='30' y1='92' y2='92' stroke='#7a1230' stroke-dasharray='3 3'/><circle id='dt' cx='30' cy='92' r='7' fill='#7a1230' stroke='#fff' stroke-width='3'/>"+
-  "<text id='yt' x='30' y='20' text-anchor='middle' font-size='10' font-weight='800' fill='#7a1230'>You</text>"+
+  "<line id='dl' x1='30' x2='30' y1='92' y2='92' stroke='#0a7a3a' stroke-width='2' stroke-dasharray='3 3'/><circle id='dt' cx='30' cy='92' r='7.5' fill='#0a7a3a' stroke='#fff' stroke-width='3'/>"+
+  "<text id='yt' x='30' y='20' text-anchor='middle' font-size='10' font-weight='800' fill='#0a7a3a'>You</text>"+
   "<g font-size='9' fill='#82747a' text-anchor='middle'><text x='"+gx(0)+"' y='105'>0</text><text x='"+gx(25)+"' y='105'>25</text><text x='"+gx(50)+"' y='105'>50</text><text x='"+gx(75)+"' y='105'>75</text><text x='"+gx(100)+"' y='105'>100</text></g>"+
   "<g font-size='8' fill='#a79aa0' text-anchor='middle'><text x='"+gx(50)+"' y='118'>Accuracy score (%)</text></g>"+
   "<text x='8' y='57' font-size='8' fill='#a79aa0' text-anchor='middle' transform='rotate(-90 8 57)'>Players</text></svg>";
@@ -907,22 +993,27 @@ function rangeBar(q,g,f){
   return "<div class='rng'><div class='band' style='left:"+p(q.lo)+"%;width:"+(p(q.hi)-p(q.lo)).toFixed(1)+"%'></div><div class='tick' style='left:"+p(q.m)+"%'></div><div class='gd' style='left:"+p(g)+"%'></div></div>"+
   "<div class='leg'><span>Plausible range <b>"+short(q.lo/f)+" to "+short(q.hi/f)+"</b></span><span>Dot is you</span></div>";
 }
-function reveal(i){
-  var q=Q[ids[i]],g=st.g[i],s=st.s[i],pc=API?0:(CD=demoDist(),pctile(s)),last=st.g.length>=3,inR=g>=q.lo&&g<=q.hi,U=unitOf(q,i),f=U[1],ul=U[0];
+function openLogic(i){
+  var q=Q[ids[i]],g=st.g[i],s=st.s[i],U=unitOf(q,i),f=U[1],ul=uCap(U[0]);
   var steps=q.s.map(function(x,k){var t=k===q.s.length-1&&q.s.length>1&&/^(Total|≈)/.test(x);return "<div class='st"+(t?" t":"")+"'><i>"+(k+1)+"</i><span>"+x+"</span></div>"}).join("");
-  mount(seg(i)+"<div class='eyebrow'><span class='cat'>"+catIcon(q.c)+q.c+"</span><span>"+qlab(i)+"</span></div><h2 class='sm'>"+q.t+"</h2>"+
-  "<div class='cmp'><div><small>Your estimate</small><b>"+short(g/f)+"</b><em>"+ul+"</em></div><div><small>Our estimate</small><b>"+short(q.m/f)+"</b><em>"+ul+"</em></div></div>"+rangeBar(q,g,f)+
-  "<div class='scoreline'><div class='big'><span id='sn'>0</span><small>% accurate</small></div><div class='pill v'>"+verdict(g,q)+"</div></div>"+
+  sheetShell("How we worked it out","<div class='in' style='padding-top:4px'>"+srcTag(q)+steps+
+  (f!==1?"<p class='note' style='margin:2px 0 8px'>Working shown in "+q.u+". "+(q.u==="QAR"?"Rates approximate.":"1 "+ul+" = "+fmt(f)+" "+q.u+".")+"</p>":"")+
+  "<div class='r'><span>You guessed</span><b>"+fmt(g/f)+" "+ul+"</b></div>"+
+  "<div class='r'><span>Our estimate</span><b>"+fmt(q.m/f)+" "+ul+"</b></div>"+
+  "<div class='r'><span>You were</span><b>"+verdict(g,q)+"</b></div>"+
+  "<div class='r'><span>Your score</span><b>"+s+"%</b></div>"+
+  "<p class='note' style='margin-top:10px'>Spot on scores 100, twice off about 80, ten times off about 26. Never zero.</p></div>");
+}
+function reveal(i){
+  var q=Q[ids[i]],g=st.g[i],s=st.s[i],pc=API?0:(CD=demoDist(),pctile(s)),last=st.g.length>=3,U=unitOf(q,i),f=U[1],ul=uCap(U[0]);
+  mount(prog(i)+"<div class='eyebrow'><span class='cat'>"+catIcon(q.c)+q.c+"</span><span>"+qlab(i)+"</span></div><h2 class='sm'>"+q.t+"</h2>"+
+  "<div class='cmp'><div class='me'><small>Your estimate</small><b>"+short(g/f)+"</b><em>"+ul+"</em></div><div class='them'><small>Our estimate</small><b>"+short(q.m/f)+"</b><em>"+ul+"</em></div></div>"+rangeBar(q,g,f)+
+  "<div class='scoreline'><div class='big'><span id='sn'>0</span><small>% accurate</small></div><div class='pill v "+vClass(g,q,s)+"'>"+verdict(g,q)+"</div></div>"+
   chartSlot("q")+
-  (s<25?"<p class='enc'>Way off this time. Open the logic below to see how the maths works out.</p>":"")+"<p class='fact'>"+q.f+"</p>"+
-  "<button class='tog' id='tg' aria-expanded='false'><svg viewBox='0 0 24 24'><path d='M12 19V5M5 12l7-7 7 7'/></svg>How we got this number</button>"+
-  "<div class='bd' id='bd'><div class='in'><h3>The logic</h3>"+srcTag(q)+(f!==1?"<p class='note' style='margin:0 0 8px'>Our working is shown in "+q.u+". "+(q.u==="QAR"?"Exchange rates are approximate.":"1 "+ul+" = "+fmt(f)+" "+q.u+".")+"</p>":"")+steps+
-  "<h3>How you were scored</h3>"+
-  "<div class='r'><span>Your estimate</span><b>"+fmt(g/f)+" "+ul+"</b></div><div class='r'><span>Our estimate</span><b>"+fmt(q.m/f)+" "+ul+"</b></div><div class='r'><span>You were</span><b>"+verdict(g,q)+"</b></div><div class='r'><span>Plausible range</span><b>"+fmt(q.lo/f)+" to "+fmt(q.hi/f)+" "+ul+"</b></div><div class='r'><span>Good to know opened</span><b>"+(st.hu[i]?"Yes":"No")+"</b></div><div class='r'><span>Accuracy = 100 ÷ (1 + (log₁₀("+times(ratio(g,q))+") ÷ 0.6)²)</span><b>"+s+"%</b></div>"+
-  "<p class='note' style='margin-top:10px'>Spot on scores 100. Twice too high or low scores about 80, ten times off about 26, and a guess is never worth zero.</p></div></div>"+
+  "<p class='fact'>"+q.f+"</p>"+
+  "<button class='ghost' id='lg' style='width:100%;margin-top:14px'>"+ICON_CHART+"See the maths</button>"+
   "<button class='main' id='nx'>"+(last?"See results":"Next question")+ARR+"</button>");
-  var tg=document.getElementById("tg"),bd=document.getElementById("bd");
-  tg.onclick=function(){var o=tg.getAttribute("aria-expanded")==="true";tg.setAttribute("aria-expanded",String(!o));bd.style.maxHeight=o?"0":bd.scrollHeight+"px"};
+  document.getElementById("lg").onclick=function(){openLogic(i)};
   document.getElementById("nx").onclick=function(){if(busy)return;busy=true;st.r=false;saveState();busy=false;render()};
   animate(s,pc);chartLater("q",ids[i],s,viewTok);
 }
@@ -942,23 +1033,32 @@ function animate(s,pc,mode){
   function tick(t){if(t0===null)t0=t;var p=Math.min(1,(t-t0)/1900),k=1-Math.pow(1-p,3);frame(k);if(p<1)raf=requestAnimationFrame(tick)}
   raf=requestAnimationFrame(tick);
 }
+var cdTimer=null;
+function nextMidnight(){var n=new Date(),m=new Date(n.getFullYear(),n.getMonth(),n.getDate()+1,0,0,0,0);return m-n}
+function fmtDur(ms){ms=Math.max(0,ms);var s=Math.floor(ms/1000),h=Math.floor(s/3600),m=Math.floor(s%3600/60),ss=s%60;function z(x){return (x<10?"0":"")+x}return z(h)+":"+z(m)+":"+z(ss)}
+function last7(){var out=[],i,d,inf;for(i=6;i>=0;i--){d=today-i;inf=(d<START||d>today)?{n:0,t:0}:dayInfo(d);out.push({d:d,avg:inf.n>=3?Math.round(inf.t/3):null})}return out}
 function done(){
-  var tot=st.s.reduce(function(a,b){return a+b},0),avg=Math.round(tot/3),pc=API?0:(CD=demoDist(),pctile(avg)),rk=rankOf(avg),lv=rankIdx(avg),lad="<div class='lad'>",rows="",i,q;
+  var tot=st.s.reduce(function(a,b){return a+b},0),avg=Math.round(tot/3),pc=API?0:(CD=demoDist(),pctile(avg)),rk=rankOf(avg),lv=rankIdx(avg),lad="<div class='lad'>",qrows="",w7,i,q;
   for(i=0;i<6;i++)lad+="<i class='"+(i<=lv?"on":"")+"'></i>";lad+="</div>";
-  for(i=0;i<3;i++){q=Q[ids[i]];rows+="<div class='brow'><div class='bt'>"+catIcon(q.c)+"<div><b>Question "+(i+1)+"</b><span class='vs'>"+verdict(st.g[i],q)+(chInfo()?" · "+esc(chInfo().n)+" "+chInfo().s[i]+"%":"")+"</span></div><span class='bval'>0%</span></div><div class='btrack'><i class='bfill' data-w='"+st.s[i]+"'></i></div><div class='bq'>"+q.t+"</div></div>"}
-  mount("<div class='res'>"+seg(2)+"<div class='eyebrow'><span>"+(day===today?"Today’s result":"Archive result")+"</span><span>"+dlabel(day)+"</span></div>"+
-  "<div class='rank'><small>Your rank</small><h2>"+rk[0]+"</h2><p>"+rk[1]+"</p>"+lad+"</div>"+
-  "<div class='scoreline' style='margin-top:0'><div class='big'><span id='sn'>0</span><small>% accuracy</small></div><div class='pill' id='pill'"+(API?" style='display:none'":"")+">Top "+(100-pc)+"%</div></div>"+
+  for(i=0;i<3;i++){q=Q[ids[i]];qrows+="<div class='qr'>"+catIcon(q.c)+"<div class='qt'><b>"+q.t+"</b><span>"+q.c+(chInfo()?" · "+esc(chInfo().n)+" "+chInfo().s[i]+"%":"")+"</span></div><div><span class='qs'>"+st.s[i]+"%</span><span class='qv'>"+verdict(st.g[i],q)+"</span></div></div>"}
+  w7=last7().map(function(x){var h=x.avg!=null?Math.max(8,x.avg):0,cls=x.avg==null?"empty":x.d===today?"today":"";return "<div class='dayc'><div class='bar "+cls+"' style='height:"+h+"%'"+(x.avg!=null?" title='"+x.avg+"%'":"")+"></div><small>"+"SMTWTFS".charAt(new Date(x.d*864e5).getUTCDay())+"</small></div>"}).join("");
+  mount("<div class='res'>"+prog(3)+"<div class='eyebrow'><span>"+(day===today?"Today’s result":"Archive result")+"</span><span>"+dlabel(day)+"</span></div>"+
+  "<div class='hero'><small>Your result</small><div class='hs'><span id='sn'>0</span><i>% accuracy</i></div><div class='hrank'>"+rk[0]+"</div><p class='hdesc'>"+rk[1]+"</p><div class='hpill' id='pill'"+(API?" style='display:none'":"")+">Top "+(100-pc)+"%</div>"+lad+"</div>"+
   chartSlot("day")+
-  h2h(avg)+"<h3 class='bh'>Your three guesses</h3>"+rows+calibHtml(false)+
-  "<div class='stats'><div><b>"+stats.streak+"</b><span>Streak</span></div><div><b>"+stats.played+"</b><span>Played</span></div><div><b>"+(stats.played?Math.round(stats.total/stats.played/3)+"%":"–")+"</b><span>Avg accuracy</span></div></div>"+
+  h2h(avg)+
+  "<h3 class='bh'>Your three guesses</h3><div class='qres'>"+qrows+"</div>"+
+  "<div class='wk'><div class='wkh'><b>Last 7 days</b><span>"+stats.streak+" day streak</span></div><div class='days'>"+w7+"</div><div class='wkft'>Next set in <b id='cdn'>"+fmtDur(nextMidnight())+"</b></div></div>"+
   "<button class='main' id='sh'>Share result</button></div>");
   document.getElementById("sh").onclick=function(){openShare(tot)};
+  if(cdTimer)clearInterval(cdTimer);
+  cdTimer=setInterval(function(){var el=document.getElementById("cdn");if(!el){clearInterval(cdTimer);cdTimer=null;return}el.textContent=fmtDur(nextMidnight())},1000);
   animate(avg,pc);chartLater("day",0,avg,viewTok);
 }
-function streak(){document.getElementById("streak").textContent=stats.streak?stats.streak+" day streak":""}
+function acctLabel(){var b=document.getElementById("acct");if(!b)return;b.textContent=acct().t?"Account":"Sign in"}
+function streak(){document.getElementById("streak").textContent=stats.streak?stats.streak+" day streak":"";acctLabel()}
 document.getElementById("how").onclick=function(e){e.preventDefault();selectDay(today);intro=true;render();window.scrollTo(0,0)};
 document.getElementById("menu").onclick=function(){var d=new Date(day*864e5);cm={y:d.getUTCFullYear(),m:d.getUTCMonth()};openMenu()};
+document.getElementById("acct").onclick=function(){if(acct().t)openMenu();else openSignIn(1,"")};
 document.getElementById("narch").onclick=function(e){e.preventDefault();document.getElementById("menu").onclick()};
 document.getElementById("nhow").onclick=function(e){e.preventDefault();document.getElementById("how").onclick(e)};
 document.querySelector(".brand").onclick=function(){selectDay(today);intro=true;render();window.scrollTo(0,0)};
