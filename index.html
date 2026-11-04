@@ -5,12 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Roughly Qatar – Daily Estimation Game</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
 <style>
 :root{--c:#2f6bff;--c2:#1b4fd8;--ct:#eef3ff;--cs:47,107,255;--mar:var(--c);--mar2:var(--c2);--tint:var(--ct);--ink:#141018;--mut:#7b7580;--line:#ecebf0;color-scheme:light;box-sizing:border-box;transition:--c .4s}
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
-body{margin:0;min-height:100vh;color:var(--ink);background:radial-gradient(135% 62% at 50% -10%,var(--ct) 0,#fff 56%) no-repeat #fff;font:500 16px/1.5 "Fredoka",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums;transition:background .4s}
+body{margin:0;min-height:100vh;color:var(--ink);background:radial-gradient(135% 62% at 50% -10%,var(--ct) 0,#fff 56%) no-repeat #fff;font:500 16px/1.5 "Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums;transition:background .4s}
 button,input{font:inherit;color:inherit}
 header{padding:calc(env(safe-area-inset-top,0px) + 16px) 20px 0}
 .hd{max-width:480px;margin:0 auto;display:flex;justify-content:space-between;align-items:center}
@@ -583,6 +583,16 @@ body:not([data-view=land]) main{min-height:calc(100dvh - 76px);display:flex;flex
 .card.qb button.main:not(:disabled)::after{content:"";position:absolute;top:0;bottom:0;left:-40%;width:26%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.42),transparent);transform:skewX(-20deg);animation:bling 4.6s ease-in-out infinite;pointer-events:none}
 @keyframes bling{0%{left:-40%}34%{left:135%}100%{left:135%}}
 @media (prefers-reduced-motion:reduce){.card.qb button.main::after{display:none}}
+/* v5: our-estimate green, score left of graph */
+.card.qb .cmp .them{background:linear-gradient(135deg,#22c55e,#0a8f52);color:#fff}
+.card.qb .cmp .them small{color:rgba(255,255,255,.82)}
+.card.qb .cmp .them b{color:#fff}
+.revrow{display:grid;grid-template-columns:1fr 1.5fr;gap:12px;align-items:center;margin:4px 0 10px}
+.revrow .revhit{margin:0;text-align:center}
+.revrow .revhit .rscore span{font-size:2.6rem}
+.revrow .revhit .rverd{font-size:.95rem}
+.revrow .revg{margin:0}
+.revrow .pct{font-size:.66rem}
 </style>
 <meta name="roughly-api" content="">
 </head>
@@ -927,7 +937,7 @@ function times(x){return x<10?(Math.round(x*10)/10):Math.round(x)}
 function verdict(g,q){var x=ratio(g,q);if(x<=1.05)return "Spot on";return times(x)+"× too "+(g>q.m?"high":"low")}
 function vClass(g,q,s){return (g>=q.lo&&g<=q.hi)||s>=80?"good":s>=40?"mid":"bad"}
 function erf(x){var s=x<0?-1:1;x=Math.abs(x);var t=1/(1+.3275911*x);return s*(1-(((((1.061405429*t-1.453152027)*t)+1.421413741)*t-.284496736)*t+.254829592)*t*Math.exp(-x*x))}
-var DEMO=[38,52,61,58,66,71,79,74,88,83,92,85,79,71,64,52,41,33,24,29],DEMO_N=DEMO.reduce(function(a,b){return a+b},0);
+var DEMO=[3,6,11,19,30,44,60,76,89,97,97,89,76,60,44,30,19,11,6,3],DEMO_N=DEMO.reduce(function(a,b){return a+b},0);
 function demoDist(){return {bins:DEMO,n:DEMO_N,demo:true}}
 function binSum(b){return b.reduce(function(a,c){return a+c},0)}
 function pctile(s){var B=CD.bins,N=binSum(B)||1,i=Math.max(0,Math.min(19,Math.floor(s/5))),f=Math.min(1,(s-i*5)/5),c=0,k;for(k=0;k<i;k++)c+=B[k];c+=B[i]*f;return Math.max(1,Math.min(99,Math.round(100*c/N)))}
@@ -1325,12 +1335,12 @@ function ask(n){
   setTimeout(function(){try{inp.focus({preventScroll:true})}catch(e){}},80);
 }
 function gx(s){return 30+s*2.56}
-function gy(s){return 92-70*dens(Math.max(0,Math.min(100,s)))/ymax()}
+function gy(s){return 92-55*dens(Math.max(0,Math.min(100,s)))/ymax()}
 function graph(){
   var p="",i,bars="",grid="",bw=(gx(5)-gx(0))-3,YM=ymax(),B=CD.bins;
   for(i=0;i<=100;i+=2)p+=(i?"L":"M")+gx(i).toFixed(1)+","+gy(i).toFixed(1);
-  for(i=0;i<20;i++){var hh=70*B[i]/YM;bars+="<rect x='"+(gx(i*5)+1.5).toFixed(1)+"' y='"+(92-hh).toFixed(1)+"' width='"+bw.toFixed(1)+"' height='"+hh.toFixed(1)+"' rx='2.5'><title>"+(i*5)+" to "+(i*5+5)+"%: "+B[i]+" players</title></rect>"}
-  [0,YM/2,YM].forEach(function(v){var y=92-70*v/YM;grid+="<line x1='30' x2='286' y1='"+y+"' y2='"+y+"' stroke='#f0eef4' stroke-width='1'/><text x='24' y='"+(y+3)+"' text-anchor='end'>"+Math.round(v)+"</text>"});
+  for(i=0;i<20;i++){var hh=55*B[i]/YM;bars+="<rect x='"+(gx(i*5)+1.5).toFixed(1)+"' y='"+(92-hh).toFixed(1)+"' width='"+bw.toFixed(1)+"' height='"+hh.toFixed(1)+"' rx='2.5'><title>"+(i*5)+" to "+(i*5+5)+"%: "+B[i]+" players</title></rect>"}
+  [0,YM/2,YM].forEach(function(v){var y=92-55*v/YM;grid+="<line x1='30' x2='286' y1='"+y+"' y2='"+y+"' stroke='#f0eef4' stroke-width='1'/><text x='24' y='"+(y+3)+"' text-anchor='end'>"+Math.round(v)+"</text>"});
   return "<svg viewBox='0 0 300 124' role='img' aria-label='How many players scored in each band, with a smoothed curve'><defs><clipPath id='cp'><rect id='cr' x='0' y='0' width='0' height='124'/></clipPath></defs>"+
   "<g font-size='8' fill='#a79aa0'>"+grid+"</g>"+
   "<g class='gbar' fill='#ecedf4'>"+bars+"</g><g class='gbar2' fill='#cdd5e3' clip-path='url(#cp)'>"+bars+"</g>"+
@@ -1363,8 +1373,8 @@ function reveal(i){
   var q=Q[ids[i]],g=st.g[i],s=st.s[i],pc=API?0:(CD=demoDist(),pctile(s)),last=st.g.length>=3,U=unitOf(q,i),f=U[1],ul=uCap(U[0]);
   mount("<div class='qhead'>"+seg(i)+"<span class='catico'>"+(ICONS[q.c]||ICONS["Everyday Qatar"])+"</span></div><h2 class='sm'>"+q.t+"</h2>"+
   "<div class='cmp'><div class='me'><small>Your guess</small><b>"+short(g/f)+"</b><em>"+ul+"</em></div><div class='them'><small>Our estimate</small><b>"+short(q.m/f)+"</b><em>"+ul+"</em></div></div>"+
-  "<div class='revhit'><div class='rscore'><span id='sn'>0</span><i>%</i></div><div class='rverd'>"+verdict(g,q)+"</div></div>"+
-  "<div class='revg'>"+chartSlot("q")+"</div>"+
+  "<div class='revrow'><div class='revhit'><div class='rscore'><span id='sn'>0</span><i>%</i></div><div class='rverd'>"+verdict(g,q)+"</div></div>"+
+  "<div class='revg'>"+chartSlot("q")+"</div></div>"+
   "<div class='revbtns'><button class='ghost' id='lg'>"+ICON_CHART+"See the maths</button><button class='main' id='nx'>"+(last?"See results":"Next")+"</button></div>");
   app.classList.add("qb");
   document.getElementById("lg").onclick=function(){openLogic(i)};
@@ -1384,7 +1394,7 @@ function animate(s,pc,mode){
     for(i=0;i<fl.length;i++){w=parseFloat(fl[i].getAttribute("data-w"));fl[i].style.width=(w*k).toFixed(1)+"%";vl[i].textContent=Math.round(w*k)+"%"}}
   if(reduce){frame(1);return}
   var t0=null;frame(0);
-  function tick(t){if(t0===null)t0=t;var p=Math.min(1,(t-t0)/1000),k=1-Math.pow(1-p,3);frame(k);if(p<1)raf=requestAnimationFrame(tick)}
+  function tick(t){if(t0===null)t0=t;var p=Math.min(1,(t-t0)/1900),k=1-Math.pow(1-p,3);frame(k);if(p<1)raf=requestAnimationFrame(tick)}
   raf=requestAnimationFrame(tick);
 }
 var cdTimer=null;
