@@ -571,6 +571,18 @@ body:not([data-view=land]) main{min-height:calc(100dvh - 76px);display:flex;flex
 .card.qb .drop b{color:#fff}
 .card.qb .h2h div{background:rgba(255,255,255,.14)}
 .card.qb .h2h small,.card.qb .h2h b,.card.qb .h2h>span{color:#fff}
+/* v4: icon small/no-box top-right, Confirm shine */
+.qhead{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.seg{flex:1}
+.card.qb .catico{background:none;box-shadow:none;width:auto;height:auto;padding:0;margin:0;border-radius:0}
+.catico svg{width:24px;height:24px}
+.card.qb .catico svg{stroke:#fff}
+.res .hcat{position:absolute;top:16px;right:20px;background:none;margin:0;width:auto;height:auto}
+.res .hcat svg{width:24px;height:24px;stroke:#fff}
+.card.qb button.main{position:relative;overflow:hidden}
+.card.qb button.main:not(:disabled)::after{content:"";position:absolute;top:0;bottom:0;left:-40%;width:26%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.42),transparent);transform:skewX(-20deg);animation:bling 4.6s ease-in-out infinite;pointer-events:none}
+@keyframes bling{0%{left:-40%}34%{left:135%}100%{left:135%}}
+@media (prefers-reduced-motion:reduce){.card.qb button.main::after{display:none}}
 </style>
 <meta name="roughly-api" content="">
 </head>
@@ -985,7 +997,7 @@ document.addEventListener("keydown",function(e){
 function hintCard(h){return "<div class='hi'>"+ICON_BULB+"</div><div class='ht'><b>"+h[0]+"</b>"+h[1]+"</div>"}
 function toolsHtml(n){
   var h=HINTS[ids[n]],shown=st.hu[n]>0?"<div class='hintbox'>"+hintCard(h)+"</div>":"";
-  return "<div id='hb'>"+shown+"</div><div class='golock'><button class='ghost icob' id='bc' aria-label='Calculator and notes'>"+ICON_CALC+"</button><button class='ghost icob' id='bh' aria-label='Good to know'>"+ICON_BULB+"<span></span></button><button class='main' id='go' disabled>Commit</button></div>";
+  return "<div id='hb'>"+shown+"</div><div class='golock'><button class='ghost icob' id='bc' aria-label='Calculator and notes'>"+ICON_CALC+"</button><button class='ghost icob' id='bh' aria-label='Good to know'>"+ICON_BULB+"<span></span></button><button class='main' id='go' disabled>Confirm</button></div>";
 }
 function wireTools(n,inp){
   var bh=document.getElementById("bh"),hb=document.getElementById("hb");
@@ -1275,13 +1287,26 @@ function unitChip(q){
   var pu=unitByLabel(q.u,load("rq-units",{})[q.u])[0];
   return "<select class='chip uc' id='un' aria-label='Choose your unit'>"+a.map(function(x){return "<option value='"+x[0]+"'"+(x[0]===pu?" selected":"")+">"+uCap(x[0])+"</option>"}).join("")+"</select>"}
 function emptyHint(q,c){return "Enter a number in "+uCap(c[0])+(c[1]!==1?" · converted to "+q.u+" for scoring (× "+fmt(c[1])+")":"")}
+var phTimer=null;
+function typePlaceholder(inp){
+  if(phTimer){clearTimeout(phTimer);phTimer=null}
+  if(reduce){inp.setAttribute("placeholder","Roughly…");return}
+  var words=["Roughly…","Roughly a million?","Your best guess…","Reason it out…"],wi=0,ci=0,del=false;
+  function tick(){
+    if(!inp||!document.body.contains(inp)||inp.value){phTimer=null;return}
+    var w=words[wi];
+    if(!del){ci++;inp.setAttribute("placeholder",w.slice(0,ci));if(ci>=w.length){del=true;phTimer=setTimeout(tick,1300);return}phTimer=setTimeout(tick,85)}
+    else{ci--;inp.setAttribute("placeholder",w.slice(0,ci));if(ci<=0){del=false;wi=(wi+1)%words.length;phTimer=setTimeout(tick,400);return}phTimer=setTimeout(tick,40)}
+  }
+  tick();
+}
 function ask(n){
   var q=Q[ids[n]];var tools=toolsHtml(n);ex="";
-  mount(seg(n)+"<span class='catico'>"+(ICONS[q.c]||ICONS["Everyday Qatar"])+"</span>"+chBanner(n)+"<h2>"+q.t+"</h2><p class='lead' style='margin-bottom:18px'>"+(q.c==="Doha life"?"No exact answer. Funny Doha logic encouraged.":"No exact answer. Use logic, then commit.")+"</p>"+
+  mount("<div class='qhead'>"+seg(n)+"<span class='catico'>"+(ICONS[q.c]||ICONS["Everyday Qatar"])+"</span></div>"+chBanner(n)+"<h2>"+q.t+"</h2><p class='lead' style='margin-bottom:18px'>"+(q.c==="Doha life"?"No exact answer. Funny Doha logic encouraged.":"No exact answer. Use logic, then commit.")+"</p>"+
   "<div class='field'><input id='in' inputmode='decimal' autocomplete='off' placeholder='Roughly …' aria-label='Your estimate'>"+unitChip(q)+"</div>"+
   "<div class='hint' id='h'>"+emptyHint(q,unitByLabel(q.u,load("rq-units",{})[q.u]))+"</div>"+tools);
   app.classList.add("qb");
-  var inp=document.getElementById("in"),go=document.getElementById("go"),h=document.getElementById("h"),un=document.getElementById("un");wireTools(n,inp);
+  var inp=document.getElementById("in"),go=document.getElementById("go"),h=document.getElementById("h"),un=document.getElementById("un");wireTools(n,inp);typePlaceholder(inp);
   function cur(){return un?unitByLabel(q.u,un.value):unitList(q.u)[0]}
   function val(){return parseFloat(inp.value.replace(/,/g,""))}
   function ok(x){return x>0&&x*cur()[1]<1e15}
@@ -1336,7 +1361,7 @@ function openLogic(i){
 }
 function reveal(i){
   var q=Q[ids[i]],g=st.g[i],s=st.s[i],pc=API?0:(CD=demoDist(),pctile(s)),last=st.g.length>=3,U=unitOf(q,i),f=U[1],ul=uCap(U[0]);
-  mount(seg(i)+"<span class='catico'>"+(ICONS[q.c]||ICONS["Everyday Qatar"])+"</span><h2 class='sm'>"+q.t+"</h2>"+
+  mount("<div class='qhead'>"+seg(i)+"<span class='catico'>"+(ICONS[q.c]||ICONS["Everyday Qatar"])+"</span></div><h2 class='sm'>"+q.t+"</h2>"+
   "<div class='cmp'><div class='me'><small>Your guess</small><b>"+short(g/f)+"</b><em>"+ul+"</em></div><div class='them'><small>Our estimate</small><b>"+short(q.m/f)+"</b><em>"+ul+"</em></div></div>"+
   "<div class='revhit'><div class='rscore'><span id='sn'>0</span><i>%</i></div><div class='rverd'>"+verdict(g,q)+"</div></div>"+
   "<div class='revg'>"+chartSlot("q")+"</div>"+
