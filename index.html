@@ -510,11 +510,72 @@ body:not([data-view=land]) main{min-height:calc(100dvh - 76px);display:flex;flex
 .revbtns{display:flex;gap:10px;margin-top:4px;align-items:stretch}
 .revbtns .ghost{flex:none;width:auto;height:58px;padding:0 18px;margin-top:0}
 .revbtns .main{flex:1;height:58px;margin-top:0}
+/* --- v3: minimal header, line stepper, box-less white graphs, unified buttons --- */
+.hd{justify-content:flex-end;gap:12px;align-items:center}
+.wordmark{font-size:.85rem;font-weight:700;color:var(--mut);cursor:pointer;letter-spacing:.2px}
+.mb{width:40px;height:40px;border-radius:50%;border:0;background:#fff;box-shadow:0 6px 16px rgba(0,0,0,.14);opacity:.5;transition:opacity .2s,transform .15s;padding:0}
+.mb:hover,.mb:focus-visible{opacity:1}
+.mb:active{transform:scale(.94)}
+.mb svg{stroke:var(--ink)}
+.seg{display:flex;gap:6px;margin-bottom:0}
+.seg i{flex:1;height:5px;border-radius:3px;background:rgba(255,255,255,.25)}
+.card.qb .seg i.on{background:#fff}
+.catico{display:flex;margin:14px 0 8px}
+.card.qb{position:relative}
+/* box-less white graph */
+.revg{background:none;box-shadow:none;padding:0;margin:2px 0 10px}
+.revg .graph{max-width:none;margin:0 auto}
+.revg .note,.revg .ovl{display:none}
+.card.qb .graph text,.rtop .graph text{fill:rgba(255,255,255,.55)}
+.card.qb .gbar,.rtop .gbar{fill:rgba(255,255,255,.2)}
+.card.qb .gbar2,.rtop .gbar2{fill:rgba(255,255,255,.5)}
+.card.qb .gcurve,.rtop .gcurve{stroke:#fff}
+.card.qb .gyline,.rtop .gyline{stroke:#fff}
+.card.qb .gydot,.rtop .gydot{fill:#fff;stroke:rgba(20,16,24,.4)}
+.card.qb .graph .gyt,.rtop .graph .gyt{fill:#fff}
+.card.qb .pct,.rtop .pct{color:rgba(255,255,255,.82)}
+.card.qb .pct b,.rtop .pct b{color:#fff}
+.card.qb .revhit{padding:0;margin:2px 0}
+.card.qb .rscore span{font-size:3.2rem}
+.card.qb .rverd{font-size:1.1rem}
+/* unified buttons: one background + white border */
+.card.qb .icob,.card.qb .ghost,.card.qb button.main,.card.qb .dropb{background:rgba(255,255,255,.14);border:2px solid rgba(255,255,255,.72);color:#fff;box-shadow:none}
+.card.qb .icob svg,.card.qb .ghost svg,.card.qb button.main svg{stroke:#fff}
+.card.qb .icob:hover:not(:disabled),.card.qb .ghost:hover:not(:disabled),.card.qb button.main:hover:not(:disabled),.card.qb .dropb:hover{background:rgba(255,255,255,.26)}
+.card.qb button.main:disabled{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.3);color:rgba(255,255,255,.5)}
+/* results on a coloured board */
+.res .hcat{position:static;margin:2px 0 8px;background:rgba(255,255,255,.2)}
+.res .hcat svg{stroke:#fff}
+.rtop{display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:center;margin:4px 0 14px;background:none;box-shadow:none;padding:0;border-radius:0}
+.rsc{text-align:center}
+.rsc>small{font-size:.66rem;letter-spacing:1.2px;text-transform:uppercase;font-weight:700;opacity:.82}
+.card.qb .hs{color:#fff}
+.card.qb .hpill{background:rgba(255,255,255,.2);color:#fff}
+.card.qb .bh{color:#fff}
+.card.qb .qr{border-bottom:1px solid rgba(255,255,255,.18)}
+.card.qb .qr .ci{background:rgba(255,255,255,.2)}
+.card.qb .qr .ci svg{stroke:#fff}
+.card.qb .qr .qt b{color:#fff}
+.card.qb .qr .qt span{color:rgba(255,255,255,.7)}
+.card.qb .qr .qs{color:#fff}
+.card.qb .qr .qv{color:rgba(255,255,255,.72)}
+.card.qb .wk{background:rgba(255,255,255,.1);box-shadow:none}
+.card.qb .wkh b{color:#fff}
+.card.qb .wkh span{color:rgba(255,255,255,.85)}
+.card.qb .dayc .bar{background:rgba(255,255,255,.6)}
+.card.qb .dayc .bar.empty{background:rgba(255,255,255,.18)}
+.card.qb .dayc .bar.today{background:#fff}
+.card.qb .dayc small{color:rgba(255,255,255,.72)}
+.card.qb .drop{background:rgba(255,255,255,.1);box-shadow:none}
+.card.qb .drop small{color:rgba(255,255,255,.85)}
+.card.qb .drop b{color:#fff}
+.card.qb .h2h div{background:rgba(255,255,255,.14)}
+.card.qb .h2h small,.card.qb .h2h b,.card.qb .h2h>span{color:#fff}
 </style>
 <meta name="roughly-api" content="">
 </head>
 <body>
-<header><div class="hd"><div class="brand"><div class="mark"><svg viewBox='0 0 24 24'><path d='M3 12c3-5 6-5 9 0s6 5 9 0'/></svg></div><span>Roughly <em class="cn">Qatar</em></span></div><div class="hr"><nav class="dnav"><a href="#" id="nhow">How to play</a><a href="#" id="narch">Archive</a></nav><div id="streak"></div><button id="acct" class="signin-top" aria-label="Sign in">Sign in</button><button id="menu" class="mb" aria-label="Open menu"><svg viewBox='0 0 24 24'><path d='M4 7h16M4 12h16M4 17h16'/></svg></button></div></div></header>
+<header><div class="hd"><span class="wordmark">roughly.gg</span><button id="menu" class="mb" aria-label="Menu"><svg viewBox='0 0 24 24'><path d='M4 7h16M4 12h16M4 17h16'/></svg></button></div></header>
 <main>
   <div class="layout"><div id="app" class="card"></div></div>
   <p class="small"><a href="#" id="how">How to play</a> &middot; A new set of three every day</p>
@@ -523,7 +584,7 @@ body:not([data-view=land]) main{min-height:calc(100dvh - 76px);display:flex;flex
 <script>
 var COUNTRY="Qatar";
 document.title="Roughly "+COUNTRY+" – Daily Estimation Game";
-document.querySelector(".brand .cn").textContent=COUNTRY;
+var _cn=document.querySelector(".brand .cn");if(_cn)_cn.textContent=COUNTRY;
 var Q=[
 {c:"Everyday Qatar",t:"How many mobile phones are in use in Qatar?",u:"phones",m:4.2e6,lo:3e6,hi:7e6,s:["About 3 million residents","× roughly 1.4 phones each, counting work phones and second SIMs","≈ 4.2 million phones"],f:"Plenty of people carry two, and at least one of them has a cracked screen."},
 {c:"Everyday Qatar",t:"How many light bulbs are switched on across Qatar at 9 pm?",u:"bulbs",m:2e7,lo:8e6,hi:5e7,s:["About 750,000 homes × roughly 15 lights each ≈ 11 million","+ offices, malls, streets and stadiums ≈ 9 million","Total ≈ 20 million bulbs"],f:"Doha after dark is basically a very efficient lightshow."},
@@ -1216,7 +1277,7 @@ function unitChip(q){
 function emptyHint(q,c){return "Enter a number in "+uCap(c[0])+(c[1]!==1?" · converted to "+q.u+" for scoring (× "+fmt(c[1])+")":"")}
 function ask(n){
   var q=Q[ids[n]];var tools=toolsHtml(n);ex="";
-  mount("<div class='qhead'><span class='catico'>"+(ICONS[q.c]||ICONS["Everyday Qatar"])+"</span>"+prog(n)+"<span class='qhsp'></span></div>"+chBanner(n)+"<h2>"+q.t+"</h2><p class='lead' style='margin-bottom:18px'>"+(q.c==="Doha life"?"No exact answer. Funny Doha logic encouraged.":"No exact answer. Use logic, then commit.")+"</p>"+
+  mount(seg(n)+"<span class='catico'>"+(ICONS[q.c]||ICONS["Everyday Qatar"])+"</span>"+chBanner(n)+"<h2>"+q.t+"</h2><p class='lead' style='margin-bottom:18px'>"+(q.c==="Doha life"?"No exact answer. Funny Doha logic encouraged.":"No exact answer. Use logic, then commit.")+"</p>"+
   "<div class='field'><input id='in' inputmode='decimal' autocomplete='off' placeholder='Roughly …' aria-label='Your estimate'>"+unitChip(q)+"</div>"+
   "<div class='hint' id='h'>"+emptyHint(q,unitByLabel(q.u,load("rq-units",{})[q.u]))+"</div>"+tools);
   app.classList.add("qb");
@@ -1275,10 +1336,10 @@ function openLogic(i){
 }
 function reveal(i){
   var q=Q[ids[i]],g=st.g[i],s=st.s[i],pc=API?0:(CD=demoDist(),pctile(s)),last=st.g.length>=3,U=unitOf(q,i),f=U[1],ul=uCap(U[0]);
-  mount("<div class='qhead'><span class='catico'>"+(ICONS[q.c]||ICONS["Everyday Qatar"])+"</span>"+prog(i)+"<span class='qhsp'></span></div><h2 class='sm'>"+q.t+"</h2>"+
-  "<div class='revhit'><div class='rscore'><span id='sn'>0</span><i>%</i></div><div class='rverd'>"+verdict(g,q)+"</div></div>"+
+  mount(seg(i)+"<span class='catico'>"+(ICONS[q.c]||ICONS["Everyday Qatar"])+"</span><h2 class='sm'>"+q.t+"</h2>"+
   "<div class='cmp'><div class='me'><small>Your guess</small><b>"+short(g/f)+"</b><em>"+ul+"</em></div><div class='them'><small>Our estimate</small><b>"+short(q.m/f)+"</b><em>"+ul+"</em></div></div>"+
-  "<div class='rgraph revg'>"+chartSlot("q")+"</div>"+
+  "<div class='revhit'><div class='rscore'><span id='sn'>0</span><i>%</i></div><div class='rverd'>"+verdict(g,q)+"</div></div>"+
+  "<div class='revg'>"+chartSlot("q")+"</div>"+
   "<div class='revbtns'><button class='ghost' id='lg'>"+ICON_CHART+"See the maths</button><button class='main' id='nx'>"+(last?"See results":"Next")+"</button></div>");
   app.classList.add("qb");
   document.getElementById("lg").onclick=function(){openLogic(i)};
@@ -1309,14 +1370,15 @@ function done(){
   var tot=st.s.reduce(function(a,b){return a+b},0),avg=Math.round(tot/3),pc=API?0:(CD=demoDist(),pctile(avg)),qrows="",w7,i,q;
   for(i=0;i<3;i++){q=Q[ids[i]];qrows+="<div class='qr'>"+catIcon(q.c)+"<div class='qt'><b>"+q.t+"</b>"+(chInfo()?"<span>"+esc(chInfo().n)+" scored "+chInfo().s[i]+"%</span>":"")+"</div><div><span class='qs'>"+st.s[i]+"%</span><span class='qv'>"+verdict(st.g[i],q)+"</span></div></div>"}
   w7=last7().map(function(x){var h=x.avg!=null?Math.max(8,x.avg):0,cls=x.avg==null?"empty":x.d===today?"today":"";return "<div class='dayc'><div class='bar "+cls+"' style='height:"+h+"%'"+(x.avg!=null?" title='"+x.avg+"%'":"")+"></div><small>"+"SMTWTFS".charAt(new Date(x.d*864e5).getUTCDay())+"</small></div>"}).join("");
-  mount("<div class='res'>"+
-  "<div class='rtop'><div class='hero'><span class='hcat'>"+ICON_TARGET+"</span><small>Your score</small><div class='hs'><span id='sn'>0</span><i>%</i></div><div class='hpill' id='pill'"+(API?" style='display:none'":"")+">Top "+(100-pc)+"%</div></div>"+
-  "<div class='rgraph'>"+chartSlot("day")+"</div></div>"+
+  mount("<div class='res'><span class='hcat'>"+ICON_TARGET+"</span>"+
+  "<div class='rtop'><div class='rsc'><small>Your score</small><div class='hs'><span id='sn'>0</span><i>%</i></div><div class='hpill' id='pill'"+(API?" style='display:none'":"")+">Top "+(100-pc)+"%</div></div>"+
+  "<div class='revg'>"+chartSlot("day")+"</div></div>"+
   h2h(avg)+
   "<div class='qres'>"+qrows+"</div>"+
   "<div class='wk'><div class='wkh'><b>Last 7 days</b><span>"+stats.streak+" day streak</span></div><div class='days'>"+w7+"</div></div>"+
   "<div class='drop'><small>Next drop in</small><b id='cdn'>"+fmtDur(nextMidnight())+"</b><button class='dropb' id='arch'>Play past drops</button></div>"+
   "<button class='main' id='sh'>Share result</button></div>");
+  app.classList.add("qb");
   document.getElementById("sh").onclick=function(){openShare(tot)};
   document.getElementById("arch").onclick=function(){var d=new Date(day*864e5);cm={y:d.getUTCFullYear(),m:d.getUTCMonth()};openMenu()};
   if(cdTimer)clearInterval(cdTimer);
@@ -1324,13 +1386,10 @@ function done(){
   animate(avg,pc);chartLater("day",0,avg,viewTok);
 }
 function acctLabel(){var b=document.getElementById("acct");if(!b)return;b.textContent=acct().t?"Account":"Sign in"}
-function streak(){document.getElementById("streak").textContent=stats.streak?stats.streak+" day streak":"";acctLabel()}
+function streak(){var e=document.getElementById("streak");if(e)e.textContent=stats.streak?stats.streak+" day streak":""}
 document.getElementById("how").onclick=function(e){e.preventDefault();selectDay(today);intro=true;render();window.scrollTo(0,0)};
 document.getElementById("menu").onclick=function(){var d=new Date(day*864e5);cm={y:d.getUTCFullYear(),m:d.getUTCMonth()};openMenu()};
-document.getElementById("acct").onclick=function(){if(acct().t)openMenu();else openSignIn(1,"")};
-document.getElementById("narch").onclick=function(e){e.preventDefault();document.getElementById("menu").onclick()};
-document.getElementById("nhow").onclick=function(e){e.preventDefault();document.getElementById("how").onclick(e)};
-document.querySelector(".brand").onclick=function(){selectDay(today);intro=true;render();window.scrollTo(0,0)};
+document.querySelector(".wordmark").onclick=function(){selectDay(today);intro=true;render();window.scrollTo(0,0)};
 document.addEventListener("visibilitychange",function(){if(!document.hidden&&dayNum()!==day){init();streak();render()}});
 init();streak();render();
 if(API&&acct().t)pullSync().then(function(c){if(c){streak();selectDay(day);if(!busy)render()}},function(){});
