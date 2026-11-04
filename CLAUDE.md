@@ -21,9 +21,14 @@ Owner: SWISS, solo founder based in Doha. Tone in copy: human, warm, a bit funny
 - Be recognisable: editorial/puzzle feel, Gulf character, strong typography. Avoid generic AI/SaaS look.
 
 ## Design rules
-- Burgundy (#7a1230 family) and white. Slick, modern. Font: Plus Jakarta Sans.
+- Bright, colourful, game-like. Each daily question gets its own vivid "candy" colour, driven by CSS vars (`--c`, `--c2`, `--ct`, `--cs`) set on `<body>` per question slot via `setTheme()`/`THEMES` (blue, coral, violet); results use a green "win" theme (`WIN`). Soft coloured shadows give depth.
+- Font: Fredoka (rounded, playful) throughout.
 - No emojis anywhere (UI or copy). Icons are inline SVG.
-- Landing page first for normal visits (diagrams, FAQ, lively). Challenge links skip it.
+- Big, bold typography: large question text and large answer text.
+- Question and reveal screens are vertically centred and sized to fit one phone screen (no scroll). The primary action button sits in normal flow — no floating bar, no arrow icon.
+- Category shown as its icon only (a badge in the stepper row), never spelled out. No "Question 1 of 3".
+- Reveal is a quick, bright "hit": a coloured score block (green/amber/red by closeness) with a fast count-up and a thump. Results show a big count-up score, Top X%, the three questions (icon + text + score), last-7-days, and a large "Next drop in" countdown bubble with a "Play past drops" button.
+- Landing page first for normal visits: game-like hero (three colour "drops", bold headline, Play button) + numbered step cards + categories + short FAQ. Challenge links skip it.
 
 ## Repo layout
 - `index.html` the entire game: HTML + CSS + vanilla JS in one file. No build step, no dependencies.
@@ -31,7 +36,7 @@ Owner: SWISS, solo founder based in Doha. Tone in copy: human, warm, a bit funny
 
 ## How the game works (index.html)
 - Day number = days since epoch (UTC date of the player's local date). `START` = 1 Oct 2026 (archive start). `today`/`day` globals.
-- Question bank `Q` (33 questions: 21 regular, 12 category "Doha life"). Shape: `{c category, t text, u unit, m our estimate, lo, hi plausible range, s [logic steps], f fun fact, k optional kind}`. `HINTS` is a parallel array (same index) of `["Good to know", text]`.
+- Question bank `Q` (133 questions, ~98 regular + 35 category "Doha life"). Shape: `{c category, t text, u unit, m our estimate, lo, hi plausible range, s [logic steps], f fun fact, k optional kind}`. `HINTS` is a parallel array (same index) of `["Good to know", text]`.
 - APPEND new questions and hints at the end only. Never reorder: stats, saved games and sync match questions by index.
 - `pick(d)` is a seeded shuffle: 2 regular + 1 Doha life question per day, same for everyone.
 - Answers are stored in base units. `UNITS` lets players answer in other units (km/miles, kg/lb, litres/gallons, hours/minutes, QAR/USD/EUR/GBP/INR/PKR/PHP, tonnes/US tons). Currency rates are fixed approximations in `UNITS`.
@@ -40,7 +45,7 @@ Owner: SWISS, solo founder based in Doha. Tone in copy: human, warm, a bit funny
 - Source tags: `KINDS` O/D/R. Default is R (Rough estimate). Only a few questions are D (set by a list near `KINDS`). Nothing is O yet.
 - One free "Good to know" note per question (no score penalty). Calculator and notes sheet per question.
 - Reveal and results screens: animated count-up, bell-curve chart with moving percentile dot, bar chart behind the curve, per-guess bars.
-- Calibration: computed on-device from saved days (`playLog`, `calib`). Unlocks after 6 answers.
+- Calibration was removed from the UI. Ranks still exist in code (`TIERS`/`rankOf`, used in share text) but the rank name is no longer shown on the results screen (only Top X%).
 - Challenge links: `?c=<day>.<s1>-<s2>-<s3>[.<name>]` (scores only, never answers). `parseChallenge()` validates, stores `rq-ch-<day>`, selects that day and skips the landing page. Head-to-head shows after finishing.
 - Sheets: one bottom sheet `#sheet` + `#scrim` for calculator, menu (sign in, calibration, archive calendar), share. Desktop (>=960px) shows a sidebar layout and centred modal.
 
