@@ -546,7 +546,7 @@ body:not([data-view=land]) main{min-height:calc(100dvh - 76px);display:flex;flex
 /* results on a coloured board */
 .res .hcat{position:static;margin:2px 0 8px;background:rgba(255,255,255,.2)}
 .res .hcat svg{stroke:#fff}
-.rtop{display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:center;margin:4px 0 14px;background:none;box-shadow:none;padding:0;border-radius:0}
+.rtop{display:grid;grid-template-columns:0.82fr 1.18fr;gap:10px;align-items:center;margin:4px 0 14px;background:none;box-shadow:none;padding:0;border-radius:0}
 .rsc{text-align:center}
 .rsc>small{font-size:.66rem;letter-spacing:1.2px;text-transform:uppercase;font-weight:700;opacity:.82}
 .card.qb .hs{color:#fff}
@@ -587,7 +587,7 @@ body:not([data-view=land]) main{min-height:calc(100dvh - 76px);display:flex;flex
 .card.qb .cmp .them{background:linear-gradient(135deg,#22c55e,#0a8f52);color:#fff}
 .card.qb .cmp .them small{color:rgba(255,255,255,.82)}
 .card.qb .cmp .them b{color:#fff}
-.revrow{display:grid;grid-template-columns:1fr 1.5fr;gap:12px;align-items:center;margin:4px 0 10px}
+.revrow{display:grid;grid-template-columns:0.8fr 1.7fr;gap:10px;align-items:center;margin:4px 0 10px}
 .revrow .revhit{margin:0;text-align:center}
 .revrow .revhit .rscore span{font-size:2.6rem}
 .revrow .revhit .rverd{font-size:.95rem}
@@ -1353,22 +1353,19 @@ function ask(n){
   go.onclick=lock;inp.onkeydown=function(e){if(e.key==="Enter"&&!e.repeat)lock()};
   setTimeout(function(){try{inp.focus({preventScroll:true})}catch(e){}},80);
 }
-function gx(s){return 30+s*2.56}
-function gy(s){return 92-55*dens(Math.max(0,Math.min(100,s)))/ymax()}
+function gx(s){return 14+s*2.7}
+function gy(s){return 114-82*dens(Math.max(0,Math.min(100,s)))/ymax()}
 function graph(){
-  var p="",i,bars="",grid="",bw=(gx(5)-gx(0))-3,YM=ymax(),B=CD.bins;
+  var p="",i,bars="",bw=(gx(5)-gx(0))-3,YM=ymax(),B=CD.bins;
   for(i=0;i<=100;i+=2)p+=(i?"L":"M")+gx(i).toFixed(1)+","+gy(i).toFixed(1);
-  for(i=0;i<20;i++){var hh=55*B[i]/YM;bars+="<rect x='"+(gx(i*5)+1.5).toFixed(1)+"' y='"+(92-hh).toFixed(1)+"' width='"+bw.toFixed(1)+"' height='"+hh.toFixed(1)+"' rx='2.5'><title>"+(i*5)+" to "+(i*5+5)+"%: "+B[i]+" players</title></rect>"}
-  [0,YM/2,YM].forEach(function(v){var y=92-55*v/YM;grid+="<line x1='30' x2='286' y1='"+y+"' y2='"+y+"' stroke='#f0eef4' stroke-width='1'/><text x='24' y='"+(y+3)+"' text-anchor='end'>"+Math.round(v)+"</text>"});
-  return "<svg viewBox='0 0 300 124' role='img' aria-label='How many players scored in each band, with a smoothed curve'><defs><clipPath id='cp'><rect id='cr' x='0' y='0' width='0' height='124'/></clipPath></defs>"+
-  "<g font-size='8' fill='#a79aa0'>"+grid+"</g>"+
+  for(i=0;i<20;i++){var hh=82*B[i]/YM;bars+="<rect x='"+(gx(i*5)+1.5).toFixed(1)+"' y='"+(114-hh).toFixed(1)+"' width='"+bw.toFixed(1)+"' height='"+Math.max(.5,hh).toFixed(1)+"' rx='2.5'></rect>"}
+  return "<svg viewBox='0 0 300 146' role='img' aria-label='Score distribution with your position'><defs><clipPath id='cp'><rect id='cr' x='0' y='0' width='0' height='146'/></clipPath></defs>"+
   "<g class='gbar' fill='#ecedf4'>"+bars+"</g><g class='gbar2' fill='#cdd5e3' clip-path='url(#cp)'>"+bars+"</g>"+
-  "<path class='gcurve' d='"+p+"' fill='none' stroke='#aab2bf' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'/><line x1='30' y1='92' x2='286' y2='92' stroke='#e9e7ef'/>"+
-  "<line id='dl' class='gyline' x1='30' x2='30' y1='92' y2='92' stroke='#2f6bff' stroke-width='2' stroke-dasharray='3 3'/><circle id='dt' class='gydot' cx='30' cy='92' r='7.5' fill='#2f6bff' stroke='#fff' stroke-width='3'/>"+
-  "<text id='yt' class='gyt' x='30' y='20' text-anchor='middle' font-size='10' font-weight='800' fill='#2f6bff'>You</text>"+
-  "<g font-size='9' fill='#82747a' text-anchor='middle'><text x='"+gx(0)+"' y='105'>0</text><text x='"+gx(25)+"' y='105'>25</text><text x='"+gx(50)+"' y='105'>50</text><text x='"+gx(75)+"' y='105'>75</text><text x='"+gx(100)+"' y='105'>100</text></g>"+
-  "<g font-size='8' fill='#a79aa0' text-anchor='middle'><text x='"+gx(50)+"' y='118'>Accuracy score (%)</text></g>"+
-  "<text x='8' y='57' font-size='8' fill='#a79aa0' text-anchor='middle' transform='rotate(-90 8 57)'>Players</text></svg>";
+  "<path class='gcurve' d='"+p+"' fill='none' stroke='#aab2bf' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'/><line x1='14' y1='114' x2='284' y2='114' stroke='#e9e7ef'/>"+
+  "<line id='dl' class='gyline' x1='14' x2='14' y1='114' y2='114' stroke='#2f6bff' stroke-width='2' stroke-dasharray='3 3'/><circle id='dt' class='gydot' cx='14' cy='114' r='8' fill='#2f6bff' stroke='#fff' stroke-width='3'/>"+
+  "<text id='yt' class='gyt' x='14' y='14' text-anchor='middle' font-size='11' font-weight='800' fill='#2f6bff'>You</text>"+
+  "<g font-size='9' fill='#82747a' text-anchor='middle'><text x='"+gx(0)+"' y='130'>0</text><text x='"+gx(25)+"' y='130'>25</text><text x='"+gx(50)+"' y='130'>50</text><text x='"+gx(75)+"' y='130'>75</text><text x='"+gx(100)+"' y='130'>100</text></g>"+
+  "<g font-size='8' fill='#a79aa0' text-anchor='middle'><text x='"+gx(50)+"' y='143'>Accuracy score (%)</text></g></svg>";
 }
 function rangeBar(q,g,f){
   f=f||1;
