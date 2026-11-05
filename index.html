@@ -593,6 +593,24 @@ body:not([data-view=land]) main{min-height:calc(100dvh - 76px);display:flex;flex
 .revrow .revhit .rverd{font-size:.95rem}
 .revrow .revg{margin:0}
 .revrow .pct{font-size:.66rem}
+/* #1 yellow past-drops bubble */
+.card.qb .drop{background:linear-gradient(135deg,#ffd84d,#ffc400);color:#3f3200;box-shadow:0 16px 32px -16px rgba(255,196,0,.75);margin-top:4px}
+.card.qb .drop small{color:#6b5300}
+.card.qb .drop b{color:#241c00}
+.card.qb .drop .dropb{background:#241c00;color:#ffd84d;border:0}
+.card.qb .drop .dropb:hover{background:#3f3200}
+/* #2 compact streak chip */
+.pillrow{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:8px;flex-wrap:wrap}
+.stk{display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.2);border-radius:20px;padding:5px 12px 5px 9px;font-size:.78rem;font-weight:600;color:#fff}
+.stk svg{width:15px;height:15px;fill:#ffd84d;stroke:none;flex:none}
+/* #3 readable Good to know on coloured board */
+.card.qb .hintbox{background:rgba(255,255,255,.16);border-left:4px solid rgba(255,255,255,.75);box-shadow:none}
+.card.qb .hintbox .hi{background:rgba(255,255,255,.22)}
+.card.qb .hintbox .hi svg{stroke:#fff}
+.card.qb .hintbox b{color:rgba(255,255,255,.85)}
+.card.qb .hintbox .ht{color:#fff}
+/* #4 stop double-tap zoom on taps */
+button,.k,.chip{touch-action:manipulation}
 </style>
 <meta name="roughly-api" content="">
 </head>
@@ -884,6 +902,7 @@ var ICON_X="<svg viewBox='0 0 24 24'><path d='M6 6l12 12M18 6L6 18'/></svg>";
 var ARR="<svg viewBox='0 0 24 24'><path d='M5 12h14M13 6l6 6-6 6'/></svg>";
 var CHECK="<svg viewBox='0 0 24 24'><path d='M5 12l5 5 9-10'/></svg>";
 var ICON_TARGET="<svg viewBox='0 0 24 24'><circle cx='12' cy='12' r='9'/><circle cx='12' cy='12' r='5'/><circle cx='12' cy='12' r='1.5'/></svg>";
+var ICON_FLAME="<svg viewBox='0 0 24 24'><path d='M12 2c.6 2.6-1.6 3.9-1.6 6.1 0 1.1.9 1.9 1.6 1.9.8 0 1.3-.8 1.3-1.6 1.2 1.1 2.1 2.7 2.1 4.4a5.4 5.4 0 0 1-10.8 0c0-3.2 2.5-4.9 4-7.1 1-1.5 1.7-3.2 1.4-3.7 .7.2 1.6.9 2 1.7z'/></svg>";
 var app=document.getElementById("app"),raf=0,busy=false,day,today,cm,ids,st,stats,intro;
 var reduce=window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches;
 function dayNum(){var d=new Date();return Math.floor(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate())/864e5)}
@@ -1406,11 +1425,10 @@ function done(){
   for(i=0;i<3;i++){q=Q[ids[i]];qrows+="<div class='qr'>"+catIcon(q.c)+"<div class='qt'><b>"+q.t+"</b>"+(chInfo()?"<span>"+esc(chInfo().n)+" scored "+chInfo().s[i]+"%</span>":"")+"</div><div><span class='qs'>"+st.s[i]+"%</span><span class='qv'>"+verdict(st.g[i],q)+"</span></div></div>"}
   w7=last7().map(function(x){var h=x.avg!=null?Math.max(8,x.avg):0,cls=x.avg==null?"empty":x.d===today?"today":"";return "<div class='dayc'><div class='bar "+cls+"' style='height:"+h+"%'"+(x.avg!=null?" title='"+x.avg+"%'":"")+"></div><small>"+"SMTWTFS".charAt(new Date(x.d*864e5).getUTCDay())+"</small></div>"}).join("");
   mount("<div class='res'><span class='hcat'>"+ICON_TARGET+"</span>"+
-  "<div class='rtop'><div class='rsc'><small>Your score</small><div class='hs'><span id='sn'>0</span><i>%</i></div><div class='hpill' id='pill'"+(API?" style='display:none'":"")+">Top "+(100-pc)+"%</div></div>"+
+  "<div class='rtop'><div class='rsc'><small>Your score</small><div class='hs'><span id='sn'>0</span><i>%</i></div><div class='pillrow'><span class='hpill' id='pill'"+(API?" style='display:none'":"")+">Top "+(100-pc)+"%</span>"+(stats.streak?"<span class='stk'>"+ICON_FLAME+stats.streak+" day streak</span>":"")+"</div></div>"+
   "<div class='revg'>"+chartSlot("day")+"</div></div>"+
   h2h(avg)+
   "<div class='qres'>"+qrows+"</div>"+
-  "<div class='wk'><div class='wkh'><b>Last 7 days</b><span>"+stats.streak+" day streak</span></div><div class='days'>"+w7+"</div></div>"+
   "<div class='drop'><small>Next drop in</small><b id='cdn'>"+fmtDur(nextMidnight())+"</b><button class='dropb' id='arch'>Play past drops</button></div>"+
   "<button class='main' id='sh'>Share result</button></div>");
   app.classList.add("qb");
