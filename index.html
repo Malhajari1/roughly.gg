@@ -3,6 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta id="themecolor" name="theme-color" content="#2f6bff">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>Roughly Qatar – Daily Estimation Game</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
@@ -611,6 +614,20 @@ body:not([data-view=land]) main{min-height:calc(100dvh - 76px);display:flex;flex
 .card.qb .hintbox .ht{color:#fff}
 /* #4 stop double-tap zoom on taps */
 button,.k,.chip{touch-action:manipulation}
+/* v6: shiny separate past-drops bubble */
+.pastdrops{position:relative;overflow:hidden;display:block;width:100%;border:0;border-radius:22px;padding:17px;margin:12px 0 0;font-family:inherit;font-weight:700;font-size:1.05rem;letter-spacing:.2px;cursor:pointer;background:linear-gradient(135deg,#ffe066,#ffc400);color:#241c00;box-shadow:0 16px 32px -16px rgba(255,196,0,.8)}
+.pastdrops::after{content:"";position:absolute;top:0;bottom:0;left:-45%;width:28%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.65),transparent);transform:skewX(-20deg);animation:bling 4s ease-in-out infinite;pointer-events:none}
+.pastdrops:active{transform:scale(.98)}
+@media (prefers-reduced-motion:reduce){.pastdrops::after{display:none}}
+/* bigger results score */
+.rtop{grid-template-columns:0.92fr 1.08fr}
+.rsc .hs span{font-size:3.9rem}
+.rsc .hs i{font-size:1.2rem}
+.rsc>small{font-size:.7rem}
+/* kill rubber-band / phantom scroll */
+html{overscroll-behavior:none;height:100%}
+body{overscroll-behavior:none}
+body:not([data-view=land]) main>.small{display:none}
 </style>
 <meta name="roughly-api" content="">
 </head>
@@ -1301,7 +1318,7 @@ var THEMES=[
  {c:"#8b5cf6",c2:"#6d28d9",ct:"#f3edff",cs:"139,92,246"}
 ];
 var WIN=THEMES[0];
-function setTheme(t){var s=document.body.style;s.setProperty("--c",t.c);s.setProperty("--c2",t.c2);s.setProperty("--ct",t.ct);s.setProperty("--cs",t.cs)}
+function setTheme(t){var s=document.body.style;s.setProperty("--c",t.c);s.setProperty("--c2",t.c2);s.setProperty("--ct",t.ct);s.setProperty("--cs",t.cs);var m=document.getElementById("themecolor");if(m)m.setAttribute("content",t.ct)}
 function render(){
   cancelAnimationFrame(raf);viewTok++;
   var n=st.g.length;
@@ -1426,7 +1443,8 @@ function done(){
   "<div class='revg'>"+chartSlot("day")+"</div></div>"+
   h2h(avg)+
   "<div class='qres'>"+qrows+"</div>"+
-  "<div class='drop'><small>Next drop in</small><b id='cdn'>"+fmtDur(nextMidnight())+"</b><button class='dropb' id='arch'>Play past drops</button></div>"+
+  "<div class='drop'><small>Next drop in</small><b id='cdn'>"+fmtDur(nextMidnight())+"</b></div>"+
+  "<button class='pastdrops' id='arch'>Play past drops</button>"+
   "<button class='main' id='sh'>Share result</button></div>");
   app.classList.add("qb");
   document.getElementById("sh").onclick=function(){openShare(tot)};
