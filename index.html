@@ -996,14 +996,17 @@ function unitByLabel(u,l){var a=unitList(u),i;for(i=0;i<a.length;i++)if(a[i][0]=
 var USYM={kg:1,km:1,kWh:1,QAR:1,lb:1,USD:1,EUR:1,GBP:1,INR:1,PKR:1,PHP:1};
 function uCap(u){u=String(u);return USYM[u]?u:u.charAt(0).toUpperCase()+u.slice(1)}
 function unitOf(q,i){return unitByLabel(q.u,st.un&&st.un[i])}
-function fmt(n){if(n>0&&n<1)return String(parseFloat(n.toPrecision(2)));if(n>=100)return Math.round(n).toLocaleString("en-US");if(n>=10)return String(Math.round(n*10)/10);return String(Math.round(n*100)/100)}
-function short(n){if(n>=1e9)return (Math.round(n/1e8)/10)+" billion";if(n>=1e6)return (Math.round(n/1e5)/10)+" million";return fmt(n)}
-function words(n){return n>=1e4?"About "+short(n):""}
+function faD(s){return LANG==="ar"?String(s).replace(/[0-9]/g,function(d){return "٠١٢٣٤٥٦٧٨٩".charAt(+d)}).replace(/%/g,"٪"):String(s)}
+function toWestern(s){return String(s).replace(/[٠-٩]/g,function(d){return String("٠١٢٣٤٥٦٧٨٩".indexOf(d))}).replace(/٫/g,".").replace(/٬/g,",")}
+function PCT(){return LANG==="ar"?"٪":"%"}
+function fmt(n){var r;if(n>0&&n<1)r=String(parseFloat(n.toPrecision(2)));else if(n>=100)r=Math.round(n).toLocaleString("en-US");else if(n>=10)r=String(Math.round(n*10)/10);else r=String(Math.round(n*100)/100);return faD(r)}
+function short(n){if(n>=1e9)return faD(Math.round(n/1e8)/10)+(LANG==="ar"?" مليار":" billion");if(n>=1e6)return faD(Math.round(n/1e5)/10)+(LANG==="ar"?" مليون":" million");return fmt(n)}
+function words(n){return n>=1e4?short(n):""}
 function L(x){return Math.log10(x)}
 function ratio(g,q){return g>=q.m?g/q.m:q.m/g}
 function score(g,q){var d=L(ratio(g,q));return Math.max(1,Math.round(100/(1+d*d/.36)))}
 function times(x){return x<10?(Math.round(x*10)/10):Math.round(x)}
-function verdict(g,q){var x=ratio(g,q);if(x<=1.05)return tr("Spot on");var hi=g>q.m;return times(x)+"× "+(LANG==="ar"?(hi?"أعلى":"أقل"):"too "+(hi?"high":"low"))}
+function verdict(g,q){var x=ratio(g,q);if(x<=1.05)return tr("Spot on");var hi=g>q.m;return faD(times(x))+"× "+(LANG==="ar"?(hi?"أعلى":"أقل"):"too "+(hi?"high":"low"))}
 function vClass(g,q,s){return (g>=q.lo&&g<=q.hi)||s>=80?"good":s>=40?"mid":"bad"}
 function erf(x){var s=x<0?-1:1;x=Math.abs(x);var t=1/(1+.3275911*x);return s*(1-(((((1.061405429*t-1.453152027)*t)+1.421413741)*t-.284496736)*t+.254829592)*t*Math.exp(-x*x))}
 var DEMO=[3,6,11,19,30,44,60,76,89,97,97,89,76,60,44,30,19,11,6,3],DEMO_N=DEMO.reduce(function(a,b){return a+b},0);
@@ -1030,12 +1033,12 @@ function calcEval(s){
   function expr(){var v=term();while(s[i]==="+"||s[i]==="-"){var o=s[i++],r=term();v=o==="+"?v+r:v-r}return v}
   if(!s)return NaN;
   var v=expr();return i===s.length?v:NaN}
-function fmtR(v){return Math.abs(v)>=1000?Math.round(v).toLocaleString("en-US"):String(Math.round(v*1e4)/1e4)}
+function fmtR(v){return faD(Math.abs(v)>=1000?Math.round(v).toLocaleString("en-US"):String(Math.round(v*1e4)/1e4))}
 function calcUpd(){
   var s=ex.replace(/[+−×÷]+$/,""),o=(s.match(/\(/g)||[]).length-(s.match(/\)/g)||[]).length;
   var v=s?calcEval(s+Array(Math.max(0,o)+1).join(")")):NaN;
-  document.getElementById("ex").textContent=ex||"\u00a0";
-  document.getElementById("rs").textContent=isFinite(v)?fmtR(v):"0";
+  document.getElementById("ex").textContent=faD(ex)||"\u00a0";
+  document.getElementById("rs").textContent=isFinite(v)?fmtR(v):faD("0");
   document.getElementById("use").disabled=!(v>0&&v<1e15);
   return v}
 function press(k){
@@ -1055,7 +1058,7 @@ function openSheet(n,inp){
   var AR=LANG==="ar";
   sh.innerHTML="<div class='grab'></div><div class='shh'><b>"+(AR?"الآلة الحاسبة والملاحظات":"Calculator &amp; Notes")+"</b><button class='x' id='sx' aria-label='Close'>"+ICON_X+"</button></div>"+
   "<div class='disp'><div class='ex' id='ex'></div><div class='rs' id='rs'>0</div></div><div class='keys'>"+
-  keys.map(function(k){var c=/[÷×−+]/.test(k)?" op":k==="="?" eq":(k==="C"||k==="⌫")?" fn":"";return "<button class='k"+c+"' data-k='"+k+"'>"+k+"</button>"}).join("")+"</div>"+
+  keys.map(function(k){var c=/[÷×−+]/.test(k)?" op":k==="="?" eq":(k==="C"||k==="⌫")?" fn":"";return "<button class='k"+c+"' data-k='"+k+"'>"+faD(k)+"</button>"}).join("")+"</div>"+
   "<button class='main use' id='use' disabled>"+(AR?"استخدم الناتج كإجابتي":"Use result as my answer")+"</button><label class='nl' for='nt'>"+(AR?"ملاحظات":"Notes")+"</label>"+
   "<textarea id='nt' placeholder='"+(AR?"دوّن منطقك، مثل بيوت × نوافذ لكل بيت…":"Jot down your logic, like homes × windows per home…")+"'></textarea>";
   var nt=document.getElementById("nt");nt.value=st.nt[n]||"";
@@ -1164,7 +1167,7 @@ function openMenu(){
   for(k=1;k<=dim;k++){
     var d=first+k-1,dis=d>today||d<START,inf=dis?{n:0,t:0}:dayInfo(d);
     var cls="cd"+(d===today?" today":"")+(d===day?" sel":"")+(inf.n>=3?" done":inf.n>0?" part":"");
-    cells+="<button class='"+cls+"' data-d='"+d+"'"+(dis?" disabled":"")+"><span>"+k+"</span><small>"+(inf.n>=3?Math.round(inf.t/3)+"%":inf.n>0?inf.n+"/3":"")+"</small></button>"}
+    cells+="<button class='"+cls+"' data-d='"+d+"'"+(dis?" disabled":"")+"><span>"+faD(k)+"</span><small>"+(inf.n>=3?faD(Math.round(inf.t/3))+PCT():inf.n>0?faD(inf.n)+"/"+faD(3):"")+"</small></button>"}
   var AR=LANG==="ar",WD=AR?["ح","ن","ث","ر","خ","ج","س"]:"SMTWTFS".split("");
   sh.innerHTML="<div class='grab'></div><div class='shh'><b>"+(AR?"القائمة":"Menu")+"</b><button class='x' id='sx' aria-label='Close'>"+ICON_X+"</button></div>"+menuRows()+"<h3 class='bh' style='margin-top:20px'>"+(AR?"العب الأرشيف":"Play archive")+"</h3>"+
   "<div class='mrow'><button class='x' data-nav='-1' aria-label='Previous month'"+(canPrev?"":" disabled")+">"+(AR?ICON_R:ICON_L)+"</button><b>"+MONL[cm.m]+" "+cm.y+"</b><button class='x' data-nav='1' aria-label='Next month'"+(canNext?"":" disabled")+">"+(AR?ICON_L:ICON_R)+"</button></div>"+
@@ -1210,7 +1213,7 @@ function chartInner(kind){
   if(kind==="q"&&!D.demo&&D.n>0){
     var po=Math.round(100*(D.over||0)/D.n),pu=Math.round(100*(D.under||0)/D.n);
     ov="<p class='ovl'>"+(AR?(Math.max(po,pu)<50?"اللاعبون انقسموا على هذا.":po>=pu?po+"٪ من اللاعبين خمّنوا أعلى من اللازم.":pu+"٪ من اللاعبين خمّنوا أقل من اللازم."):(Math.max(po,pu)<50?"Players were split on this one.":po>=pu?po+"% of players guessed too high.":pu+"% of players guessed too low."))+"</p>"}
-  return "<div class='graph'>"+graph()+"</div><div class='pct'><span>"+tr("Better than")+"</span><b><span id='pn'>0</span>"+(AR?"٪ من اللاعبين":"% of players")+"</b></div>"+ov+
+  return "<div class='graph'>"+graph()+"</div><div class='pct'><span>"+tr("Better than")+"</span><b><span id='pn'>"+faD(0)+"</span>"+(AR?"٪ من اللاعبين":"% of players")+"</b></div>"+ov+
     (D.demo?"":"<p class='note'>"+(AR?"بناءً على "+D.n.toLocaleString("ar-EG")+" لاعب جاوبوا "+(kind==="q"?"على هذا السؤال":"أسئلة اليوم الثلاثة")+".":"Based on "+D.n.toLocaleString("en-US")+" players who answered "+(kind==="q"?"this question":"today’s three")+".")+"</p>")}
 function chartSlot(kind){
   if(!API){CD=demoDist();return chartInner(kind)}
@@ -1224,7 +1227,7 @@ function chartLater(kind,qi,s,tok){
     if(!o||n<MINN){box.innerHTML="<p class='note'>Comparison with other players unlocks once "+MINN+" people have answered"+(n?" ("+n+" so far)":"")+". You’re early.</p>";return}
     CD={bins:o.dist,n:n,demo:false,over:o.over||0,under:o.under||0};
     var pc=pctile(s);box.innerHTML=chartInner(kind);
-    if(kind==="day"){var pl=document.getElementById("pill");if(pl){pl.textContent="Top "+(100-pc)+"%";pl.style.display=""}}
+    if(kind==="day"){var pl=document.getElementById("pill");if(pl){pl.textContent=LANG==="ar"?"أفضل "+faD(100-pc)+"٪":"Top "+(100-pc)+"%";pl.style.display=""}}
     animate(s,pc,"graph")
   }).catch(function(){
     if(tok!==viewTok)return;var b=document.getElementById("gbox");
@@ -1253,8 +1256,8 @@ function chBanner(n){var c=n===0&&st.g.length===0?chInfo():null;
 function h2h(avg){
   var c=chInfo();if(!c)return "";
   var th=Math.round((c.s[0]+c.s[1]+c.s[2])/3),d=avg-th,nm=esc(c.n),
-    msg=LANG==="ar"?(Math.abs(d)<=1?"تعادل تام مع "+nm+".":d>0?"غلبت "+nm+" بفارق "+d+" نقطة.":nm+" سبقك بـ "+(-d)+" نقطة. إعادة بكرة؟"):(Math.abs(d)<=1?"Dead heat with "+nm+".":d>0?"You beat "+nm+" by "+d+" points.":nm+" edges you by "+(-d)+" points. Rematch tomorrow?");
-  return "<h3 class='bh'>"+(LANG==="ar"?"وجهاً لوجه":"Head to head")+"</h3><div class='h2h'><div><small>"+tr("You")+"</small><b>"+avg+"%</b></div><span>"+(LANG==="ar"?"ضد":"vs")+"</span><div><small>"+nm+"</small><b>"+th+"%</b></div></div><p class='note' style='text-align:center;margin-top:10px'>"+msg+"</p>"}
+    msg=LANG==="ar"?(Math.abs(d)<=1?"تعادل تام مع "+nm+".":d>0?"غلبت "+nm+" بفارق "+faD(d)+" نقطة.":nm+" سبقك بـ "+faD(-d)+" نقطة. إعادة بكرة؟"):(Math.abs(d)<=1?"Dead heat with "+nm+".":d>0?"You beat "+nm+" by "+d+" points.":nm+" edges you by "+(-d)+" points. Rematch tomorrow?");
+  return "<h3 class='bh'>"+(LANG==="ar"?"وجهاً لوجه":"Head to head")+"</h3><div class='h2h'><div><small>"+tr("You")+"</small><b>"+faD(avg)+PCT()+"</b></div><span>"+(LANG==="ar"?"ضد":"vs")+"</span><div><small>"+nm+"</small><b>"+faD(th)+PCT()+"</b></div></div><p class='note' style='text-align:center;margin-top:10px'>"+msg+"</p>"}
 
 /* ===== sign in (optional) and sync ===== */
 var ICON_USER="<svg viewBox='0 0 24 24'><circle cx='12' cy='8' r='4'/><path d='M4 21c0-4 4-6 8-6s8 2 8 6'/></svg>",
@@ -1360,10 +1363,10 @@ function side(){
   var n=st.g.length,rows="",i,q,state,AR=LANG==="ar";
   for(i=0;i<3;i++){
     q=Q[ids[i]];state=i<n?"done":i===n?"cur":"up";
-    rows+="<div class='sq "+state+"'>"+catIcon(q.c)+"<div><b>"+(AR?"السؤال "+(i+1):"Question "+(i+1))+"</b><span class='s'>"+(AR?catAr(q.c):q.c)+"</span></div>"+(i<n?"<span class='sc2'>"+st.s[i]+"%</span>":"")+"</div>"}
-  var avg=stats.played?Math.round(stats.total/stats.played/3)+"%":"–";
+    rows+="<div class='sq "+state+"'>"+catIcon(q.c)+"<div><b>"+(AR?"السؤال "+(i+1):"Question "+(i+1))+"</b><span class='s'>"+(AR?catAr(q.c):q.c)+"</span></div>"+(i<n?"<span class='sc2'>"+faD(st.s[i])+PCT()+"</span>":"")+"</div>"}
+  var avg=stats.played?faD(Math.round(stats.total/stats.played/3))+PCT():"–";
   el.innerHTML="<div class='sdc'><h4>"+(day===today?(AR?"اليوم":"Today"):(AR?"الأرشيف":"Archive"))+" · "+dlabel(day)+"</h4>"+rows+"</div>"+
-  "<div class='sdc'><h4>"+(AR?"إحصائياتك":"Your stats")+"</h4><div class='stats'><div><b>"+stats.streak+"</b><span>"+(AR?"السلسلة":"Streak")+"</span></div><div><b>"+stats.played+"</b><span>"+(AR?"لعبت":"Played")+"</span></div><div><b>"+avg+"</b><span>"+(AR?"الدقة":"Accuracy")+"</span></div></div></div>"+
+  "<div class='sdc'><h4>"+(AR?"إحصائياتك":"Your stats")+"</h4><div class='stats'><div><b>"+faD(stats.streak)+"</b><span>"+(AR?"السلسلة":"Streak")+"</span></div><div><b>"+faD(stats.played)+"</b><span>"+(AR?"لعبت":"Played")+"</span></div><div><b>"+avg+"</b><span>"+(AR?"الدقة":"Accuracy")+"</span></div></div></div>"+
   "<div class='sdc tipcard'><h4>"+(AR?"نصيحة":"Pro tip")+"</h4><p>"+(AR?TIPS_AR[(day+n)%TIPS_AR.length]:TIPS[(day+n)%TIPS.length])+"</p></div>"+
   "<button class='ghost' id='sa' style='width:100%;background:#fff'>"+ICON_CAL+(AR?"العب الأرشيف":"Play the archive")+"</button>";
   document.getElementById("sa").onclick=function(){var d=new Date(day*864e5);cm={y:d.getUTCFullYear(),m:d.getUTCMonth()};openMenu()};
@@ -1431,12 +1434,12 @@ function ask(n){
   app.classList.add("qb");
   var inp=document.getElementById("in"),go=document.getElementById("go"),h=document.getElementById("h"),un=document.getElementById("un");wireTools(n,inp);typePlaceholder(inp);
   function cur(){return un?unitByLabel(q.u,un.value):unitList(q.u)[0]}
-  function val(){return parseFloat(inp.value.replace(/,/g,""))}
+  function val(){return parseFloat(toWestern(inp.value).replace(/,/g,""))}
   function ok(x){return x>0&&x*cur()[1]<1e15}
   inp.oninput=function(){
-    var v=inp.value.replace(/[^0-9.]/g,""),p=v.split(".");
+    var v=toWestern(inp.value).replace(/[^0-9.]/g,""),p=v.split(".");
     p[0]=p[0].slice(0,15).replace(/\B(?=(\d{3})+(?!\d))/g,",");
-    inp.value=p.length>1?p[0]+"."+p.slice(1).join("").slice(0,4):p[0];
+    inp.value=faD(p.length>1?p[0]+"."+p.slice(1).join("").slice(0,4):p[0]);
     var x=val();go.disabled=!ok(x);h.textContent=ok(x)?(words(x)||"\u00a0"):emptyHint(q,cur())};
   if(un)un.onchange=function(){var p=load("rq-units",{});p[q.u]=un.value;save("rq-units",p);inp.oninput();try{inp.focus({preventScroll:true})}catch(e){}};
   function lock(){
@@ -1458,7 +1461,7 @@ function graph(){
   "<path class='gcurve' d='"+p+"' fill='none' stroke='#aab2bf' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'/><line x1='14' y1='114' x2='284' y2='114' stroke='#e9e7ef'/>"+
   "<line id='dl' class='gyline' x1='14' x2='14' y1='114' y2='114' stroke='#2f6bff' stroke-width='2' stroke-dasharray='3 3'/><circle id='dt' class='gydot' cx='14' cy='114' r='8' fill='#2f6bff' stroke='#fff' stroke-width='3'/>"+
   "<text id='yt' class='gyt' x='14' y='14' text-anchor='middle' font-size='11' font-weight='800' fill='#2f6bff'>"+tr("You")+"</text>"+
-  "<g font-size='9' fill='#82747a' text-anchor='middle'><text x='"+gx(0)+"' y='130'>0</text><text x='"+gx(25)+"' y='130'>25</text><text x='"+gx(50)+"' y='130'>50</text><text x='"+gx(75)+"' y='130'>75</text><text x='"+gx(100)+"' y='130'>100</text></g>"+
+  "<g font-size='9' fill='#82747a' text-anchor='middle'><text x='"+gx(0)+"' y='130'>"+faD(0)+"</text><text x='"+gx(25)+"' y='130'>"+faD(25)+"</text><text x='"+gx(50)+"' y='130'>"+faD(50)+"</text><text x='"+gx(75)+"' y='130'>"+faD(75)+"</text><text x='"+gx(100)+"' y='130'>"+faD(100)+"</text></g>"+
   "<g font-size='8' fill='#a79aa0' text-anchor='middle'><text x='"+gx(50)+"' y='143'>"+(LANG==="ar"?"نسبة الدقة (٪)":"Accuracy score (%)")+"</text></g></svg>";
 }
 function rangeBar(q,g,f){
@@ -1469,20 +1472,20 @@ function rangeBar(q,g,f){
   "<div class='leg'><span>Plausible range <b>"+short(q.lo/f)+" to "+short(q.hi/f)+"</b></span><span>Dot is you</span></div>";
 }
 function openLogic(i){
-  var q=Q[ids[i]],g=st.g[i],s=st.s[i],U=unitOf(q,i),f=U[1],ul=qUL(q,U[0]),S=qS(q);
-  var steps=S.map(function(x,k){var t=k===S.length-1&&S.length>1&&/^(Total|≈|المجموع)/.test(x);return "<div class='st"+(t?" t":"")+"'><i>"+(k+1)+"</i><span>"+x+"</span></div>"}).join("");
+  var q=Q[ids[i]],g=st.g[i],s=st.s[i],U=unitOf(q,i),f=U[1],ul=qUL(q,U[0]),S=qS(q),isAr=LANG==="ar"&&q.ar&&q.ar.s;
+  var steps=S.map(function(x,k){var t=k===S.length-1&&S.length>1&&/^(Total|≈|المجموع)/.test(x);return "<div class='st"+(t?" t":"")+"'><i>"+faD(k+1)+"</i><span>"+(isAr?faD(x):x)+"</span></div>"}).join("");
   sheetShell(tr("How we worked it out"),"<div class='in' style='padding-top:4px'><p style='margin:0 0 12px;color:var(--mut);font-size:.9rem'>"+qF(q)+"</p>"+srcTag(q)+steps+
   "<div class='r'><span>"+tr("You guessed")+"</span><b>"+fmt(g/f)+" "+ul+"</b></div>"+
   "<div class='r'><span>"+tr("Our estimate")+"</span><b>"+fmt(q.m/f)+" "+ul+"</b></div>"+
   "<div class='r'><span>"+tr("You were")+"</span><b>"+verdict(g,q)+"</b></div>"+
-  "<div class='r'><span>"+(LANG==="ar"?"نتيجتك":"Your score")+"</span><b>"+s+"%</b></div>"+
+  "<div class='r'><span>"+(LANG==="ar"?"نتيجتك":"Your score")+"</span><b>"+faD(s)+PCT()+"</b></div>"+
   "<p class='note' style='margin-top:10px'>"+(LANG==="ar"?"الإجابة بالضبط = 100، ضعفين بعيد ≈ 80، عشر مرات ≈ 26. ولا مرة صفر.":"Spot on scores 100, twice off about 80, ten times off about 26. Never zero.")+"</p></div>");
 }
 function reveal(i){
   var q=Q[ids[i]],g=st.g[i],s=st.s[i],pc=API?0:(CD=demoDist(),pctile(s)),last=st.g.length>=3,U=unitOf(q,i),f=U[1],ul=qUL(q,U[0]);
   mount("<div class='qhead'>"+seg(i)+"<span class='catico'>"+(ICONS[q.c]||ICONS["Everyday Qatar"])+"</span></div><h2 class='sm' dir='auto'>"+qT(q)+"</h2>"+
   "<div class='cmp'><div class='me'><small>"+tr("Your guess")+"</small><b>"+short(g/f)+"</b><em>"+ul+"</em></div><div class='them'><small>"+tr("Our estimate")+"</small><b>"+short(q.m/f)+"</b><em>"+ul+"</em></div></div>"+
-  "<div class='revrow'><div class='revhit'><div class='rscore'><span id='sn'>0</span><i>%</i></div><div class='rverd'>"+verdict(g,q)+"</div></div>"+
+  "<div class='revrow'><div class='revhit'><div class='rscore'><span id='sn'>"+faD(0)+"</span><i>"+PCT()+"</i></div><div class='rverd'>"+verdict(g,q)+"</div></div>"+
   "<div class='revg'>"+chartSlot("q")+"</div></div>"+
   "<div class='revbtns'><button class='ghost' id='lg'>"+ICON_CHART+tr("See the maths")+"</button><button class='main' id='nx'>"+(last?tr("See results"):tr("Next"))+"</button></div>");
   app.classList.add("qb");
@@ -1497,10 +1500,10 @@ function animate(s,pc,mode){
   var g=function(i){return document.getElementById(i)},sn=g("sn"),pn=g("pn"),dt=g("dt"),dl=g("dl"),yt=g("yt"),cr=g("cr"),
     only=mode==="graph",fl=only?[]:document.querySelectorAll(".bfill"),vl=only?[]:document.querySelectorAll(".bval");
   function frame(k){var v=s*k,i,w,x,y;
-    if(sn&&!only)sn.textContent=Math.round(v);
-    if(pn)pn.textContent=Math.round(pc*k);
+    if(sn&&!only)sn.textContent=faD(Math.round(v));
+    if(pn)pn.textContent=faD(Math.round(pc*k));
     if(dt&&CD){x=gx(v);y=gy(v);dt.setAttribute("cx",x);dt.setAttribute("cy",y);dl.setAttribute("x1",x);dl.setAttribute("x2",x);dl.setAttribute("y1",y);yt.setAttribute("x",x);yt.setAttribute("y",Math.max(12,y-14));cr.setAttribute("width",x)}
-    for(i=0;i<fl.length;i++){w=parseFloat(fl[i].getAttribute("data-w"));fl[i].style.width=(w*k).toFixed(1)+"%";vl[i].textContent=Math.round(w*k)+"%"}}
+    for(i=0;i<fl.length;i++){w=parseFloat(fl[i].getAttribute("data-w"));fl[i].style.width=(w*k).toFixed(1)+"%";vl[i].textContent=faD(Math.round(w*k))+PCT()}}
   if(reduce){frame(1);return}
   var t0=null;frame(0);
   function tick(t){if(t0===null)t0=t;var p=Math.min(1,(t-t0)/1900),k=1-Math.pow(1-p,3);frame(k);if(p<1)raf=requestAnimationFrame(tick)}
@@ -1508,13 +1511,13 @@ function animate(s,pc,mode){
 }
 var cdTimer=null;
 function nextMidnight(){var n=new Date(),m=new Date(n.getFullYear(),n.getMonth(),n.getDate()+1,0,0,0,0);return m-n}
-function fmtDur(ms){ms=Math.max(0,ms);var s=Math.floor(ms/1000),h=Math.floor(s/3600),m=Math.floor(s%3600/60),ss=s%60;function z(x){return (x<10?"0":"")+x}return z(h)+":"+z(m)+":"+z(ss)}
+function fmtDur(ms){ms=Math.max(0,ms);var s=Math.floor(ms/1000),h=Math.floor(s/3600),m=Math.floor(s%3600/60),ss=s%60;function z(x){return (x<10?"0":"")+x}return faD(z(h)+":"+z(m)+":"+z(ss))}
 function last7(){var out=[],i,d,inf;for(i=6;i>=0;i--){d=today-i;inf=(d<START||d>today)?{n:0,t:0}:dayInfo(d);out.push({d:d,avg:inf.n>=3?Math.round(inf.t/3):null})}return out}
 function done(){
   var tot=st.s.reduce(function(a,b){return a+b},0),avg=Math.round(tot/3),pc=API?0:(CD=demoDist(),pctile(avg)),qrows="",w7,i,q;
-  for(i=0;i<3;i++){q=Q[ids[i]];qrows+="<div class='qr'>"+catIcon(q.c)+"<div class='qt'><b dir='auto'>"+qT(q)+"</b>"+(chInfo()?"<span>"+esc(chInfo().n)+(LANG==="ar"?" سجّل ":" scored ")+chInfo().s[i]+"%</span>":"")+"</div><div><span class='qs'>"+st.s[i]+"%</span><span class='qv'>"+verdict(st.g[i],q)+"</span></div></div>"}
+  for(i=0;i<3;i++){q=Q[ids[i]];qrows+="<div class='qr'>"+catIcon(q.c)+"<div class='qt'><b dir='auto'>"+qT(q)+"</b>"+(chInfo()?"<span>"+esc(chInfo().n)+(LANG==="ar"?" سجّل ":" scored ")+faD(chInfo().s[i])+PCT()+"</span>":"")+"</div><div><span class='qs'>"+faD(st.s[i])+PCT()+"</span><span class='qv'>"+verdict(st.g[i],q)+"</span></div></div>"}
   mount("<div class='res card qb'><span class='hcat'>"+ICON_TARGET+"</span>"+
-  "<div class='rtop'><div class='rsc'><small>"+(LANG==="ar"?"نتيجتك":"Your score")+"</small><div class='hs'><span id='sn'>0</span><i>%</i></div><div class='pillrow'><span class='hpill' id='pill'"+(API?" style='display:none'":"")+">"+(LANG==="ar"?"أفضل "+(100-pc)+"%":"Top "+(100-pc)+"%")+"</span>"+(stats.streak?"<span class='stk'>"+ICON_FLAME+stats.streak+(LANG==="ar"?" يوم متتالي":" day streak")+"</span>":"")+"</div></div>"+
+  "<div class='rtop'><div class='rsc'><small>"+(LANG==="ar"?"نتيجتك":"Your score")+"</small><div class='hs'><span id='sn'>"+faD(0)+"</span><i>"+PCT()+"</i></div><div class='pillrow'><span class='hpill' id='pill'"+(API?" style='display:none'":"")+">"+(LANG==="ar"?"أفضل "+faD(100-pc)+"٪":"Top "+(100-pc)+"%")+"</span>"+(stats.streak?"<span class='stk'>"+ICON_FLAME+faD(stats.streak)+(LANG==="ar"?" يوم متتالي":" day streak")+"</span>":"")+"</div></div>"+
   "<div class='revg'>"+chartSlot("day")+"</div></div>"+
   h2h(avg)+
   "<div class='qres'>"+qrows+"</div><button class='main shareb' id='sh'>"+tr("Share result")+"</button></div>"+
