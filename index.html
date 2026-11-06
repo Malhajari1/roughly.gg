@@ -12,8 +12,8 @@
 <style>
 :root{--c:#2f6bff;--c2:#1b4fd8;--ct:#eef3ff;--cs:47,107,255;--mar:var(--c);--mar2:var(--c2);--tint:var(--ct);--ink:#141018;--mut:#7b7580;--line:#ecebf0;color-scheme:light;box-sizing:border-box;transition:--c .4s}
 *{box-sizing:border-box}
-html{-webkit-text-size-adjust:100%}
-body{margin:0;min-height:100vh;color:var(--ink);background:radial-gradient(135% 62% at 50% -10%,var(--ct) 0,#fff 56%) no-repeat #fff;font:500 16px/1.5 "Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums;transition:background .4s}
+html{-webkit-text-size-adjust:100%;background:#eaf1ff;transition:background-color .4s}
+body{margin:0;min-height:100vh;min-height:100dvh;color:var(--ink);background:linear-gradient(180deg,var(--ct) 0,#fff 46%) no-repeat #fff;font:500 16px/1.5 "Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums;transition:background .4s}
 button,input{font:inherit;color:inherit}
 header{padding:calc(env(safe-area-inset-top,0px) + 16px) 20px 0}
 .hd{max-width:480px;margin:0 auto;display:flex;justify-content:space-between;align-items:center}
@@ -648,6 +648,18 @@ body:not([data-view=land]) main>.small{display:none}
 @keyframes sharebounce{0%,82%,100%{transform:translateY(0)}88%{transform:translateY(-5px)}94%{transform:translateY(0)}}
 body.fit{overflow:hidden}
 body.fit main{min-height:0;height:calc(100dvh - 68px);justify-content:center;padding-bottom:10px}
+/* v9: fit the results page to one phone screen (no scroll) */
+.plain>.res.card{padding-top:14px;padding-bottom:14px}
+.res .rtop{margin-bottom:9px}
+.res .rsc .hs span{font-size:3.3rem}
+.res .pillrow{margin-top:6px}
+.res .qres{margin:7px 0}
+.res .qr{padding:6px 2px}
+.res .shareb{margin-top:10px}
+.drop0{padding:13px;margin-top:9px}
+.drop0 .dropin small{font-size:.66rem}
+.drop0 .dropin b{font-size:2.1rem;margin:2px 0 9px}
+.drop0 .pastdrops{padding:12px}
 @media (prefers-reduced-motion:reduce){.card.qb .shareb{animation:none}}
 /* ===== Arabic / RTL ===== */
 html[lang=ar] body,html[lang=ar] button,html[lang=ar] input,html[lang=ar] textarea,html[lang=ar] select{font-family:"IBM Plex Sans Arabic","Plus Jakarta Sans",system-ui,sans-serif}
@@ -1585,7 +1597,7 @@ var THEMES=[
  {c:"#8b5cf6",c2:"#6d28d9",ct:"#f3edff",cs:"139,92,246"}
 ];
 var WIN=THEMES[0];
-function setTheme(t){var s=document.body.style;s.setProperty("--c",t.c);s.setProperty("--c2",t.c2);s.setProperty("--ct",t.ct);s.setProperty("--cs",t.cs);var m=document.getElementById("themecolor");if(m)m.setAttribute("content",t.ct)}
+function setTheme(t){var s=document.body.style;s.setProperty("--c",t.c);s.setProperty("--c2",t.c2);s.setProperty("--ct",t.ct);s.setProperty("--cs",t.cs);document.documentElement.style.backgroundColor=t.ct;var m=document.getElementById("themecolor");if(m)m.setAttribute("content",t.ct)}
 var LANG="en";try{LANG=localStorage.getItem("rq-lang")==="ar"?"ar":"en"}catch(e){}
 function applyLang(){document.documentElement.lang=LANG;document.documentElement.dir=(LANG==="ar"?"rtl":"ltr");var b=document.getElementById("lang");if(b)b.textContent=(LANG==="ar"?"EN":"عربي")}
 function toggleLang(){LANG=(LANG==="ar"?"en":"ar");try{localStorage.setItem("rq-lang",LANG)}catch(e){}applyLang();render()}
