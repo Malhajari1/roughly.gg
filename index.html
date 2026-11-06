@@ -639,11 +639,21 @@ body:not([data-view=land]) main>.small{display:none}
 .drop0 .pastdrops::after{content:"";position:absolute;top:0;bottom:0;left:-45%;width:32%;background:linear-gradient(100deg,transparent,rgba(255,230,102,.55),transparent);transform:skewX(-20deg);animation:bling 3.8s ease-in-out infinite .5s;pointer-events:none}
 .shareb{margin-top:14px}
 @media (prefers-reduced-motion:reduce){.drop0::after,.drop0 .pastdrops::after{display:none}}
+/* v8: EN/AR toggle, share bounce, lock scroll on game screens */
+.hd{justify-content:space-between}
+.hr{display:flex;align-items:center;gap:12px}
+.langbtn{border:1.5px solid var(--line);background:#fff;color:var(--mar);font-weight:700;font-size:.82rem;cursor:pointer;font-family:inherit;padding:7px 14px;border-radius:20px;min-width:48px;text-align:center}
+.langbtn:hover{background:var(--ct)}
+.card.qb .shareb{animation:sharebounce 2.8s ease-in-out infinite}
+@keyframes sharebounce{0%,82%,100%{transform:translateY(0)}88%{transform:translateY(-5px)}94%{transform:translateY(0)}}
+body.fit{overflow:hidden}
+body.fit main{min-height:0;height:calc(100dvh - 68px);justify-content:center;padding-bottom:10px}
+@media (prefers-reduced-motion:reduce){.card.qb .shareb{animation:none}}
 </style>
 <meta name="roughly-api" content="">
 </head>
 <body>
-<header><div class="hd"><span class="wordmark">roughly.gg</span><button id="menu" class="mb" aria-label="Menu"><svg viewBox='0 0 24 24'><path d='M4 7h16M4 12h16M4 17h16'/></svg></button></div></header>
+<header><div class="hd"><button id="lang" class="langbtn" aria-label="Switch language">عربي</button><div class="hr"><span class="wordmark">roughly.gg</span><button id="menu" class="mb" aria-label="Menu"><svg viewBox='0 0 24 24'><path d='M4 7h16M4 12h16M4 17h16'/></svg></button></div></div></header>
 <main>
   <div class="layout"><div id="app" class="card"></div></div>
   <p class="small"><a href="#" id="how">How to play</a> &middot; A new set of three every day</p>
@@ -1330,10 +1340,13 @@ var THEMES=[
 ];
 var WIN=THEMES[0];
 function setTheme(t){var s=document.body.style;s.setProperty("--c",t.c);s.setProperty("--c2",t.c2);s.setProperty("--ct",t.ct);s.setProperty("--cs",t.cs);var m=document.getElementById("themecolor");if(m)m.setAttribute("content",t.ct)}
+var LANG="en";try{LANG=localStorage.getItem("rq-lang")==="ar"?"ar":"en"}catch(e){}
+function applyLang(){document.documentElement.lang=LANG;document.documentElement.dir=(LANG==="ar"?"rtl":"ltr");var b=document.getElementById("lang");if(b)b.textContent=(LANG==="ar"?"EN":"عربي")}
+function toggleLang(){LANG=(LANG==="ar"?"en":"ar");try{localStorage.setItem("rq-lang",LANG)}catch(e){}applyLang();render()}
 function render(){
   cancelAnimationFrame(raf);viewTok++;
   var n=st.g.length;
-  document.body.setAttribute("data-view",intro?"land":"play");side();
+  document.body.setAttribute("data-view",intro?"land":"play");document.body.classList.toggle("fit",!intro&&!(n>=3&&!st.r));side();
   if(intro){setTheme(THEMES[0]);return landing();}
   if(n>=3&&!st.r){setTheme(WIN);return done();}
   if(st.r&&n>=1){setTheme(THEMES[(n-1)%3]);return reveal(n-1);}
@@ -1452,9 +1465,8 @@ function done(){
   "<div class='rtop'><div class='rsc'><small>Your score</small><div class='hs'><span id='sn'>0</span><i>%</i></div><div class='pillrow'><span class='hpill' id='pill'"+(API?" style='display:none'":"")+">Top "+(100-pc)+"%</span>"+(stats.streak?"<span class='stk'>"+ICON_FLAME+stats.streak+" day streak</span>":"")+"</div></div>"+
   "<div class='revg'>"+chartSlot("day")+"</div></div>"+
   h2h(avg)+
-  "<div class='qres'>"+qrows+"</div></div>"+
-  "<div class='drop0'><div class='dropin'><small>Next drop in</small><b id='cdn'>"+fmtDur(nextMidnight())+"</b></div><button class='pastdrops' id='arch'>Play past drops</button></div>"+
-  "<button class='main shareb' id='sh'>Share result</button>");
+  "<div class='qres'>"+qrows+"</div><button class='main shareb' id='sh'>Share result</button></div>"+
+  "<div class='drop0'><div class='dropin'><small>Next drop in</small><b id='cdn'>"+fmtDur(nextMidnight())+"</b></div><button class='pastdrops' id='arch'>Play past drops</button></div>");
   app.classList.add("plain");
   document.getElementById("sh").onclick=function(){openShare(tot)};
   document.getElementById("arch").onclick=function(){var d=new Date(day*864e5);cm={y:d.getUTCFullYear(),m:d.getUTCMonth()};openMenu()};
@@ -1466,9 +1478,10 @@ function acctLabel(){var b=document.getElementById("acct");if(!b)return;b.textCo
 function streak(){var e=document.getElementById("streak");if(e)e.textContent=stats.streak?stats.streak+" day streak":""}
 document.getElementById("how").onclick=function(e){e.preventDefault();selectDay(today);intro=true;render();window.scrollTo(0,0)};
 document.getElementById("menu").onclick=function(){var d=new Date(day*864e5);cm={y:d.getUTCFullYear(),m:d.getUTCMonth()};openMenu()};
+document.getElementById("lang").onclick=toggleLang;
 document.querySelector(".wordmark").onclick=function(){selectDay(today);intro=true;render();window.scrollTo(0,0)};
 document.addEventListener("visibilitychange",function(){if(!document.hidden&&dayNum()!==day){init();streak();render()}});
-init();streak();render();
+applyLang();init();streak();render();
 if(API&&acct().t)pullSync().then(function(c){if(c){streak();selectDay(day);if(!busy)render()}},function(){});
 </script>
 </body>
