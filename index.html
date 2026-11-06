@@ -424,9 +424,9 @@ select.chip.uc:focus-visible{outline:2px solid var(--mar);outline-offset:2px}
 .mark{padding-bottom:0}
 .mark svg{width:24px;height:24px;stroke:#fff;fill:none;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
 @media (min-width:960px){.mark svg{width:28px;height:28px}}
-/* compact + centre the play/reveal/results card */
+/* compact + top-align the play/reveal/results card so every screen starts at the same point */
 .card:not(.land){padding-top:18px;padding-bottom:16px}
-body:not([data-view=land]) main{min-height:calc(100dvh - 76px);display:flex;flex-direction:column;justify-content:center;padding-top:4px}
+body:not([data-view=land]) main{min-height:calc(100dvh - 76px);display:flex;flex-direction:column;justify-content:flex-start;padding-top:14px}
 /* results: result card + graph side by side */
 .rtop{display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:stretch;margin-bottom:12px}
 .rgraph{background:#fff;border-radius:22px;padding:10px 8px 8px;box-shadow:0 1px 0 rgba(var(--cs),.04),0 14px 36px -28px rgba(var(--cs),.5);display:flex;flex-direction:column;justify-content:center}
@@ -646,8 +646,8 @@ body:not([data-view=land]) main>.small{display:none}
 .langbtn:hover{background:var(--ct)}
 .card.qb .shareb{animation:sharebounce 2.8s ease-in-out infinite}
 @keyframes sharebounce{0%,82%,100%{transform:translateY(0)}88%{transform:translateY(-5px)}94%{transform:translateY(0)}}
-body.fit{overflow:hidden}
-body.fit main{min-height:0;height:calc(100dvh - 68px);justify-content:center;padding-bottom:10px}
+/* game screens top-align (see rule above); never clip — scroll if a card is taller than the screen */
+body.fit main{justify-content:flex-start}
 /* v9: fit the results page to one phone screen (no scroll) */
 .plain>.res.card{padding-top:14px;padding-bottom:14px}
 .res .rtop{margin-bottom:9px}
