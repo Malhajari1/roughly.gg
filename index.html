@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>Roughly Qatar – Daily Estimation Game</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap">
 <style>
 :root{--c:#2f6bff;--c2:#1b4fd8;--ct:#eef3ff;--cs:47,107,255;--mar:var(--c);--mar2:var(--c2);--tint:var(--ct);--ink:#141018;--mut:#7b7580;--line:#ecebf0;color-scheme:light;box-sizing:border-box;transition:--c .4s}
 *{box-sizing:border-box}
@@ -649,6 +649,18 @@ body:not([data-view=land]) main>.small{display:none}
 body.fit{overflow:hidden}
 body.fit main{min-height:0;height:calc(100dvh - 68px);justify-content:center;padding-bottom:10px}
 @media (prefers-reduced-motion:reduce){.card.qb .shareb{animation:none}}
+/* ===== Arabic / RTL ===== */
+html[lang=ar] body,html[lang=ar] button,html[lang=ar] input,html[lang=ar] textarea,html[lang=ar] select{font-family:"IBM Plex Sans Arabic","Plus Jakarta Sans",system-ui,sans-serif}
+html[lang=ar] h1,html[lang=ar] h2,html[lang=ar] h3,html[lang=ar] h4{font-weight:700;letter-spacing:0}
+/* keep the top bar fixed: lang left, wordmark right, in both directions */
+header .hd{direction:ltr}
+/* numbers, scores, timers and the calculator always read left-to-right */
+[dir=rtl] .hs,[dir=rtl] .rscore,[dir=rtl] .rsc .hs,[dir=rtl] #cdn,[dir=rtl] .disp,[dir=rtl] .keys,[dir=rtl] .mb2,[dir=rtl] .h2h{direction:ltr}
+[dir=rtl] #in{direction:rtl;text-align:right}
+[dir=rtl] .mi,[dir=rtl] .st,[dir=rtl] .fc,[dir=rtl] select.chip.uc{text-align:right}
+[dir=rtl] select.chip.uc{padding-right:14px;padding-left:30px;background-position:left 10px center}
+[dir=rtl] .st i{margin-left:0}
+[dir=rtl] .lead,[dir=rtl] .sub,[dir=rtl] .note,[dir=rtl] .hint,[dir=rtl] details p,[dir=rtl] details summary{text-align:right}
 </style>
 <meta name="roughly-api" content="">
 </head>
@@ -664,20 +676,20 @@ var COUNTRY="Qatar";
 document.title="Roughly "+COUNTRY+" – Daily Estimation Game";
 var _cn=document.querySelector(".brand .cn");if(_cn)_cn.textContent=COUNTRY;
 var Q=[
-{c:"Everyday Qatar",t:"How many mobile phones are in use in Qatar?",u:"phones",m:4.2e6,lo:3e6,hi:7e6,s:["About 3 million residents","× roughly 1.4 phones each, counting work phones and second SIMs","≈ 4.2 million phones"],f:"Plenty of people carry two, and at least one of them has a cracked screen."},
-{c:"Everyday Qatar",t:"How many light bulbs are switched on across Qatar at 9 pm?",u:"bulbs",m:2e7,lo:8e6,hi:5e7,s:["About 750,000 homes × roughly 15 lights each ≈ 11 million","+ offices, malls, streets and stadiums ≈ 9 million","Total ≈ 20 million bulbs"],f:"Doha after dark is basically a very efficient lightshow."},
-{c:"Everyday Qatar",t:"How many WhatsApp voice notes are sent in Qatar every day?",u:"voice notes",m:3.7e7,lo:1e7,hi:1.5e8,s:["About 3 million residents","× roughly 85% use WhatsApp ≈ 2.5 million people","× about 15 voice notes each ≈ 37 million"],f:"Most of them are three minutes long and could have been a text."},
+{c:"Everyday Qatar",t:"How many mobile phones are in use in Qatar?",u:"phones",m:4.2e6,lo:3e6,hi:7e6,s:["About 3 million residents","× roughly 1.4 phones each, counting work phones and second SIMs","≈ 4.2 million phones"],f:"Plenty of people carry two, and at least one of them has a cracked screen.",ar:{t:"كم جوال مستخدَم في قطر؟",u:"جوال",s:["حوالي 3 ملايين نسمة","× تقريباً 1.4 جوال لكل شخص، مع جوالات الشغل والشرائح الثانية","≈ 4.2 مليون جوال"],f:"ناس كثير يحملون اثنين، وواحد منهم على الأقل شاشته مكسورة."}},
+{c:"Everyday Qatar",t:"How many light bulbs are switched on across Qatar at 9 pm?",u:"bulbs",m:2e7,lo:8e6,hi:5e7,s:["About 750,000 homes × roughly 15 lights each ≈ 11 million","+ offices, malls, streets and stadiums ≈ 9 million","Total ≈ 20 million bulbs"],f:"Doha after dark is basically a very efficient lightshow.",ar:{t:"كم لمبة مضيّئة في قطر الساعة 9 مساءً؟",u:"لمبة",s:["حوالي 750,000 بيت × تقريباً 15 لمبة لكل بيت ≈ 11 مليون","+ المكاتب والمولات والشوارع والملاعب ≈ 9 ملايين","المجموع ≈ 20 مليون لمبة"],f:"الدوحة بالليل عبارة عن عرض إضاءة فعّال جداً."}},
+{c:"Everyday Qatar",t:"How many WhatsApp voice notes are sent in Qatar every day?",u:"voice notes",m:3.7e7,lo:1e7,hi:1.5e8,s:["About 3 million residents","× roughly 85% use WhatsApp ≈ 2.5 million people","× about 15 voice notes each ≈ 37 million"],f:"Most of them are three minutes long and could have been a text.",ar:{t:"كم رسالة واتساب صوتية تُرسَل في قطر كل يوم؟",u:"رسالة صوتية",s:["حوالي 3 ملايين نسمة","× تقريباً 85% يستخدمون واتساب ≈ 2.5 مليون شخص","× حوالي 15 رسالة صوتية لكل واحد ≈ 37 مليون"],f:"أغلبها ثلاث دقائق وكان ممكن تكون رسالة نصية."}},
 {c:"Food & drink",t:"How many loaves and flatbreads does Qatar eat every day?",u:"pieces of bread",m:2.4e6,lo:1e6,hi:5e6,s:["About 3 million residents","× roughly 0.8 pieces of bread each a day, from samoon to Arabic bread to toast","≈ 2.4 million pieces"],f:"Bread is quietly the most dependable food in the country."},
 {c:"Food & drink",t:"How many bottles of water does Qatar drink every day?",u:"bottles",m:4.5e6,lo:2e6,hi:1e7,s:["About 3 million residents","× roughly 1.5 bottles each a day, counting small ones, big ones and the office cooler","≈ 4.5 million bottles"],f:"It’s hot enough that nobody has ever been caught without one."},
 {c:"Food & drink",t:"How many pizzas does Qatar order on a typical Friday?",u:"pizzas",m:2e5,lo:6e4,hi:6e5,s:["About 3 million residents","× roughly 1 in 5 orders pizza on a Friday ≈ 600,000 people","÷ about 3 people sharing each pizza ≈ 200,000 pizzas"],f:"Friday night is basically a national pizza holiday."},
-{c:"Food & drink",t:"How many kilograms of rice does Qatar eat every day?",u:"kg",m:4.5e5,lo:2e5,hi:1e6,s:["About 3 million residents","× roughly 150 g of dry rice each a day, from biryani to machboos to plain white","≈ 450,000 kg"],f:"Biryani, machboos, kabsa. Rice rarely misses a meal."},
+{c:"Food & drink",t:"How many kilograms of rice does Qatar eat every day?",u:"kg",m:4.5e5,lo:2e5,hi:1e6,s:["About 3 million residents","× roughly 150 g of dry rice each a day, from biryani to machboos to plain white","≈ 450,000 kg"],f:"Biryani, machboos, kabsa. Rice rarely misses a meal.",ar:{t:"كم كيلوغرام رز تاكل قطر كل يوم؟",u:"كجم",s:["حوالي 3 ملايين نسمة","× تقريباً 150 غرام رز جاف لكل شخص يومياً، من البرياني للمجبوس للرز الأبيض","≈ 450,000 كجم"],f:"برياني، مجبوس، كبسة. الرز نادراً ما يغيب عن وجبة."}},
 {c:"Money",t:"How many riyals does Qatar spend on coffee every day?",u:"QAR",m:1.8e7,lo:6e6,hi:5e7,s:["About 3 million residents","× roughly 1 in 3 buys a coffee on a typical day ≈ 1 million cups","× about QAR 18 a cup ≈ QAR 18 million"],f:"A lot of it is the extra shot nobody needed."},
-{c:"Money",t:"How many riyals of cash are sitting in people’s wallets across Qatar right now?",u:"QAR",m:5e8,lo:1.5e8,hi:1.5e9,s:["About 3 million residents","× roughly 70% carry some cash ≈ 2.1 million wallets","× about QAR 250 each ≈ QAR 525 million"],f:"Digital payments are winning, but the QAR 5 note in the car door lives on."},
+{c:"Money",t:"How many riyals of cash are sitting in people’s wallets across Qatar right now?",u:"QAR",m:5e8,lo:1.5e8,hi:1.5e9,s:["About 3 million residents","× roughly 70% carry some cash ≈ 2.1 million wallets","× about QAR 250 each ≈ QAR 525 million"],f:"Digital payments are winning, but the QAR 5 note in the car door lives on.",ar:{t:"كم ريال نقدي موجود في محافظ الناس في قطر الحين؟",u:"ريال",s:["حوالي 3 ملايين نسمة","× تقريباً 70% يحملون شيء من الكاش ≈ 2.1 مليون محفظة","× حوالي 250 ريال لكل واحدة ≈ 525 مليون ريال"],f:"الدفع الإلكتروني ينتصر، بس فئة الـ5 ريال في باب السيارة لسه حية."}},
 {c:"Roads",t:"How many litres of petrol and diesel do Qatar’s cars burn every day?",u:"litres",m:8e6,lo:3e6,hi:2e7,s:["About 1.8 million cars","× roughly 35 km a day = 63 million km","÷ about 8 km per litre ≈ 8 million litres"],f:"Big engines, long roundabouts and the AC on full."},
 {c:"Roads",t:"How many people ride the Doha Metro on a typical weekday?",u:"riders",m:2e5,lo:8e4,hi:5e5,s:["About 3 million residents","× roughly 1 in 15 uses the metro on a weekday ≈ 200,000 riders"],f:"During the Arab Cup in December 2025, the metro and tram together averaged about 270,000 riders a day."},
 {c:"Roads",t:"How many cars are washed in Qatar every day?",u:"cars",m:2.5e5,lo:8e4,hi:6e5,s:["About 1.8 million cars","÷ roughly 7, since most get washed about once a week ≈ 250,000 cars a day"],f:"The sand is back on the bonnet by lunchtime anyway."},
 {c:"Travel",t:"How many flights take off or land at Hamad Airport every day?",u:"flights",m:880,lo:450,hi:1700,s:["About 54 million passengers a year (Hamad handled 54.3 million in 2025) ÷ 365 ≈ 149,000 a day","÷ roughly 170 passengers per flight ≈ 880 flights, counting arrivals and departures"],f:"That’s a plane roughly every minute and a half, all day and all night."},
-{c:"Geography",t:"How many hours would it take to drive the whole Qatar coastline at 80 km/h?",u:"hours",m:7,lo:4,hi:14,s:["Qatar’s coastline is roughly 560 km","÷ 80 km/h ≈ 7 hours"],f:"In reality the road doesn’t follow the coast, so you’d need a boat for some of it."},
+{c:"Geography",t:"How many hours would it take to drive the whole Qatar coastline at 80 km/h?",u:"hours",m:7,lo:4,hi:14,s:["Qatar’s coastline is roughly 560 km","÷ 80 km/h ≈ 7 hours"],f:"In reality the road doesn’t follow the coast, so you’d need a boat for some of it.",ar:{t:"كم ساعة ياخذ قطع ساحل قطر كامل بسرعة 80 كم/س؟",u:"ساعة",s:["ساحل قطر حوالي 560 كم","÷ 80 كم/س ≈ 7 ساعات"],f:"بالواقع الطريق ما يتبع الساحل، فبتحتاج قارب لجزء منه."}},
 {c:"Geography",t:"If everyone in the world stood in Qatar with one square metre each, how many people would fit?",u:"people",m:1.16e10,lo:5e9,hi:2e10,s:["Qatar covers about 11,600 km²","= 11.6 billion m²","÷ 1 m² per person ≈ 11.6 billion people"],f:"More than the entire planet, standing very, very close."},
 {c:"Resources",t:"How many Olympic swimming pools would Qatar’s daily water use fill?",u:"pools",m:540,lo:280,hi:1100,s:["About 3 million residents × roughly 450 litres per person per day ≈ 1.35 billion litres","÷ one Olympic pool at about 2.5 million litres","≈ 540 pools"],f:"A new pool’s worth of water roughly every three minutes."},
 {c:"Resources",t:"How many kilowatt-hours of electricity does Qatar use every day?",u:"kWh",m:1.2e8,lo:6e7,hi:3e8,s:["About 3 million residents","× roughly 40 kWh per person per day, among the highest in the world","≈ 120 million kWh a day"],f:"Air conditioning is the quiet giant behind most of it."},
@@ -685,7 +697,7 @@ var Q=[
 {c:"Resources",t:"How many tonnes of rubbish does Qatar produce every day?",u:"tonnes",m:5e3,lo:2.5e3,hi:1.2e4,s:["About 3 million residents","× roughly 1.7 kg of waste per person per day ≈ 5,000 tonnes"],f:"Roughly the weight of 800 elephants, every single day."},
 {c:"Sport",t:"How many kilometres do people run and walk along the Corniche on a cool Friday morning, combined?",u:"km",m:7500,lo:2e3,hi:3e4,s:["Roughly 1,500 runners and walkers on a cool morning","× about 5 km each ≈ 7,500 km"],f:"More than the distance from Doha to Beijing, before breakfast."},
 {c:"Sport",t:"How many gym memberships are active in Qatar?",u:"memberships",m:3.75e5,lo:1.5e5,hi:8e5,s:["About 3 million residents","× roughly 1 in 8 has a gym membership ≈ 375,000"],f:"Whether they use them is a different question entirely."},
-{c:"Doha life",t:"How many times a week does a driver in Doha get cut off at a roundabout?",u:"times",m:8,lo:3,hi:25,s:["About 20 roundabouts a week on a normal commute","× roughly 2 in 5 involve someone who either didn’t see you or did and didn’t care","≈ 8 times"],f:"Indicators are treated as an optional extra."},
+{c:"Doha life",t:"How many times a week does a driver in Doha get cut off at a roundabout?",u:"times",m:8,lo:3,hi:25,s:["About 20 roundabouts a week on a normal commute","× roughly 2 in 5 involve someone who either didn’t see you or did and didn’t care","≈ 8 times"],f:"Indicators are treated as an optional extra.",ar:{t:"كم مرة بالأسبوع يتقطّع على سائق في الدوحة عند الدوار؟",u:"مرة",s:["حوالي 20 دوار بالأسبوع في مشوار عادي","× تقريباً 2 من 5 فيها أحد إما ما شافك أو شافك وما يهمه","≈ 8 مرات"],f:"الغمازات تُعتبر إضافة اختيارية."}},
 {c:"Doha life",t:"How many times does the average person say “habibi” or “habibti” in a day?",u:"times",m:12,lo:4,hi:40,s:["Roughly 36 chats, calls and messages a day","× about 1 in 3 includes a habibi, habibti or ya habibi ≈ 12 times"],f:"Both a greeting and an apology, and occasionally a warning."},
 {c:"Doha life",t:"A friend says they’re “two minutes away.” How many minutes does it actually take?",u:"minutes",m:20,lo:8,hi:60,s:["Promised: 2 minutes","× the Doha conversion factor of roughly 10, for traffic, parking and one more errand","≈ 20 minutes"],f:"The first ten of those are spent “almost there” while still getting ready."},
 {c:"Doha life",t:"How many people head out to the desert on a winter Thursday night?",u:"people",m:1.5e5,lo:5e4,hi:4e5,s:["About 3 million residents","× roughly 1 in 20 goes camping, drives the dunes or sits around a fire ≈ 150,000 people"],f:"With a full dallah, a speaker and a worrying amount of sand in the car."},
@@ -799,9 +811,9 @@ var Q=[
 {c:"Doha life",t:"How many abayas are there in the average wardrobe?",u:"abayas",m:12,lo:5,hi:30,s:["Everyday, work, occasion and the special ones","roughly 12 abayas"],f:"There is always room for one more in black."}
 ];
 var HINTS=[
-["Good to know","Plenty of people carry two phones, one for work and one personal, and many have a spare SIM too."],
-["Good to know","Most homes have somewhere around 10 to 20 light fittings, before you count streets, malls and towers."],
-["Good to know","Voice notes are rarely sent alone. A burst of three to five in a row is normal."],
+["Good to know","Plenty of people carry two phones, one for work and one personal, and many have a spare SIM too.","ناس كثير يحملون جوالين، واحد للشغل وواحد شخصي، وكثير عندهم شريحة احتياطية بعد."],
+["Good to know","Most homes have somewhere around 10 to 20 light fittings, before you count streets, malls and towers.","أغلب البيوت فيها من 10 إلى 20 إنارة، قبل ما تحسب الشوارع والمولات والأبراج."],
+["Good to know","Voice notes are rarely sent alone. A burst of three to five in a row is normal.","الرسائل الصوتية نادراً ترسل وحدها. دفعة من ثلاث لخمس ورا بعض شيء عادي."],
 ["Good to know","Samoon, Arabic bread, paratha and toast all count. A single meal often involves something you tear, dip or wrap."],
 ["Good to know","In summer, one person can easily get through two litres or more of water a day."],
 ["Good to know","Pineapple on pizza is a matter of national debate. It does not change the number of pizzas."],
@@ -991,7 +1003,7 @@ function L(x){return Math.log10(x)}
 function ratio(g,q){return g>=q.m?g/q.m:q.m/g}
 function score(g,q){var d=L(ratio(g,q));return Math.max(1,Math.round(100/(1+d*d/.36)))}
 function times(x){return x<10?(Math.round(x*10)/10):Math.round(x)}
-function verdict(g,q){var x=ratio(g,q);if(x<=1.05)return "Spot on";return times(x)+"× too "+(g>q.m?"high":"low")}
+function verdict(g,q){var x=ratio(g,q);if(x<=1.05)return tr("Spot on");var hi=g>q.m;return times(x)+"× "+(LANG==="ar"?(hi?"أعلى":"أقل"):"too "+(hi?"high":"low"))}
 function vClass(g,q,s){return (g>=q.lo&&g<=q.hi)||s>=80?"good":s>=40?"mid":"bad"}
 function erf(x){var s=x<0?-1:1;x=Math.abs(x);var t=1/(1+.3275911*x);return s*(1-(((((1.061405429*t-1.453152027)*t)+1.421413741)*t-.284496736)*t+.254829592)*t*Math.exp(-x*x))}
 var DEMO=[3,6,11,19,30,44,60,76,89,97,97,89,76,60,44,30,19,11,6,3],DEMO_N=DEMO.reduce(function(a,b){return a+b},0);
@@ -1040,11 +1052,12 @@ function closeSheet(){
 function openSheet(n,inp){
   var sh=document.getElementById("sheet"),sc=document.getElementById("scrim");
   var keys=["C","(",")","÷","7","8","9","×","4","5","6","−","1","2","3","+","0",".","⌫","="];
-  sh.innerHTML="<div class='grab'></div><div class='shh'><b>Calculator &amp; Notes</b><button class='x' id='sx' aria-label='Close'>"+ICON_X+"</button></div>"+
+  var AR=LANG==="ar";
+  sh.innerHTML="<div class='grab'></div><div class='shh'><b>"+(AR?"الآلة الحاسبة والملاحظات":"Calculator &amp; Notes")+"</b><button class='x' id='sx' aria-label='Close'>"+ICON_X+"</button></div>"+
   "<div class='disp'><div class='ex' id='ex'></div><div class='rs' id='rs'>0</div></div><div class='keys'>"+
   keys.map(function(k){var c=/[÷×−+]/.test(k)?" op":k==="="?" eq":(k==="C"||k==="⌫")?" fn":"";return "<button class='k"+c+"' data-k='"+k+"'>"+k+"</button>"}).join("")+"</div>"+
-  "<button class='main use' id='use' disabled>Use result as my answer</button><label class='nl' for='nt'>Notes</label>"+
-  "<textarea id='nt' placeholder='Jot down your logic, like homes × windows per home…'></textarea>";
+  "<button class='main use' id='use' disabled>"+(AR?"استخدم الناتج كإجابتي":"Use result as my answer")+"</button><label class='nl' for='nt'>"+(AR?"ملاحظات":"Notes")+"</label>"+
+  "<textarea id='nt' placeholder='"+(AR?"دوّن منطقك، مثل بيوت × نوافذ لكل بيت…":"Jot down your logic, like homes × windows per home…")+"'></textarea>";
   var nt=document.getElementById("nt");nt.value=st.nt[n]||"";
   nt.oninput=function(){st.nt[n]=nt.value.slice(0,500);saveState()};
   sh.onclick=function(e){var b=e.target.closest&&e.target.closest("button[data-k]");if(b)press(b.getAttribute("data-k"))};
@@ -1063,21 +1076,35 @@ document.addEventListener("keydown",function(e){
 });
 function hintCard(h){return "<div class='hi'>"+ICON_BULB+"</div><div class='ht'><b>"+h[0]+"</b>"+h[1]+"</div>"}
 function toolsHtml(n){
-  var h=HINTS[ids[n]],shown=st.hu[n]>0?"<div class='hintbox'>"+hintCard(h)+"</div>":"";
-  return "<div id='hb'>"+shown+"</div><div class='golock'><button class='ghost icob' id='bc' aria-label='Calculator and notes'>"+ICON_CALC+"</button><button class='ghost icob' id='bh' aria-label='Good to know'>"+ICON_BULB+"<span></span></button><button class='main' id='go' disabled>Confirm</button></div>";
+  var h=hintPair(ids[n]),shown=st.hu[n]>0?"<div class='hintbox'>"+hintCard(h)+"</div>":"";
+  return "<div id='hb'>"+shown+"</div><div class='golock'><button class='ghost icob' id='bc' aria-label='Calculator and notes'>"+ICON_CALC+"</button><button class='ghost icob' id='bh' aria-label='Good to know'>"+ICON_BULB+"<span></span></button><button class='main' id='go' disabled>"+tr("Confirm")+"</button></div>";
 }
 function wireTools(n,inp){
   var bh=document.getElementById("bh"),hb=document.getElementById("hb");
-  function lab(){bh.disabled=st.hu[n]>0;bh.querySelector("span").textContent=st.hu[n]>0?"Good to know shown":"Good to know"}
+  function lab(){bh.disabled=st.hu[n]>0;bh.querySelector("span").textContent=st.hu[n]>0?(LANG==="ar"?"ظهر":"Good to know shown"):tr("Good to know")}
   bh.onclick=function(){
     if(st.hu[n]>0)return;st.hu[n]=1;saveState();
-    var h=HINTS[ids[n]],d=document.createElement("div");d.className="hintbox";d.innerHTML=hintCard(h);hb.appendChild(d);lab()};
+    var h=hintPair(ids[n]),d=document.createElement("div");d.className="hintbox";d.innerHTML=hintCard(h);hb.appendChild(d);lab()};
   document.getElementById("bc").onclick=function(){openSheet(n,inp)};
   lab();
 }
 function landing(){
+  var AR=LANG==="ar";
   var cats=["Sport","Food & drink","Roads","Geography","Travel","Money","Resources","Everyday Qatar","Doha life"];
-  var faq=[
+  var CATAR={"Sport":"الرياضة","Food & drink":"الأكل والشرب","Roads":"الطرق","Geography":"الجغرافيا","Travel":"السفر","Money":"المال","Resources":"الموارد","Everyday Qatar":"قطر اليومية","Doha life":"حياة الدوحة"};
+  var faq=AR?[
+    ["هل فيه جواب صحيح؟","لا. كل سؤال تقدير. نعرض لك تقديراً منطقياً ومجالاً معقولاً حوله، وتسجّل نقاطك كل ما قربت أكثر."],
+    ["أقدر أستخدم الآلة الحاسبة؟","أكيد. اضغط «الآلة الحاسبة والملاحظات» في أي سؤال تحسب فيه الأرقام وتدوّن منطقك."],
+    ["هل «للعلم» تكلّفني نقاط؟","لا، مجانية. كل سؤال فيه معلومة «للعلم» وحدة. أحياناً رقم بداية قوي، وأحياناً قاعدة عامة، وأحياناً لمسة محلية قد تنفع وقد لا."],
+    ["كيف تُحسب نتيجتي؟","نقارن تخمينك بتقديرنا ونحسب كم مرة كنت أعلى أو أقل. الإجابة بالضبط 100، وضعفين بعيد حوالي 80، وعشر مرات بعيد حوالي 26. وما تنزل أبداً لصفر."],
+    ["وش هي الرتب؟","نحسب متوسط نتائجك الثلاث كنسبة دقّة. تعطيك رتبة، من «نازل جديد» إلى «عرّاف الصحراء»."],
+    ["من وين تجيب الأرقام؟","كل تقدير له وسم. «مشتق» يعني مبني على أرقام منشورة مع حساب بسيط. «تقدير تقريبي» يعني مبني على فرضيات مقرّبة. والحساب الكامل يظهر بعد كل سؤال."],
+    ["هل النسبة المئوية حقيقية؟","نعم. تُحسب من إجابات لاعبين حقيقيين بعد ما يجاوب 30 شخص على الأقل على السؤال. وقبلها نقول لك كذا بدل ما نخترع رقم."],
+    ["متى تنزل الأسئلة الجديدة؟","كل يوم منتصف الليل بالتوقيت المحلي. والكل ياخذ نفس الثلاثة."],
+    ["أقدر ألعب الأيام السابقة؟","نعم. افتح القائمة في الزاوية، اختر أي يوم سابق من التقويم، والعبه. أيام الأرشيف ما تُحسب في سلسلتك."],
+    ["أقدر أتحدى صديق؟","نعم. بعد ما تخلّص، اضغط «شارك نتيجتك» وترسل رابط تحدي. يفتح مباشرة على نفس الأسئلة الثلاثة، وصديقك ما يشوف نتيجتك إلا بعد ما يجاوب."],
+    ["أحتاج حساب؟","لا. تسجيل الدخول اختياري. افتح القائمة إذا تبي سلسلتك وإحصائياتك تتبعك بين الأجهزة."]
+  ]:[
     ["Is there a right answer?","No. Every question is an estimate. We show a logical estimate and a plausible range around it, and you score by landing close."],
     ["Can I use a calculator?","Yes. Tap Calculator &amp; Notes on any question to crunch numbers and jot down your logic."],
     ["Does Good to know cost points?","No, it’s free. Each question has one Good to know note. Sometimes it’s a solid starting number, sometimes a rule of thumb, sometimes local colour that may or may not help."],
@@ -1090,23 +1117,22 @@ function landing(){
     ["Can I challenge a friend?","Yes. After you finish, tap Share result to send a challenge link. It opens straight into the same three questions, and your friend only sees your score after they’ve answered."],
     ["Do I need an account?","No. Signing in is optional. Open the menu if you want your streak and stats to follow you between devices."]
   ];
-  var lab=["10× low","3× low","Spot on","3× high","10× high"];
-  var cta=(st.g.length>=3&&!st.r?"See today’s results":st.g.length?"Continue today’s game":"Play today’s game");
+  var cta=(st.g.length>=3&&!st.r?(AR?"شوف نتيجة اليوم":"See today’s results"):st.g.length?(AR?"كمّل لعبة اليوم":"Continue today’s game"):(AR?"العب لعبة اليوم":"Play today’s game"));
   mount(
   "<div class='lhero'><div class='ldrops'>"+[0,1,2].map(function(i){var t=THEMES[i],ic=["Food & drink","Roads","Doha life"][i];return "<span class='ldrop' style='--c:"+t.c+";--c2:"+t.c2+";--cs:"+t.cs+"'>"+(ICONS[ic]||"")+"</span>"}).join("")+"</div>"+
-  "<h1>Three guesses.<br><em>Pure logic.</em></h1><p class='lead'>A fresh set of three how-many questions about Qatar, every day. No exact answers, just reason your way close and chase the score.</p>"+
-  "<button class='main' id='pl'>"+cta+"</button><p class='lsub'>New drop daily &middot; 2 minutes &middot; no sign-up</p></div>"+
+  "<h1>"+(AR?"ثلاث تخمينات.<br><em>منطق خالص.</em>":"Three guesses.<br><em>Pure logic.</em>")+"</h1><p class='lead'>"+(AR?"ثلاثة أسئلة «كم؟» جديدة عن قطر، كل يوم. ما في جواب مضبوط — فكّر بمنطقك، قرّب قدر ما تقدر، واطلع بأعلى نتيجة.":"A fresh set of three how-many questions about Qatar, every day. No exact answers, just reason your way close and chase the score.")+"</p>"+
+  "<button class='main' id='pl'>"+cta+"</button><p class='lsub'>"+(AR?"سؤال جديد كل يوم &middot; دقيقتان &middot; بدون تسجيل":"New drop daily &middot; 2 minutes &middot; no sign-up")+"</p></div>"+
   "<div class='lsteps'>"+
-  "<div class='lstep' style='--c:"+THEMES[0].c+";--c2:"+THEMES[0].c2+";--cs:"+THEMES[0].cs+"'><b>1</b><h4>Guess</h4><span>Use logic, pick a number, lock it in.</span></div>"+
-  "<div class='lstep' style='--c:"+THEMES[1].c+";--c2:"+THEMES[1].c2+";--cs:"+THEMES[1].cs+"'><b>2</b><h4>Reveal</h4><span>See how close you landed, and why.</span></div>"+
-  "<div class='lstep' style='--c:"+THEMES[2].c+";--c2:"+THEMES[2].c2+";--cs:"+THEMES[2].cs+"'><b>3</b><h4>Compare</h4><span>Stack up against everyone, then challenge a friend.</span></div></div>"+
-  "<div class='sec'><h3>Your toolkit</h3><p class='sub'>Everything you need to think it through.</p><div class='feat'>"+
-  "<div class='fc'><div class='fi'>"+ICON_CALC+"</div><div><b>Calculator &amp; Notes</b><span>Crunch numbers and jot down your logic.</span></div></div>"+
-  "<div class='fc'><div class='fi'>"+ICON_BULB+"</div><div><b>One Good to know per question</b><span>A useful fact or a bit of Doha colour. Free.</span></div></div>"+
-  "<div class='fc'><div class='fi'>"+ICON_CHART+"</div><div><b>Instant breakdown</b><span>See the full logic and where you rank.</span></div></div><div class='fc'><div class='fi'>"+ICON_CAL+"</div><div><b>Play the archive</b><span>Missed a day? Catch up from the calendar menu.</span></div></div></div></div>"+
-  "<div class='sec'><h3>What you’ll be guessing</h3><p class='sub'>From WhatsApp voice notes to petrol. The third question is always a Doha life one.</p><div class='chips'>"+cats.map(function(c){return "<span>"+catIcon(c)+c+"</span>"}).join("")+"</div></div>"+
-  "<div class='sec'><h3>Questions, answered</h3>"+faq.map(function(f){return "<details><summary>"+f[0]+"</summary><p>"+f[1]+"</p></details>"}).join("")+"</div>"+
-  "<div class='cta'><h3>Ready? Today’s three are waiting.</h3><p>Trust your logic. Commit to a number.</p><button class='main light' id='pl2'>"+cta+"</button></div>");
+  "<div class='lstep' style='--c:"+THEMES[0].c+";--c2:"+THEMES[0].c2+";--cs:"+THEMES[0].cs+"'><b>1</b><h4>"+(AR?"خمّن":"Guess")+"</h4><span>"+(AR?"استخدم منطقك، اختر رقماً، وثبّته.":"Use logic, pick a number, lock it in.")+"</span></div>"+
+  "<div class='lstep' style='--c:"+THEMES[1].c+";--c2:"+THEMES[1].c2+";--cs:"+THEMES[1].cs+"'><b>2</b><h4>"+(AR?"النتيجة":"Reveal")+"</h4><span>"+(AR?"شوف كم قربت، وليش.":"See how close you landed, and why.")+"</span></div>"+
+  "<div class='lstep' style='--c:"+THEMES[2].c+";--c2:"+THEMES[2].c2+";--cs:"+THEMES[2].cs+"'><b>3</b><h4>"+(AR?"قارن":"Compare")+"</h4><span>"+(AR?"قارن نفسك بالكل، وبعدين تحدَّ صديقك.":"Stack up against everyone, then challenge a friend.")+"</span></div></div>"+
+  "<div class='sec'><h3>"+(AR?"أدواتك":"Your toolkit")+"</h3><p class='sub'>"+(AR?"كل اللي تحتاجه تفكر فيه.":"Everything you need to think it through.")+"</p><div class='feat'>"+
+  "<div class='fc'><div class='fi'>"+ICON_CALC+"</div><div><b>"+(AR?"الآلة الحاسبة والملاحظات":"Calculator &amp; Notes")+"</b><span>"+(AR?"احسب الأرقام ودوّن منطقك.":"Crunch numbers and jot down your logic.")+"</span></div></div>"+
+  "<div class='fc'><div class='fi'>"+ICON_BULB+"</div><div><b>"+(AR?"معلومة «للعلم» واحدة لكل سؤال":"One Good to know per question")+"</b><span>"+(AR?"معلومة مفيدة أو لمسة من أجواء الدوحة. مجاناً.":"A useful fact or a bit of Doha colour. Free.")+"</span></div></div>"+
+  "<div class='fc'><div class='fi'>"+ICON_CHART+"</div><div><b>"+(AR?"تحليل فوري":"Instant breakdown")+"</b><span>"+(AR?"شوف الحساب كامل وترتيبك.":"See the full logic and where you rank.")+"</span></div></div><div class='fc'><div class='fi'>"+ICON_CAL+"</div><div><b>"+(AR?"العب الأرشيف":"Play the archive")+"</b><span>"+(AR?"فاتك يوم؟ الحقه من تقويم القائمة.":"Missed a day? Catch up from the calendar menu.")+"</span></div></div></div></div>"+
+  "<div class='sec'><h3>"+(AR?"وش راح تخمّن":"What you’ll be guessing")+"</h3><p class='sub'>"+(AR?"من رسائل الواتساب الصوتية إلى البنزين. السؤال الثالث دايماً عن حياة الدوحة.":"From WhatsApp voice notes to petrol. The third question is always a Doha life one.")+"</p><div class='chips'>"+cats.map(function(c){return "<span>"+catIcon(c)+(AR?CATAR[c]:c)+"</span>"}).join("")+"</div></div>"+
+  "<div class='sec'><h3>"+(AR?"أسئلة وأجوبة":"Questions, answered")+"</h3>"+faq.map(function(f){return "<details><summary>"+f[0]+"</summary><p>"+f[1]+"</p></details>"}).join("")+"</div>"+
+  "<div class='cta'><h3>"+(AR?"جاهز؟ أسئلة اليوم الثلاثة تنتظرك.":"Ready? Today’s three are waiting.")+"</h3><p>"+(AR?"ثق بمنطقك. اختر رقماً بثقة.":"Trust your logic. Commit to a number.")+"</p><button class='main light' id='pl2'>"+cta+"</button></div>");
   app.classList.add("land");
   var go=function(){intro=false;render();window.scrollTo(0,0)};
   document.getElementById("pl").onclick=go;document.getElementById("pl2").onclick=go;
@@ -1139,11 +1165,12 @@ function openMenu(){
     var d=first+k-1,dis=d>today||d<START,inf=dis?{n:0,t:0}:dayInfo(d);
     var cls="cd"+(d===today?" today":"")+(d===day?" sel":"")+(inf.n>=3?" done":inf.n>0?" part":"");
     cells+="<button class='"+cls+"' data-d='"+d+"'"+(dis?" disabled":"")+"><span>"+k+"</span><small>"+(inf.n>=3?Math.round(inf.t/3)+"%":inf.n>0?inf.n+"/3":"")+"</small></button>"}
-  sh.innerHTML="<div class='grab'></div><div class='shh'><b>Menu</b><button class='x' id='sx' aria-label='Close'>"+ICON_X+"</button></div>"+menuRows()+"<h3 class='bh' style='margin-top:20px'>Play archive</h3>"+
-  "<div class='mrow'><button class='x' data-nav='-1' aria-label='Previous month'"+(canPrev?"":" disabled")+">"+ICON_L+"</button><b>"+MONL[cm.m]+" "+cm.y+"</b><button class='x' data-nav='1' aria-label='Next month'"+(canNext?"":" disabled")+">"+ICON_R+"</button></div>"+
-  "<div class='cal' style='margin-bottom:6px'>"+"SMTWTFS".split("").map(function(c){return "<span class='wd'>"+c+"</span>"}).join("")+"</div><div class='cal'>"+cells+"</div>"+
-  "<p class='note' style='margin-top:14px'>Tap any day up to today to play it. Archive days don’t count toward your streak.</p>"+
-  "<div class='mis' style='margin-top:14px'><button class='mi' data-home='1'>"+ICON_HOME+"<div><b>Back to home</b><span>How to play and the FAQ</span></div>"+ICON_R+"</button></div>";
+  var AR=LANG==="ar",WD=AR?["ح","ن","ث","ر","خ","ج","س"]:"SMTWTFS".split("");
+  sh.innerHTML="<div class='grab'></div><div class='shh'><b>"+(AR?"القائمة":"Menu")+"</b><button class='x' id='sx' aria-label='Close'>"+ICON_X+"</button></div>"+menuRows()+"<h3 class='bh' style='margin-top:20px'>"+(AR?"العب الأرشيف":"Play archive")+"</h3>"+
+  "<div class='mrow'><button class='x' data-nav='-1' aria-label='Previous month'"+(canPrev?"":" disabled")+">"+(AR?ICON_R:ICON_L)+"</button><b>"+MONL[cm.m]+" "+cm.y+"</b><button class='x' data-nav='1' aria-label='Next month'"+(canNext?"":" disabled")+">"+(AR?ICON_L:ICON_R)+"</button></div>"+
+  "<div class='cal' style='margin-bottom:6px'>"+WD.map(function(c){return "<span class='wd'>"+c+"</span>"}).join("")+"</div><div class='cal'>"+cells+"</div>"+
+  "<p class='note' style='margin-top:14px'>"+(AR?"اضغط أي يوم حتى اليوم لتلعبه. أيام الأرشيف ما تُحسب في سلسلتك.":"Tap any day up to today to play it. Archive days don’t count toward your streak.")+"</p>"+
+  "<div class='mis' style='margin-top:14px'><button class='mi' data-home='1'>"+ICON_HOME+"<div><b>"+(AR?"الرجوع للرئيسية":"Back to home")+"</b><span>"+(AR?"كيف تلعب والأسئلة الشائعة":"How to play and the FAQ")+"</span></div>"+ICON_R+"</button></div>";
   sh.onclick=function(e){
     var b=e.target.closest?e.target.closest("button"):null;if(!b||b.disabled)return;
     if(b.hasAttribute("data-d")){selectDay(parseInt(b.getAttribute("data-d"),10));intro=false;closeSheet();render();window.scrollTo(0,0)}
@@ -1179,11 +1206,12 @@ function getStats(d){return api("/stats?day="+d)}
 /* ===== charts: demo data locally, real data once the backend is on ===== */
 function chartInner(kind){
   var D=CD,ov="";
+  var AR=LANG==="ar";
   if(kind==="q"&&!D.demo&&D.n>0){
     var po=Math.round(100*(D.over||0)/D.n),pu=Math.round(100*(D.under||0)/D.n);
-    ov="<p class='ovl'>"+(Math.max(po,pu)<50?"Players were split on this one.":po>=pu?po+"% of players guessed too high.":pu+"% of players guessed too low.")+"</p>"}
-  return "<div class='graph'>"+graph()+"</div><div class='pct'><span>Better than</span><b><span id='pn'>0</span>% of players</b></div>"+ov+
-    (D.demo?"":"<p class='note'>Based on "+D.n.toLocaleString("en-US")+" players who answered "+(kind==="q"?"this question":"today’s three")+".</p>")}
+    ov="<p class='ovl'>"+(AR?(Math.max(po,pu)<50?"اللاعبون انقسموا على هذا.":po>=pu?po+"٪ من اللاعبين خمّنوا أعلى من اللازم.":pu+"٪ من اللاعبين خمّنوا أقل من اللازم."):(Math.max(po,pu)<50?"Players were split on this one.":po>=pu?po+"% of players guessed too high.":pu+"% of players guessed too low."))+"</p>"}
+  return "<div class='graph'>"+graph()+"</div><div class='pct'><span>"+tr("Better than")+"</span><b><span id='pn'>0</span>"+(AR?"٪ من اللاعبين":"% of players")+"</b></div>"+ov+
+    (D.demo?"":"<p class='note'>"+(AR?"بناءً على "+D.n.toLocaleString("ar-EG")+" لاعب جاوبوا "+(kind==="q"?"على هذا السؤال":"أسئلة اليوم الثلاثة")+".":"Based on "+D.n.toLocaleString("en-US")+" players who answered "+(kind==="q"?"this question":"today’s three")+".")+"</p>")}
 function chartSlot(kind){
   if(!API){CD=demoDist();return chartInner(kind)}
   return "<div id='gbox' class='gbox'><p class='note'>Loading how other players did…</p></div>"}
@@ -1205,7 +1233,8 @@ function chartLater(kind,qi,s,tok){
 /* ===== source tags ===== */
 var KINDS={O:["Official","Taken straight from a published figure."],D:["Derived","Built from published figures plus simple maths."],R:["Rough estimate","Built on rounded assumptions, not published data."]};
 ["How many flights take off","How many hours would it take to drive","If everyone in the world stood"].forEach(function(p){Q.forEach(function(q){if(q.t.indexOf(p)===0)q.k="D"})});
-function srcTag(q){var k=q.k||"R";return "<p class='srcl'><span class='src s"+k+"'>"+KINDS[k][0]+"</span>"+KINDS[k][1]+"</p>"}
+var KINDS_AR={O:["رسمي","مأخوذ مباشرة من رقم منشور."],D:["مشتق","مبني على أرقام منشورة مع حساب بسيط."],R:["تقدير تقريبي","مبني على فرضيات مقرّبة، مو بيانات منشورة."]};
+function srcTag(q){var k=q.k||"R",K=LANG==="ar"?KINDS_AR[k]:KINDS[k];return "<p class='srcl'><span class='src s"+k+"'>"+K[0]+"</span>"+K[1]+"</p>"}
 
 
 /* ===== challenge links ===== */
@@ -1220,43 +1249,43 @@ function parseChallenge(){
   try{window.history.replaceState(null,"",location.pathname)}catch(e){}
   return true}
 function chBanner(n){var c=n===0&&st.g.length===0?chInfo():null;
-  return c?"<div class='chb'><b>"+esc(c.n)+" challenged you</b><span>Same three questions. Guess first, then see how you stack up.</span></div>":""}
+  return c?"<div class='chb'><b>"+esc(c.n)+(LANG==="ar"?" يتحداك":" challenged you")+"</b><span>"+(LANG==="ar"?"نفس الأسئلة الثلاثة. خمّن أول، وبعدين شوف وين صرت.":"Same three questions. Guess first, then see how you stack up.")+"</span></div>":""}
 function h2h(avg){
   var c=chInfo();if(!c)return "";
   var th=Math.round((c.s[0]+c.s[1]+c.s[2])/3),d=avg-th,nm=esc(c.n),
-    msg=Math.abs(d)<=1?"Dead heat with "+nm+".":d>0?"You beat "+nm+" by "+d+" points.":nm+" edges you by "+(-d)+" points. Rematch tomorrow?";
-  return "<h3 class='bh'>Head to head</h3><div class='h2h'><div><small>You</small><b>"+avg+"%</b></div><span>vs</span><div><small>"+nm+"</small><b>"+th+"%</b></div></div><p class='note' style='text-align:center;margin-top:10px'>"+msg+"</p>"}
+    msg=LANG==="ar"?(Math.abs(d)<=1?"تعادل تام مع "+nm+".":d>0?"غلبت "+nm+" بفارق "+d+" نقطة.":nm+" سبقك بـ "+(-d)+" نقطة. إعادة بكرة؟"):(Math.abs(d)<=1?"Dead heat with "+nm+".":d>0?"You beat "+nm+" by "+d+" points.":nm+" edges you by "+(-d)+" points. Rematch tomorrow?");
+  return "<h3 class='bh'>"+(LANG==="ar"?"وجهاً لوجه":"Head to head")+"</h3><div class='h2h'><div><small>"+tr("You")+"</small><b>"+avg+"%</b></div><span>"+(LANG==="ar"?"ضد":"vs")+"</span><div><small>"+nm+"</small><b>"+th+"%</b></div></div><p class='note' style='text-align:center;margin-top:10px'>"+msg+"</p>"}
 
 /* ===== sign in (optional) and sync ===== */
 var ICON_USER="<svg viewBox='0 0 24 24'><circle cx='12' cy='8' r='4'/><path d='M4 21c0-4 4-6 8-6s8 2 8 6'/></svg>",
 ICON_BAL="<svg viewBox='0 0 24 24'><path d='M12 4v16M6 20h12M5 8h14M7 8l-3 7a3 3 0 0 0 6 0L7 8zM17 8l-3 7a3 3 0 0 0 6 0l-3-7z'/></svg>",
 ICON_HOME="<svg viewBox='0 0 24 24'><path d='M4 20V10l8-6 8 6v10M4 20h16M10 20v-5h4v5'/></svg>";
 function menuRows(){
-  var a=acct();
+  var a=acct(),AR=LANG==="ar";
   return "<div class='mis'>"+
-  (a.t?"<div class='mi static'>"+ICON_USER+"<div><b>Signed in</b><span>"+esc(a.e)+"</span></div><button class='lnk' data-act='signout'>Sign out</button></div>"
-      :"<button class='mi' data-act='signin'>"+ICON_USER+"<div><b>Sign in</b><span>Optional. Keep your streak across devices.</span></div>"+ICON_R+"</button>")+"</div>"}
+  (a.t?"<div class='mi static'>"+ICON_USER+"<div><b>"+(AR?"مسجّل الدخول":"Signed in")+"</b><span>"+esc(a.e)+"</span></div><button class='lnk' data-act='signout'>"+(AR?"خروج":"Sign out")+"</button></div>"
+      :"<button class='mi' data-act='signin'>"+ICON_USER+"<div><b>"+(AR?"تسجيل الدخول":"Sign in")+"</b><span>"+(AR?"اختياري. احتفظ بسلسلتك بين الأجهزة.":"Optional. Keep your streak across devices.")+"</span></div>"+ICON_R+"</button>")+"</div>"}
 function sheetShell(title,body){
   var sh=document.getElementById("sheet"),sc=document.getElementById("scrim");
   sh.innerHTML="<div class='grab'></div><div class='shh'><b>"+title+"</b><button class='x' id='sx' aria-label='Close'>"+ICON_X+"</button></div>"+body;
   sh.onclick=null;document.getElementById("sx").onclick=closeSheet;sc.onclick=closeSheet;
   sh.classList.add("open");sc.classList.add("open");document.body.style.overflow="hidden";return sh}
 function openSignIn(step,email,msg){
-  var body,g=function(i){return document.getElementById(i)};
-  if(!API)body="<p class='sub'>Sign-in isn’t switched on yet. It arrives when the game goes live, so your streak and stats can follow you between your phone and your laptop. You never need an account to play.</p>";
-  else if(step===3)body="<p class='sub'>You’re signed in as <b>"+esc(email)+"</b>. Your progress now follows you between devices.</p><button class='main' id='sd'>Done</button>";
-  else if(step===2)body="<p class='sub'>"+esc(msg||"We emailed a 6-digit code to "+email+".")+"</p><input id='sc' class='inp' inputmode='numeric' maxlength='6' autocomplete='one-time-code' placeholder='6-digit code'><p class='err' id='se'></p><button class='main' id='sv' style='margin-top:12px'>Verify and sign in</button>";
-  else body="<p class='sub'>Optional. Sign in to keep your streak and stats when you switch devices. No password, we just email you a one-time code.</p><input id='s1' class='inp' type='email' autocomplete='email' placeholder='you@example.com'><p class='err' id='se'></p><button class='main' id='ss' style='margin-top:12px'>Send my code</button>";
-  sheetShell("Sign in",body+(step===3?"":"<button class='ghost' id='bk' style='width:100%;margin-top:12px'>Back to menu</button>"));
+  var body,AR=LANG==="ar",g=function(i){return document.getElementById(i)};
+  if(!API)body="<p class='sub'>"+(AR?"تسجيل الدخول لسه ما اشتغل. بيوصل لما تنزل اللعبة رسمياً، عشان سلسلتك وإحصائياتك تتبعك بين جوالك ولابتوبك. وما تحتاج حساب عشان تلعب أبداً.":"Sign-in isn’t switched on yet. It arrives when the game goes live, so your streak and stats can follow you between your phone and your laptop. You never need an account to play.")+"</p>";
+  else if(step===3)body="<p class='sub'>"+(AR?"سجّلت الدخول باسم <b>"+esc(email)+"</b>. تقدّمك الآن يتبعك بين الأجهزة.":"You’re signed in as <b>"+esc(email)+"</b>. Your progress now follows you between devices.")+"</p><button class='main' id='sd'>"+(AR?"تم":"Done")+"</button>";
+  else if(step===2)body="<p class='sub'>"+esc(msg||(AR?"أرسلنا رمزاً من 6 أرقام إلى "+email+".":"We emailed a 6-digit code to "+email+"."))+"</p><input id='sc' class='inp' inputmode='numeric' maxlength='6' autocomplete='one-time-code' placeholder='"+(AR?"الرمز المكوّن من 6 أرقام":"6-digit code")+"'><p class='err' id='se'></p><button class='main' id='sv' style='margin-top:12px'>"+(AR?"تحقّق وسجّل الدخول":"Verify and sign in")+"</button>";
+  else body="<p class='sub'>"+(AR?"اختياري. سجّل الدخول عشان تحتفظ بسلسلتك وإحصائياتك لما تغيّر الجهاز. بدون كلمة سر، بس نرسل لك رمزاً لمرة وحدة.":"Optional. Sign in to keep your streak and stats when you switch devices. No password, we just email you a one-time code.")+"</p><input id='s1' class='inp' type='email' autocomplete='email' placeholder='you@example.com'><p class='err' id='se'></p><button class='main' id='ss' style='margin-top:12px'>"+(AR?"أرسل رمزي":"Send my code")+"</button>";
+  sheetShell(AR?"تسجيل الدخول":"Sign in",body+(step===3?"":"<button class='ghost' id='bk' style='width:100%;margin-top:12px'>"+(AR?"الرجوع للقائمة":"Back to menu")+"</button>"));
   if(g("bk"))g("bk").onclick=openMenu;
   function fail(e){if(g("se"))g("se").textContent=e.message;var b=g("ss")||g("sv");if(b)b.disabled=false}
   if(g("ss"))g("ss").onclick=function(){
     var em=g("s1").value.trim().toLowerCase();
-    if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em)){g("se").textContent="That email doesn’t look right.";return}
+    if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em)){g("se").textContent=AR?"هذا البريد ما يبدو صحيحاً.":"That email doesn’t look right.";return}
     g("ss").disabled=true;
-    api("/auth/start",{method:"POST",body:{email:em}}).then(function(r){openSignIn(2,em,r.devCode?"Dev mode: your code is "+r.devCode:"")},fail)};
+    api("/auth/start",{method:"POST",body:{email:em}}).then(function(r){openSignIn(2,em,r.devCode?(AR?"وضع المطور: رمزك هو "+r.devCode:"Dev mode: your code is "+r.devCode):"")},fail)};
   if(g("sv"))g("sv").onclick=function(){
-    var code=g("sc").value.trim();if(!/^\d{6}$/.test(code)){g("se").textContent="Enter the 6-digit code.";return}
+    var code=g("sc").value.trim();if(!/^\d{6}$/.test(code)){g("se").textContent=AR?"أدخل الرمز المكوّن من 6 أرقام.":"Enter the 6-digit code.";return}
     g("sv").disabled=true;
     api("/auth/verify",{method:"POST",body:{email:email,code:code}}).then(function(r){
       setAcct(r.token,email);
@@ -1291,7 +1320,9 @@ function rebuildStats(){
 var SITE="roughly.gg/"+COUNTRY;
 function myName(){return cleanName((load("rq-name",{})||{}).n)}
 function chLink(){var n=myName();return "https://"+SITE+"?c="+day+"."+st.s.join("-")+(n?"."+encodeURIComponent(n):"")}
-function shareText(tot){var avg=Math.round(tot/3);return "Roughly "+COUNTRY+" · "+dlabel(day)+"\n"+rankOf(avg)[0]+" · "+avg+"% accuracy\n"+st.s.map(function(x){return x+"%"}).join(" · ")+"\nWhat would you have guessed?\n"+chLink()}
+function shareText(tot){var avg=Math.round(tot/3);
+  if(LANG==="ar")return "Roughly "+COUNTRY+" · "+dlabel(day)+"\n"+avg+"٪ دقة\n"+st.s.map(function(x){return x+"٪"}).join(" · ")+"\nوش كان تخمينك إنت؟\n"+chLink();
+  return "Roughly "+COUNTRY+" · "+dlabel(day)+"\n"+rankOf(avg)[0]+" · "+avg+"% accuracy\n"+st.s.map(function(x){return x+"%"}).join(" · ")+"\nWhat would you have guessed?\n"+chLink()}
 function copyText(t,ta,cb){
   function legacy(){var ok=false;try{ta.focus();ta.select();ta.setSelectionRange(0,t.length);ok=document.execCommand("copy")}catch(x){}cb(ok)}
   try{if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(function(){cb(true)},legacy);return}}catch(x){}
@@ -1300,37 +1331,41 @@ function copyText(t,ta,cb){
 function openShare(tot){
   var sh=document.getElementById("sheet"),sc=document.getElementById("scrim"),avg=Math.round(tot/3),e=encodeURIComponent,g=function(i){return document.getElementById(i)};
   var mini=st.s.map(function(s){return "<i><u style='width:"+s+"%'></u></i>"}).join("");
-  sh.innerHTML="<div class='grab'></div><div class='shh'><b>Challenge a friend</b><button class='x' id='sx' aria-label='Close'>"+ICON_X+"</button></div>"+
-  "<div class='shp'><small>Roughly "+COUNTRY+" · "+dlabel(day)+"</small><b>"+rankOf(avg)[0]+"</b><span>"+avg+"% accuracy</span><div class='mb2'>"+mini+"</div><em>"+SITE+"</em></div>"+
-  "<label class='nl' for='shn' style='margin-top:0'>Your name on the challenge (optional)</label><input id='shn' class='inp' maxlength='20' autocomplete='off' placeholder='e.g. Sam'>"+
-  "<p class='note' style='margin:6px 2px 12px'>Friends play the same three questions. They see your score only after they’ve answered.</p>"+
+  var AR=LANG==="ar";
+  sh.innerHTML="<div class='grab'></div><div class='shh'><b>"+(AR?"تحدّى صاحبك":"Challenge a friend")+"</b><button class='x' id='sx' aria-label='Close'>"+ICON_X+"</button></div>"+
+  "<div class='shp'><small>Roughly "+COUNTRY+" · "+dlabel(day)+"</small><b>"+rankOf(avg)[0]+"</b><span>"+avg+(AR?"٪ دقة":"% accuracy")+"</span><div class='mb2'>"+mini+"</div><em>"+SITE+"</em></div>"+
+  "<label class='nl' for='shn' style='margin-top:0'>"+(AR?"اسمك في التحدي (اختياري)":"Your name on the challenge (optional)")+"</label><input id='shn' class='inp' maxlength='20' autocomplete='off' placeholder='"+(AR?"مثلاً: سلطان":"e.g. Sam")+"'>"+
+  "<p class='note' style='margin:6px 2px 12px'>"+(AR?"أصحابك يلعبون نفس الأسئلة الثلاثة. ما يشوفون نتيجتك إلا بعد ما يجاوبون.":"Friends play the same three questions. They see your score only after they’ve answered.")+"</p>"+
   "<div class='shg'><a class='shl' id='wa' target='_blank' rel='noopener noreferrer'>WhatsApp</a><a class='shl' id='tg' target='_blank' rel='noopener noreferrer'>Telegram</a><a class='shl' id='tw' target='_blank' rel='noopener noreferrer'>X</a></div>"+
-  "<button class='main' id='cp2' style='margin-top:0'>Copy challenge</button>"+
-  (navigator.share?"<button class='ghost' id='nat' style='width:100%;margin-top:10px'>More options</button>":"")+
+  "<button class='main' id='cp2' style='margin-top:0'>"+(AR?"انسخ التحدي":"Copy challenge")+"</button>"+
+  (navigator.share?"<button class='ghost' id='nat' style='width:100%;margin-top:10px'>"+(AR?"خيارات أكثر":"More options")+"</button>":"")+
   "<textarea id='nt' class='sr' readonly rows='4'></textarea>";
   var ta=g("nt"),cp=g("cp2"),nat=g("nat"),ni=g("shn"),t="";
   function refresh(){t=shareText(tot);var body=t.split("\n").slice(0,-1).join("\n");ta.value=t;
     g("wa").href="https://wa.me/?text="+e(t);g("tg").href="https://t.me/share/url?url="+e(chLink())+"&text="+e(body);g("tw").href="https://twitter.com/intent/tweet?text="+e(t)}
   ni.value=myName();refresh();
-  ni.oninput=function(){save("rq-name",{n:cleanName(ni.value)});cp.textContent="Copy challenge";refresh()};
+  ni.oninput=function(){save("rq-name",{n:cleanName(ni.value)});cp.textContent=AR?"انسخ التحدي":"Copy challenge";refresh()};
   sh.onclick=null;g("sx").onclick=closeSheet;sc.onclick=closeSheet;
-  cp.onclick=function(){copyText(t,ta,function(ok){cp.textContent=ok?"Copied":"Select the text below and copy it";if(!ok){ta.classList.remove("sr");try{ta.focus();ta.select()}catch(x){}}})};
+  cp.onclick=function(){copyText(t,ta,function(ok){cp.textContent=ok?(AR?"تم النسخ":"Copied"):(AR?"حدّد النص بالأسفل وانسخه":"Select the text below and copy it");if(!ok){ta.classList.remove("sr");try{ta.focus();ta.select()}catch(x){}}})};
   if(nat)nat.onclick=function(){try{navigator.share({text:t}).catch(function(){})}catch(x){}};
   sh.classList.add("open");sc.classList.add("open");document.body.style.overflow="hidden";
 }
 function shareResult(tot){openShare(tot)}
 var TIPS=["Break big numbers into things you can picture: homes, people, cars, days.","Round to friendly numbers. 3 million people, 4 per home, 8 windows each. Good enough.","Sanity check: is your answer more than everyone in Qatar? Less than one per person?","Being off by 2× still scores well. Don’t agonise over the last digit.","Not sure where to start? Begin with the population, then ask how many do it in a day."];
+var TIPS_AR=["قسّم الأرقام الكبيرة لأشياء تتخيلها: بيوت، ناس، سيارات، أيام.","قرّب لأرقام مريحة. 3 ملايين نسمة، 4 بكل بيت، 8 نوافذ لكل واحد. يكفي.","تأكد بالمنطق: جوابك أكثر من كل سكان قطر؟ أقل من واحد لكل شخص؟","الخطأ بمقدار الضعف لسه يسجّل زين. لا تتعب نفسك على آخر رقم.","ما تدري من وين تبدأ؟ ابدأ بعدد السكان، وبعدين اسأل كم واحد يسويها في اليوم."];
+var CAT_AR={"Sport":"الرياضة","Food & drink":"الأكل والشرب","Roads":"الطرق","Geography":"الجغرافيا","Travel":"السفر","Money":"المال","Resources":"الموارد","Everyday Qatar":"قطر اليومية","Doha life":"حياة الدوحة"};
+function catAr(c){return CAT_AR[c]||c}
 function side(){
   var el=document.getElementById("side");if(!el)return;
-  var n=st.g.length,rows="",i,q,state;
+  var n=st.g.length,rows="",i,q,state,AR=LANG==="ar";
   for(i=0;i<3;i++){
     q=Q[ids[i]];state=i<n?"done":i===n?"cur":"up";
-    rows+="<div class='sq "+state+"'>"+catIcon(q.c)+"<div><b>Question "+(i+1)+"</b><span class='s'>"+q.c+"</span></div>"+(i<n?"<span class='sc2'>"+st.s[i]+"%</span>":"")+"</div>"}
+    rows+="<div class='sq "+state+"'>"+catIcon(q.c)+"<div><b>"+(AR?"السؤال "+(i+1):"Question "+(i+1))+"</b><span class='s'>"+(AR?catAr(q.c):q.c)+"</span></div>"+(i<n?"<span class='sc2'>"+st.s[i]+"%</span>":"")+"</div>"}
   var avg=stats.played?Math.round(stats.total/stats.played/3)+"%":"–";
-  el.innerHTML="<div class='sdc'><h4>"+(day===today?"Today":"Archive")+" · "+dlabel(day)+"</h4>"+rows+"</div>"+
-  "<div class='sdc'><h4>Your stats</h4><div class='stats'><div><b>"+stats.streak+"</b><span>Streak</span></div><div><b>"+stats.played+"</b><span>Played</span></div><div><b>"+avg+"</b><span>Accuracy</span></div></div></div>"+
-  "<div class='sdc tipcard'><h4>Pro tip</h4><p>"+TIPS[(day+n)%TIPS.length]+"</p></div>"+
-  "<button class='ghost' id='sa' style='width:100%;background:#fff'>"+ICON_CAL+"Play the archive</button>";
+  el.innerHTML="<div class='sdc'><h4>"+(day===today?(AR?"اليوم":"Today"):(AR?"الأرشيف":"Archive"))+" · "+dlabel(day)+"</h4>"+rows+"</div>"+
+  "<div class='sdc'><h4>"+(AR?"إحصائياتك":"Your stats")+"</h4><div class='stats'><div><b>"+stats.streak+"</b><span>"+(AR?"السلسلة":"Streak")+"</span></div><div><b>"+stats.played+"</b><span>"+(AR?"لعبت":"Played")+"</span></div><div><b>"+avg+"</b><span>"+(AR?"الدقة":"Accuracy")+"</span></div></div></div>"+
+  "<div class='sdc tipcard'><h4>"+(AR?"نصيحة":"Pro tip")+"</h4><p>"+(AR?TIPS_AR[(day+n)%TIPS_AR.length]:TIPS[(day+n)%TIPS.length])+"</p></div>"+
+  "<button class='ghost' id='sa' style='width:100%;background:#fff'>"+ICON_CAL+(AR?"العب الأرشيف":"Play the archive")+"</button>";
   document.getElementById("sa").onclick=function(){var d=new Date(day*864e5);cm={y:d.getUTCFullYear(),m:d.getUTCMonth()};openMenu()};
 }
 var THEMES=[
@@ -1343,6 +1378,24 @@ function setTheme(t){var s=document.body.style;s.setProperty("--c",t.c);s.setPro
 var LANG="en";try{LANG=localStorage.getItem("rq-lang")==="ar"?"ar":"en"}catch(e){}
 function applyLang(){document.documentElement.lang=LANG;document.documentElement.dir=(LANG==="ar"?"rtl":"ltr");var b=document.getElementById("lang");if(b)b.textContent=(LANG==="ar"?"EN":"عربي")}
 function toggleLang(){LANG=(LANG==="ar"?"en":"ar");try{localStorage.setItem("rq-lang",LANG)}catch(e){}applyLang();render()}
+var AR=LANG==="ar";
+var TR={
+"Confirm":"أكّد","Next":"التالي","See results":"شوف النتيجة","See the maths":"شوف الحساب","Share result":"شارك نتيجتك",
+"Play past drops":"العب الأيام السابقة","Next drop in":"السؤال الجديد بعد","Your score":"نتيجتك","Your guess":"تخمينك","Our estimate":"تقديرنا",
+"Better than":"أفضل من","You":"أنت","Spot on":"بالضبط","Good to know":"للعلم","How we worked it out":"كيف حسبناها","The logic":"الطريقة",
+"You guessed":"تخمينك","You were":"كنت","Your score ":"نتيجتك","day streak":"يوم متتالي",
+"Three guesses.":"ثلاث تخمينات.","Pure logic.":"منطق خالص.","Play today’s game":"العب سؤال اليوم","Continue today’s game":"أكمل لعبة اليوم","See today’s results":"شوف نتيجة اليوم",
+"How to play":"كيف تلعب","Menu":"القائمة","Sign in":"تسجيل الدخول","Back to home":"الرئيسية","Play archive":"الأرشيف","Challenge a friend":"تحدّى صاحبك",
+"Today’s result":"نتيجة اليوم","Archive result":"نتيجة الأرشيف","Your three guesses":"تخميناتك الثلاثة",
+"No exact answer. Use logic, then commit.":"ما في جواب دقيق. فكّر بالمنطق وأكّد.","No exact answer. Funny Doha logic encouraged.":"ما في جواب دقيق، ومنطق دوحاوي مضحك مرحّب فيه.",
+"% accurate":"٪ دقة","% accuracy":"٪ دقة"
+};
+function tr(s){return LANG==="ar"&&TR[s]?TR[s]:s}
+function qT(q){return LANG==="ar"&&q.ar&&q.ar.t?q.ar.t:q.t}
+function qF(q){return LANG==="ar"&&q.ar&&q.ar.f?q.ar.f:q.f}
+function qS(q){return LANG==="ar"&&q.ar&&q.ar.s?q.ar.s:q.s}
+function qUL(q,ul){return LANG==="ar"&&q.ar&&q.ar.u?q.ar.u:uCap(ul)}
+function hintPair(i){var h=HINTS[i];return LANG==="ar"&&h&&h[2]?["للعلم",h[2]]:h}
 function render(){
   cancelAnimationFrame(raf);viewTok++;
   var n=st.g.length;
@@ -1353,15 +1406,15 @@ function render(){
   setTheme(THEMES[n%3]);ask(n);
 }
 function unitChip(q){
-  var a=unitList(q.u);if(a.length<2)return "<div class='chip'>"+uCap(q.u)+"</div>";
+  var a=unitList(q.u);if(a.length<2)return "<div class='chip'>"+qUL(q,q.u)+"</div>";
   var pu=unitByLabel(q.u,load("rq-units",{})[q.u])[0];
   return "<select class='chip uc' id='un' aria-label='Choose your unit'>"+a.map(function(x){return "<option value='"+x[0]+"'"+(x[0]===pu?" selected":"")+">"+uCap(x[0])+"</option>"}).join("")+"</select>"}
-function emptyHint(q,c){return "Enter a number in "+uCap(c[0])+(c[1]!==1?" · converted to "+q.u+" for scoring (× "+fmt(c[1])+")":"")}
+function emptyHint(q,c){return LANG==="ar"?"أدخل رقماً بـ "+qUL(q,c[0]):"Enter a number in "+uCap(c[0])+(c[1]!==1?" · converted to "+q.u+" for scoring (× "+fmt(c[1])+")":"")}
 var phTimer=null;
 function typePlaceholder(inp){
   if(phTimer){clearTimeout(phTimer);phTimer=null}
-  if(reduce){inp.setAttribute("placeholder","Roughly…");return}
-  var words=["Roughly…","Roughly a million?","Your best guess…","Reason it out…"],wi=0,ci=0,del=false;
+  if(reduce){inp.setAttribute("placeholder",LANG==="ar"?"تقريباً…":"Roughly…");return}
+  var words=LANG==="ar"?["تقريباً…","خمّن بالمنطق…","رقمك هنا…"]:["Roughly…","Roughly a million?","Your best guess…","Reason it out…"],wi=0,ci=0,del=false;
   function tick(){
     if(!inp||!document.body.contains(inp)||inp.value){phTimer=null;return}
     var w=words[wi];
@@ -1372,8 +1425,8 @@ function typePlaceholder(inp){
 }
 function ask(n){
   var q=Q[ids[n]];var tools=toolsHtml(n);ex="";
-  mount("<div class='qhead'>"+seg(n)+"<span class='catico'>"+(ICONS[q.c]||ICONS["Everyday Qatar"])+"</span></div>"+chBanner(n)+"<h2>"+q.t+"</h2><p class='lead' style='margin-bottom:18px'>"+(q.c==="Doha life"?"No exact answer. Funny Doha logic encouraged.":"No exact answer. Use logic, then commit.")+"</p>"+
-  "<div class='field'><input id='in' inputmode='decimal' autocomplete='off' placeholder='Roughly …' aria-label='Your estimate'>"+unitChip(q)+"</div>"+
+  mount("<div class='qhead'>"+seg(n)+"<span class='catico'>"+(ICONS[q.c]||ICONS["Everyday Qatar"])+"</span></div>"+chBanner(n)+"<h2 dir='auto'>"+qT(q)+"</h2><p class='lead' style='margin-bottom:18px'>"+tr(q.c==="Doha life"?"No exact answer. Funny Doha logic encouraged.":"No exact answer. Use logic, then commit.")+"</p>"+
+  "<div class='field'><input id='in' inputmode='decimal' autocomplete='off' placeholder='"+(LANG==="ar"?"تقريباً…":"Roughly …")+"' aria-label='Your estimate'>"+unitChip(q)+"</div>"+
   "<div class='hint' id='h'>"+emptyHint(q,unitByLabel(q.u,load("rq-units",{})[q.u]))+"</div>"+tools);
   app.classList.add("qb");
   var inp=document.getElementById("in"),go=document.getElementById("go"),h=document.getElementById("h"),un=document.getElementById("un");wireTools(n,inp);typePlaceholder(inp);
@@ -1404,9 +1457,9 @@ function graph(){
   "<g class='gbar' fill='#ecedf4'>"+bars+"</g><g class='gbar2' fill='#cdd5e3' clip-path='url(#cp)'>"+bars+"</g>"+
   "<path class='gcurve' d='"+p+"' fill='none' stroke='#aab2bf' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'/><line x1='14' y1='114' x2='284' y2='114' stroke='#e9e7ef'/>"+
   "<line id='dl' class='gyline' x1='14' x2='14' y1='114' y2='114' stroke='#2f6bff' stroke-width='2' stroke-dasharray='3 3'/><circle id='dt' class='gydot' cx='14' cy='114' r='8' fill='#2f6bff' stroke='#fff' stroke-width='3'/>"+
-  "<text id='yt' class='gyt' x='14' y='14' text-anchor='middle' font-size='11' font-weight='800' fill='#2f6bff'>You</text>"+
+  "<text id='yt' class='gyt' x='14' y='14' text-anchor='middle' font-size='11' font-weight='800' fill='#2f6bff'>"+tr("You")+"</text>"+
   "<g font-size='9' fill='#82747a' text-anchor='middle'><text x='"+gx(0)+"' y='130'>0</text><text x='"+gx(25)+"' y='130'>25</text><text x='"+gx(50)+"' y='130'>50</text><text x='"+gx(75)+"' y='130'>75</text><text x='"+gx(100)+"' y='130'>100</text></g>"+
-  "<g font-size='8' fill='#a79aa0' text-anchor='middle'><text x='"+gx(50)+"' y='143'>Accuracy score (%)</text></g></svg>";
+  "<g font-size='8' fill='#a79aa0' text-anchor='middle'><text x='"+gx(50)+"' y='143'>"+(LANG==="ar"?"نسبة الدقة (٪)":"Accuracy score (%)")+"</text></g></svg>";
 }
 function rangeBar(q,g,f){
   f=f||1;
@@ -1416,23 +1469,22 @@ function rangeBar(q,g,f){
   "<div class='leg'><span>Plausible range <b>"+short(q.lo/f)+" to "+short(q.hi/f)+"</b></span><span>Dot is you</span></div>";
 }
 function openLogic(i){
-  var q=Q[ids[i]],g=st.g[i],s=st.s[i],U=unitOf(q,i),f=U[1],ul=uCap(U[0]);
-  var steps=q.s.map(function(x,k){var t=k===q.s.length-1&&q.s.length>1&&/^(Total|≈)/.test(x);return "<div class='st"+(t?" t":"")+"'><i>"+(k+1)+"</i><span>"+x+"</span></div>"}).join("");
-  sheetShell("How we worked it out","<div class='in' style='padding-top:4px'><p style='margin:0 0 12px;color:var(--mut);font-size:.9rem'>"+q.f+"</p>"+srcTag(q)+steps+
-  (f!==1?"<p class='note' style='margin:2px 0 8px'>Working shown in "+q.u+". "+(q.u==="QAR"?"Rates approximate.":"1 "+ul+" = "+fmt(f)+" "+q.u+".")+"</p>":"")+
-  "<div class='r'><span>You guessed</span><b>"+fmt(g/f)+" "+ul+"</b></div>"+
-  "<div class='r'><span>Our estimate</span><b>"+fmt(q.m/f)+" "+ul+"</b></div>"+
-  "<div class='r'><span>You were</span><b>"+verdict(g,q)+"</b></div>"+
-  "<div class='r'><span>Your score</span><b>"+s+"%</b></div>"+
-  "<p class='note' style='margin-top:10px'>Spot on scores 100, twice off about 80, ten times off about 26. Never zero.</p></div>");
+  var q=Q[ids[i]],g=st.g[i],s=st.s[i],U=unitOf(q,i),f=U[1],ul=qUL(q,U[0]),S=qS(q);
+  var steps=S.map(function(x,k){var t=k===S.length-1&&S.length>1&&/^(Total|≈|المجموع)/.test(x);return "<div class='st"+(t?" t":"")+"'><i>"+(k+1)+"</i><span>"+x+"</span></div>"}).join("");
+  sheetShell(tr("How we worked it out"),"<div class='in' style='padding-top:4px'><p style='margin:0 0 12px;color:var(--mut);font-size:.9rem'>"+qF(q)+"</p>"+srcTag(q)+steps+
+  "<div class='r'><span>"+tr("You guessed")+"</span><b>"+fmt(g/f)+" "+ul+"</b></div>"+
+  "<div class='r'><span>"+tr("Our estimate")+"</span><b>"+fmt(q.m/f)+" "+ul+"</b></div>"+
+  "<div class='r'><span>"+tr("You were")+"</span><b>"+verdict(g,q)+"</b></div>"+
+  "<div class='r'><span>"+(LANG==="ar"?"نتيجتك":"Your score")+"</span><b>"+s+"%</b></div>"+
+  "<p class='note' style='margin-top:10px'>"+(LANG==="ar"?"الإجابة بالضبط = 100، ضعفين بعيد ≈ 80، عشر مرات ≈ 26. ولا مرة صفر.":"Spot on scores 100, twice off about 80, ten times off about 26. Never zero.")+"</p></div>");
 }
 function reveal(i){
-  var q=Q[ids[i]],g=st.g[i],s=st.s[i],pc=API?0:(CD=demoDist(),pctile(s)),last=st.g.length>=3,U=unitOf(q,i),f=U[1],ul=uCap(U[0]);
-  mount("<div class='qhead'>"+seg(i)+"<span class='catico'>"+(ICONS[q.c]||ICONS["Everyday Qatar"])+"</span></div><h2 class='sm'>"+q.t+"</h2>"+
-  "<div class='cmp'><div class='me'><small>Your guess</small><b>"+short(g/f)+"</b><em>"+ul+"</em></div><div class='them'><small>Our estimate</small><b>"+short(q.m/f)+"</b><em>"+ul+"</em></div></div>"+
+  var q=Q[ids[i]],g=st.g[i],s=st.s[i],pc=API?0:(CD=demoDist(),pctile(s)),last=st.g.length>=3,U=unitOf(q,i),f=U[1],ul=qUL(q,U[0]);
+  mount("<div class='qhead'>"+seg(i)+"<span class='catico'>"+(ICONS[q.c]||ICONS["Everyday Qatar"])+"</span></div><h2 class='sm' dir='auto'>"+qT(q)+"</h2>"+
+  "<div class='cmp'><div class='me'><small>"+tr("Your guess")+"</small><b>"+short(g/f)+"</b><em>"+ul+"</em></div><div class='them'><small>"+tr("Our estimate")+"</small><b>"+short(q.m/f)+"</b><em>"+ul+"</em></div></div>"+
   "<div class='revrow'><div class='revhit'><div class='rscore'><span id='sn'>0</span><i>%</i></div><div class='rverd'>"+verdict(g,q)+"</div></div>"+
   "<div class='revg'>"+chartSlot("q")+"</div></div>"+
-  "<div class='revbtns'><button class='ghost' id='lg'>"+ICON_CHART+"See the maths</button><button class='main' id='nx'>"+(last?"See results":"Next")+"</button></div>");
+  "<div class='revbtns'><button class='ghost' id='lg'>"+ICON_CHART+tr("See the maths")+"</button><button class='main' id='nx'>"+(last?tr("See results"):tr("Next"))+"</button></div>");
   app.classList.add("qb");
   document.getElementById("lg").onclick=function(){openLogic(i)};
   document.getElementById("nx").onclick=function(){if(busy)return;busy=true;st.r=false;saveState();busy=false;render()};
@@ -1460,13 +1512,13 @@ function fmtDur(ms){ms=Math.max(0,ms);var s=Math.floor(ms/1000),h=Math.floor(s/3
 function last7(){var out=[],i,d,inf;for(i=6;i>=0;i--){d=today-i;inf=(d<START||d>today)?{n:0,t:0}:dayInfo(d);out.push({d:d,avg:inf.n>=3?Math.round(inf.t/3):null})}return out}
 function done(){
   var tot=st.s.reduce(function(a,b){return a+b},0),avg=Math.round(tot/3),pc=API?0:(CD=demoDist(),pctile(avg)),qrows="",w7,i,q;
-  for(i=0;i<3;i++){q=Q[ids[i]];qrows+="<div class='qr'>"+catIcon(q.c)+"<div class='qt'><b>"+q.t+"</b>"+(chInfo()?"<span>"+esc(chInfo().n)+" scored "+chInfo().s[i]+"%</span>":"")+"</div><div><span class='qs'>"+st.s[i]+"%</span><span class='qv'>"+verdict(st.g[i],q)+"</span></div></div>"}
+  for(i=0;i<3;i++){q=Q[ids[i]];qrows+="<div class='qr'>"+catIcon(q.c)+"<div class='qt'><b dir='auto'>"+qT(q)+"</b>"+(chInfo()?"<span>"+esc(chInfo().n)+(LANG==="ar"?" سجّل ":" scored ")+chInfo().s[i]+"%</span>":"")+"</div><div><span class='qs'>"+st.s[i]+"%</span><span class='qv'>"+verdict(st.g[i],q)+"</span></div></div>"}
   mount("<div class='res card qb'><span class='hcat'>"+ICON_TARGET+"</span>"+
-  "<div class='rtop'><div class='rsc'><small>Your score</small><div class='hs'><span id='sn'>0</span><i>%</i></div><div class='pillrow'><span class='hpill' id='pill'"+(API?" style='display:none'":"")+">Top "+(100-pc)+"%</span>"+(stats.streak?"<span class='stk'>"+ICON_FLAME+stats.streak+" day streak</span>":"")+"</div></div>"+
+  "<div class='rtop'><div class='rsc'><small>"+(LANG==="ar"?"نتيجتك":"Your score")+"</small><div class='hs'><span id='sn'>0</span><i>%</i></div><div class='pillrow'><span class='hpill' id='pill'"+(API?" style='display:none'":"")+">"+(LANG==="ar"?"أفضل "+(100-pc)+"%":"Top "+(100-pc)+"%")+"</span>"+(stats.streak?"<span class='stk'>"+ICON_FLAME+stats.streak+(LANG==="ar"?" يوم متتالي":" day streak")+"</span>":"")+"</div></div>"+
   "<div class='revg'>"+chartSlot("day")+"</div></div>"+
   h2h(avg)+
-  "<div class='qres'>"+qrows+"</div><button class='main shareb' id='sh'>Share result</button></div>"+
-  "<div class='drop0'><div class='dropin'><small>Next drop in</small><b id='cdn'>"+fmtDur(nextMidnight())+"</b></div><button class='pastdrops' id='arch'>Play past drops</button></div>");
+  "<div class='qres'>"+qrows+"</div><button class='main shareb' id='sh'>"+tr("Share result")+"</button></div>"+
+  "<div class='drop0'><div class='dropin'><small>"+tr("Next drop in")+"</small><b id='cdn'>"+fmtDur(nextMidnight())+"</b></div><button class='pastdrops' id='arch'>"+tr("Play past drops")+"</button></div>");
   app.classList.add("plain");
   document.getElementById("sh").onclick=function(){openShare(tot)};
   document.getElementById("arch").onclick=function(){var d=new Date(day*864e5);cm={y:d.getUTCFullYear(),m:d.getUTCMonth()};openMenu()};
