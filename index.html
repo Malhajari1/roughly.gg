@@ -337,7 +337,8 @@ select.chip.uc:focus-visible{outline:2px solid var(--mar);outline-offset:2px}
 .mi span{display:block;font-size:.78rem;color:var(--mut);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .lnk{border:0;background:none;color:var(--mar);font-weight:700;font-size:.82rem;cursor:pointer;font-family:inherit}
 .inp{width:100%;border:2px solid transparent;background:var(--tint);border-radius:14px;padding:14px;font-size:1rem;outline:0;font-family:inherit;color:var(--ink);box-sizing:border-box}
-.inp:focus{background:#fff;border-color:var(--mar)}.err{color:#b3261e;font-size:.82rem;min-height:1.2em;margin:6px 2px 0}
+.inp:focus{background:#fff;border-color:var(--mar)}
+.linkbox{width:100%;margin-top:12px;border:1.5px solid var(--line);background:var(--tint);border-radius:12px;padding:11px 12px;font-family:inherit;font-size:.82rem;color:var(--ink);resize:none;word-break:break-all;line-height:1.45;box-sizing:border-box;-webkit-user-select:all;user-select:all;cursor:text}.err{color:#b3261e;font-size:.82rem;min-height:1.2em;margin:6px 2px 0}
 .chb{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.95);border-radius:14px;padding:8px 12px;margin:0 0 14px;box-shadow:0 2px 10px rgba(0,0,0,.08)}
 .chb svg{width:16px;height:16px;stroke:var(--mar);fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;flex:none}
 .chb .ct{font-weight:700;font-size:.85rem;color:var(--mar);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -1700,15 +1701,13 @@ function openInvite(id,name){var AR=LANG==="ar",e=encodeURIComponent,g=function(
   var msg=(AR?"انضم لمجموعتي في Roughly "+COUNTRY+" ونشوف مين يكسب هذا الأسبوع: ":"Join my group on Roughly "+COUNTRY+" and let’s see who wins this week: ")+link;
   sheetShell(AR?"ادعُ أصدقاء":"Invite friends",
     "<p class='sub'>"+(AR?"أي شخص يفتح الرابط ينضم إلى «"+esc(name)+"».":"Anyone who opens this link joins “"+esc(name)+"”.")+"</p>"+
-    "<div class='shg'><a class='shl' id='wa' target='_blank' rel='noopener noreferrer'>WhatsApp</a><a class='shl' id='tg' target='_blank' rel='noopener noreferrer'>Telegram</a><a class='shl' id='tw' target='_blank' rel='noopener noreferrer'>X</a></div>"+
-    "<button class='main' id='cp'>"+(navigator.share?(AR?"شارك رابط الدعوة":"Share invite link"):(AR?"انسخ الرابط":"Copy invite link"))+"</button>"+
-    "<textarea id='nt' class='sr' readonly rows='2'></textarea>"+
+    "<textarea id='nt' class='linkbox' readonly rows='2' aria-label='"+(AR?"رابط الدعوة":"Invite link")+"'></textarea>"+
+    "<button class='main' id='cp'>"+(AR?"انسخ إلى الحافظة":"Copy to clipboard")+"</button>"+
+    "<div class='shg' style='margin-top:10px'><a class='shl' id='wa' target='_blank' rel='noopener noreferrer'>WhatsApp</a><a class='shl' id='tg' target='_blank' rel='noopener noreferrer'>Telegram</a><a class='shl' id='tw' target='_blank' rel='noopener noreferrer'>X</a></div>"+
     "<button class='ghost' id='gbk' style='width:100%;margin-top:10px'>"+(AR?"رجوع":"Back")+"</button>");
-  var ta=g("nt");ta.value=link;
+  var ta=g("nt");ta.value=link;ta.onclick=function(){try{ta.focus();ta.select()}catch(x){}};
   g("wa").href="https://wa.me/?text="+e(msg);g("tg").href="https://t.me/share/url?url="+e(link)+"&text="+e(AR?"انضم لمجموعتي في Roughly":"Join my group on Roughly");g("tw").href="https://twitter.com/intent/tweet?text="+e(msg);
-  g("cp").onclick=function(){
-    if(navigator.share){try{navigator.share({title:"Roughly "+COUNTRY,text:(AR?"انضم لمجموعتي في Roughly "+COUNTRY:"Join my group on Roughly "+COUNTRY),url:link}).catch(function(){})}catch(e){}return}
-    copyText(link,ta,function(ok){g("cp").textContent=ok?(AR?"تم النسخ":"Copied"):(AR?"حدّد وانسخ":"Select & copy")})};
+  g("cp").onclick=function(){copyText(link,ta,function(ok){g("cp").textContent=ok?(AR?"تم النسخ":"Copied!"):(AR?"حدّد الرابط بالأعلى وانسخه":"Select the link above to copy")})};
   g("gbk").onclick=function(){openGroup(id)};
 }
 window.RQ_inviteFlow=function(id){
@@ -1969,9 +1968,14 @@ if(!firebaseConfig||!firebaseConfig.apiKey){
           out.push({id:g.id,name:g.data().name,members:(g.data().memberUids||[]).length,myTotal:Math.round(my),myRank:rank});}
         return out;},
       async board(id){await ready;const wk=gWeek(gToday()),me=uid();
-        const g=await getDoc(doc(db,"groups",id));if(!g.exists())throw new Error("Group not found");
-        const names={};try{const ms=await getDocs(collection(db,"groups",id,"members"));ms.forEach(x=>names[x.id]=(x.data().name||"Player"));}catch(e){}
-        const tot={};try{const ss=await getDocs(query(collection(db,"groups",id,"scores"),where("day","in",wk)));ss.forEach(x=>{const d=x.data();tot[d.uid]=(tot[d.uid]||0)+(d.avg||0);if(d.name&&!names[d.uid])names[d.uid]=d.name;});}catch(e){}
+        const [g,ms,ss]=await Promise.all([
+          getDoc(doc(db,"groups",id)),
+          getDocs(collection(db,"groups",id,"members")).catch(()=>null),
+          getDocs(query(collection(db,"groups",id,"scores"),where("day","in",wk))).catch(()=>null)
+        ]);
+        if(!g.exists())throw new Error("Group not found");
+        const names={};if(ms)ms.forEach(x=>names[x.id]=(x.data().name||"Player"));
+        const tot={};if(ss)ss.forEach(x=>{const d=x.data();tot[d.uid]=(tot[d.uid]||0)+(d.avg||0);if(d.name&&!names[d.uid])names[d.uid]=d.name;});
         const uids=g.data().memberUids||[];
         const rows=uids.map(u=>({uid:u,name:names[u]||"Player",total:Math.round(tot[u]||0),you:u===me})).sort((a,b)=>b.total-a.total);
         return {id,name:g.data().name,members:uids.length,rows};},
