@@ -337,9 +337,7 @@ select.chip.uc:focus-visible{outline:2px solid var(--mar);outline-offset:2px}
 .mi span{display:block;font-size:.78rem;color:var(--mut);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .lnk{border:0;background:none;color:var(--mar);font-weight:700;font-size:.82rem;cursor:pointer;font-family:inherit}
 .inp{width:100%;border:2px solid transparent;background:var(--tint);border-radius:14px;padding:14px;font-size:1rem;outline:0;font-family:inherit;color:var(--ink);box-sizing:border-box}
-.inp:focus{background:#fff;border-color:var(--mar)}
-.linkbox{width:100%;margin-top:12px;border:1.5px solid var(--line);background:var(--tint);border-radius:12px;padding:11px 12px;font-family:inherit;font-size:.82rem;color:var(--ink);resize:none;word-break:break-all;line-height:1.45;box-sizing:border-box;-webkit-user-select:all;user-select:all;cursor:text}
-.err{color:#b3261e;font-size:.82rem;min-height:1.2em;margin:6px 2px 0}
+.inp:focus{background:#fff;border-color:var(--mar)}.err{color:#b3261e;font-size:.82rem;min-height:1.2em;margin:6px 2px 0}
 .chb{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.95);border-radius:14px;padding:8px 12px;margin:0 0 14px;box-shadow:0 2px 10px rgba(0,0,0,.08)}
 .chb svg{width:16px;height:16px;stroke:var(--mar);fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;flex:none}
 .chb .ct{font-weight:700;font-size:.85rem;color:var(--mar);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -1599,22 +1597,22 @@ function shareText(tot){
   if(LANG==="ar")return "لعبت Roughly "+COUNTRY+" اليوم. تظن تقدر تتغلب عليّ؟\nنفس الأسئلة الثلاثة — بدون حرق للإجابات.\n"+chLink();
   return "I just played today’s Roughly "+COUNTRY+". Think you can beat me?\nSame three questions, no spoilers.\n"+chLink()}
 function copyText(t,ta,cb){
-  function legacy(){
-    var ok=false,el;
-    try{
-      el=document.createElement("textarea");el.value=t;el.setAttribute("readonly","");
-      el.style.cssText="position:fixed;top:50%;left:0;width:1px;height:1px;padding:0;border:0;opacity:0;font-size:16px";
-      document.body.appendChild(el);
-      if(/iP(ad|hone|od)/.test(navigator.userAgent)){el.contentEditable="true";el.readOnly=false;var r=document.createRange();r.selectNodeContents(el);var sel=window.getSelection();sel.removeAllRanges();sel.addRange(r);el.setSelectionRange(0,999999)}
-      else{el.focus();el.select();try{el.setSelectionRange(0,t.length)}catch(e){}}
-      ok=document.execCommand("copy")
-    }catch(x){ok=false}
-    try{if(el)document.body.removeChild(el)}catch(e){}
-    if(!ok&&ta){try{ta.classList.remove("sr");ta.focus();ta.select()}catch(e){}}
-    cb(ok)
-  }
-  try{if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(function(){cb(true)},legacy);return}}catch(x){}
-  legacy()
+  // Synchronous copy FIRST, inside the user's tap (iOS blocks copy that runs
+  // after an async clipboard promise rejects — that was the bug).
+  var ok=false,el;
+  try{
+    el=document.createElement("textarea");el.value=t;el.readOnly=false;
+    el.style.cssText="position:fixed;top:0;left:0;width:1px;height:1px;padding:0;border:0;opacity:0;font-size:16px";
+    document.body.appendChild(el);
+    if(/iP(ad|hone|od)/.test(navigator.userAgent)){el.contentEditable="true";var r=document.createRange();r.selectNodeContents(el);var sel=window.getSelection();sel.removeAllRanges();sel.addRange(r);el.setSelectionRange(0,999999)}
+    else{el.focus();el.select();try{el.setSelectionRange(0,t.length)}catch(e){}}
+    ok=document.execCommand("copy")
+  }catch(x){ok=false}
+  try{if(el)document.body.removeChild(el)}catch(e){}
+  if(ok){cb(true);return}
+  if(navigator.clipboard&&navigator.clipboard.writeText){try{navigator.clipboard.writeText(t).then(function(){cb(true)},function(){cb(false)});return}catch(x){}}
+  if(ta){try{ta.classList.remove("sr");ta.focus();ta.select()}catch(e){}}
+  cb(false)
 }
 function openShare(tot){
   var sh=document.getElementById("sheet"),sc=document.getElementById("scrim"),avg=Math.round(tot/3),e=encodeURIComponent,g=function(i){return document.getElementById(i)};
@@ -1702,13 +1700,13 @@ function openInvite(id,name){var AR=LANG==="ar",e=encodeURIComponent,g=function(
   var msg=(AR?"انضم لمجموعتي في Roughly "+COUNTRY+" ونشوف مين يكسب هذا الأسبوع: ":"Join my group on Roughly "+COUNTRY+" and let’s see who wins this week: ")+link;
   sheetShell(AR?"ادعُ أصدقاء":"Invite friends",
     "<p class='sub'>"+(AR?"أي شخص يفتح الرابط ينضم إلى «"+esc(name)+"».":"Anyone who opens this link joins “"+esc(name)+"”.")+"</p>"+
-    "<textarea id='nt' class='linkbox' readonly rows='2' aria-label='"+(AR?"رابط الدعوة":"Invite link")+"'></textarea>"+
+    "<div class='shg'><a class='shl' id='wa' target='_blank' rel='noopener noreferrer'>WhatsApp</a><a class='shl' id='tg' target='_blank' rel='noopener noreferrer'>Telegram</a><a class='shl' id='tw' target='_blank' rel='noopener noreferrer'>X</a></div>"+
     "<button class='main' id='cp'>"+(AR?"انسخ الرابط":"Copy invite link")+"</button>"+
-    "<div class='shg' style='margin-top:10px'><a class='shl' id='wa' target='_blank' rel='noopener noreferrer'>WhatsApp</a><a class='shl' id='tg' target='_blank' rel='noopener noreferrer'>Telegram</a><a class='shl' id='tw' target='_blank' rel='noopener noreferrer'>X</a></div>"+
+    "<textarea id='nt' class='sr' readonly rows='2'></textarea>"+
     "<button class='ghost' id='gbk' style='width:100%;margin-top:10px'>"+(AR?"رجوع":"Back")+"</button>");
-  var ta=g("nt");ta.value=link;ta.onclick=function(){try{ta.focus();ta.select()}catch(x){}};
+  var ta=g("nt");ta.value=link;
   g("wa").href="https://wa.me/?text="+e(msg);g("tg").href="https://t.me/share/url?url="+e(link)+"&text="+e(AR?"انضم لمجموعتي في Roughly":"Join my group on Roughly");g("tw").href="https://twitter.com/intent/tweet?text="+e(msg);
-  g("cp").onclick=function(){copyText(link,ta,function(ok){g("cp").textContent=ok?(AR?"تم النسخ":"Copied"):(AR?"حدّد الرابط وانسخه":"Select the link above");try{ta.focus();ta.select()}catch(x){}})};
+  g("cp").onclick=function(){copyText(link,ta,function(ok){g("cp").textContent=ok?(AR?"تم النسخ":"Copied"):(AR?"حدّد وانسخ":"Select & copy")})};
   g("gbk").onclick=function(){openGroup(id)};
 }
 window.RQ_inviteFlow=function(id){
