@@ -646,13 +646,24 @@ body:not([data-view=land]) main>.small{display:none}
 /* v7: results stacked boards; combined bright shiny drop board off the blue */
 #app.plain{background:none;box-shadow:none;padding:0;border-radius:0}
 .plain>.res.card{margin:0}
-.drop0{position:relative;overflow:hidden;background:linear-gradient(135deg,#ffe766,#ffcf1a);border-radius:26px;padding:18px;margin-top:14px;box-shadow:0 18px 38px -16px rgba(255,200,0,.9);text-align:center;color:#241c00}
-.drop0 .dropin small{display:block;font-size:.7rem;letter-spacing:1.4px;text-transform:uppercase;font-weight:800;color:#5a4700}
-.drop0 .dropin b{display:block;font-size:2.7rem;font-weight:800;letter-spacing:1px;font-variant-numeric:tabular-nums;color:#241c00;margin:4px 0 14px;line-height:1}
-.drop0 .pastdrops{position:relative;overflow:hidden;width:100%;border:0;border-radius:16px;padding:15px;margin:0;font-family:inherit;font-weight:700;font-size:1.05rem;cursor:pointer;background:#241c00;color:#ffe766;box-shadow:0 10px 22px -10px rgba(0,0,0,.5)}
+.drop0{position:relative;overflow:hidden;background:linear-gradient(160deg,var(--c),var(--c2));border-radius:26px;padding:18px;margin-top:14px;box-shadow:0 18px 38px -16px rgba(var(--cs),.6);text-align:center;color:#fff}
+.drop0 .dropin small{display:block;font-size:.7rem;letter-spacing:1.4px;text-transform:uppercase;font-weight:800;color:rgba(255,255,255,.72)}
+.drop0 .dropin b{display:block;font-size:2.7rem;font-weight:800;letter-spacing:1px;font-variant-numeric:tabular-nums;color:#fff;margin:4px 0 14px;line-height:1}
+.drop0 .pastdrops{position:relative;overflow:hidden;width:100%;border:0;border-radius:16px;padding:15px;margin:0;font-family:inherit;font-weight:700;font-size:1.05rem;cursor:pointer;background:#fff;color:var(--c);box-shadow:0 10px 22px -10px rgba(0,0,0,.28)}
 .drop0::after{content:"";position:absolute;top:0;bottom:0;left:-45%;width:26%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.7),transparent);transform:skewX(-20deg);animation:bling 3.8s ease-in-out infinite;pointer-events:none}
-.drop0 .pastdrops::after{content:"";position:absolute;top:0;bottom:0;left:-45%;width:32%;background:linear-gradient(100deg,transparent,rgba(255,230,102,.55),transparent);transform:skewX(-20deg);animation:bling 3.8s ease-in-out infinite .5s;pointer-events:none}
+.drop0 .pastdrops::after{content:"";position:absolute;top:0;bottom:0;left:-45%;width:32%;background:linear-gradient(100deg,transparent,rgba(var(--cs),.16),transparent);transform:skewX(-20deg);animation:bling 3.8s ease-in-out infinite .5s;pointer-events:none}
 .shareb{margin-top:14px}
+.res .shareb{background:#fff;color:var(--c);box-shadow:0 12px 24px -10px rgba(0,0,0,.3)}
+.res .shareb:hover{background:#fff;opacity:.95;transform:translateY(-1px)}
+.gbtn{display:flex;align-items:center;gap:12px;width:100%;text-align:left;border:0;border-radius:26px;padding:16px 18px;margin-top:12px;cursor:pointer;font-family:inherit;color:#fff;background:linear-gradient(160deg,var(--c),var(--c2));box-shadow:0 18px 38px -16px rgba(var(--cs),.6);position:relative;overflow:hidden;transition:transform .15s}
+.gbtn:active{transform:scale(.98)}
+.gbtn>svg{flex:none;width:24px;height:24px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.gbtn>svg:last-child:not(:first-child){width:18px;height:18px;stroke:rgba(255,255,255,.8);stroke-width:2.4}
+.gbtn div{flex:1;min-width:0}
+.gbtn b{display:block;font-size:.98rem;font-weight:700}
+.gbtn span{display:block;font-size:.8rem;opacity:.82;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.gbtn::after{content:"";position:absolute;top:0;bottom:0;left:-45%;width:26%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.55),transparent);transform:skewX(-20deg);animation:bling 4.2s ease-in-out infinite 1s;pointer-events:none}
+@media (prefers-reduced-motion:reduce){.gbtn::after{display:none}}
 @media (prefers-reduced-motion:reduce){.drop0::after,.drop0 .pastdrops::after{display:none}}
 /* v8: EN/AR toggle, share bounce, lock scroll on game screens */
 .hd{justify-content:space-between}
@@ -1867,7 +1878,7 @@ function done(){
   if(cdTimer)clearInterval(cdTimer);
   cdTimer=setInterval(function(){var el=document.getElementById("cdn");if(!el){clearInterval(cdTimer);cdTimer=null;return}el.textContent=fmtDur(nextMidnight())},1000);
   animate(avg,pc);chartLater("day",0,avg,viewTok);
-  if(groupsOn()){window.RQGroups.submitDay(day,avg);var gel=document.getElementById("gnudge");if(gel){gel.innerHTML="<button class='mi' id='gnb' style='margin-top:12px'>"+ICON_USERS+"<div><b>"+(LANG==="ar"?"المجموعات":"Groups")+"</b><span id='gnbsub'>"+(LANG==="ar"?"لوحات أسبوعية · ادعُ أصدقاءك":"Weekly leaderboards · invite friends")+"</span></div>"+ICON_R+"</button>";var nb=document.getElementById("gnb");if(nb)nb.onclick=function(){openGroups()};window.RQGroups.listGroups().then(function(gs){var sub=document.getElementById("gnbsub");if(sub&&gs&&gs.length){var best=gs.slice().sort(function(a,b){return (a.myRank||99)-(b.myRank||99)})[0];sub.textContent=(LANG==="ar"?faD(gs.length)+" مجموعات · أفضل #"+faD(best.myRank||"-"):gs.length+" group"+(gs.length>1?"s":"")+" · best #"+(best.myRank||"-")+" this week")}},function(){})}}
+  if(groupsOn()){window.RQGroups.submitDay(day,avg);var gel=document.getElementById("gnudge");if(gel){gel.innerHTML="<button class='gbtn' id='gnb'>"+ICON_USERS+"<div><b>"+(LANG==="ar"?"المجموعات":"Groups")+"</b><span id='gnbsub'>"+(LANG==="ar"?"لوحات أسبوعية · ادعُ أصدقاءك":"Weekly leaderboards · invite friends")+"</span></div>"+ICON_R+"</button>";var nb=document.getElementById("gnb");if(nb)nb.onclick=function(){openGroups()};window.RQGroups.listGroups().then(function(gs){var sub=document.getElementById("gnbsub");if(sub&&gs&&gs.length){var best=gs.slice().sort(function(a,b){return (a.myRank||99)-(b.myRank||99)})[0];sub.textContent=(LANG==="ar"?faD(gs.length)+" مجموعات · أفضل #"+faD(best.myRank||"-"):gs.length+" group"+(gs.length>1?"s":"")+" · best #"+(best.myRank||"-")+" this week")}},function(){})}}
 }
 function acctLabel(){var b=document.getElementById("acct");if(!b)return;b.textContent=acct().t?"Account":"Sign in"}
 function streak(){var e=document.getElementById("streak");if(e)e.textContent=stats.streak?stats.streak+" day streak":""}
