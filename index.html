@@ -7,6 +7,20 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <title>Roughly Qatar – Daily Estimation Game</title>
+<meta name="description" content="A fresh set of three how-many questions about Qatar every day. No exact answers — just reason your way close. What would you have guessed?">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Roughly">
+<meta property="og:title" content="Roughly Qatar — can you beat me?">
+<meta property="og:description" content="Three how-many questions about Qatar. No exact answers — just reason your way close. Play today's drop.">
+<meta property="og:url" content="https://roughly.gg/Qatar">
+<meta property="og:image" content="https://www.roughly.gg/banner.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Roughly Qatar — three guesses, pure logic">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Roughly Qatar — can you beat me?">
+<meta name="twitter:description" content="Three how-many questions about Qatar. What would you have guessed?">
+<meta name="twitter:image" content="https://www.roughly.gg/banner.jpg">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap">
 <style>
@@ -648,7 +662,7 @@ body:not([data-view=land]) main>.small{display:none}
 .card.qb .shareb{animation:sharebounce 2.8s ease-in-out infinite}
 @keyframes sharebounce{0%,82%,100%{transform:translateY(0)}88%{transform:translateY(-5px)}94%{transform:translateY(0)}}
 /* game screens top-align (see rule above); never clip — scroll if a card is taller than the screen */
-body.fit main{justify-content:flex-start}
+body.fit main{justify-content:center}
 /* v9: fit the results page to one phone screen (no scroll) */
 .plain>.res.card{padding-top:14px;padding-bottom:14px}
 .res .rtop{margin-bottom:9px}
@@ -1558,9 +1572,9 @@ function rebuildStats(){
 var SITE="roughly.gg/"+COUNTRY;
 function myName(){return cleanName((load("rq-name",{})||{}).n)}
 function chLink(){var n=myName();return "https://"+SITE+"?c="+day+"."+st.s.join("-")+(n?"."+encodeURIComponent(n):"")}
-function shareText(tot){var avg=Math.round(tot/3);
-  if(LANG==="ar")return "Roughly "+COUNTRY+" · "+dlabel(day)+"\n"+avg+"٪ دقة\n"+st.s.map(function(x){return x+"٪"}).join(" · ")+"\nماذا كنت ستخمّن؟\n"+chLink();
-  return "Roughly "+COUNTRY+" · "+dlabel(day)+"\n"+rankOf(avg)[0]+" · "+avg+"% accuracy\n"+st.s.map(function(x){return x+"%"}).join(" · ")+"\nWhat would you have guessed?\n"+chLink()}
+function shareText(tot){
+  if(LANG==="ar")return "لعبت Roughly "+COUNTRY+" اليوم. تظن تقدر تتغلب عليّ؟\nنفس الأسئلة الثلاثة — بدون حرق للإجابات.\n"+chLink();
+  return "I just played today’s Roughly "+COUNTRY+". Think you can beat me?\nSame three questions, no spoilers.\n"+chLink()}
 function copyText(t,ta,cb){
   function legacy(){var ok=false;try{ta.focus();ta.select();ta.setSelectionRange(0,t.length);ok=document.execCommand("copy")}catch(x){}cb(ok)}
   try{if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(function(){cb(true)},legacy);return}}catch(x){}
@@ -1571,7 +1585,6 @@ function openShare(tot){
   var mini=st.s.map(function(s){return "<i><u style='width:"+s+"%'></u></i>"}).join("");
   var AR=LANG==="ar";
   sh.innerHTML="<div class='grab'></div><div class='shh'><b>"+(AR?"تحدَّ صديقاً":"Challenge a friend")+"</b><button class='x' id='sx' aria-label='Close'>"+ICON_X+"</button></div>"+
-  "<div class='shp'><small>Roughly "+COUNTRY+" · "+dlabel(day)+"</small><b>"+rankOf(avg)[0]+"</b><span>"+avg+(AR?"٪ دقة":"% accuracy")+"</span><div class='mb2'>"+mini+"</div><em>"+SITE+"</em></div>"+
   "<label class='nl' for='shn' style='margin-top:0'>"+(AR?"اسمك في التحدي (اختياري)":"Your name on the challenge (optional)")+"</label><input id='shn' class='inp' maxlength='20' autocomplete='off' placeholder='"+(AR?"مثلاً: سلطان":"e.g. Sam")+"'>"+
   "<p class='note' style='margin:6px 2px 12px'>"+(AR?"يلعب أصدقاؤك نفس الأسئلة الثلاثة. لا يرون نتيجتك إلا بعد أن يجيبوا.":"Friends play the same three questions. They see your score only after they’ve answered.")+"</p>"+
   "<div class='shg'><a class='shl' id='wa' target='_blank' rel='noopener noreferrer'>WhatsApp</a><a class='shl' id='tg' target='_blank' rel='noopener noreferrer'>Telegram</a><a class='shl' id='tw' target='_blank' rel='noopener noreferrer'>X</a></div>"+
@@ -1854,7 +1867,7 @@ function done(){
   if(cdTimer)clearInterval(cdTimer);
   cdTimer=setInterval(function(){var el=document.getElementById("cdn");if(!el){clearInterval(cdTimer);cdTimer=null;return}el.textContent=fmtDur(nextMidnight())},1000);
   animate(avg,pc);chartLater("day",0,avg,viewTok);
-  if(groupsOn()){window.RQGroups.submitDay(day,avg);window.RQGroups.listGroups().then(function(gs){var el=document.getElementById("gnudge");if(!el||!gs.length)return;var g0=gs[0];el.innerHTML="<button class='mi' id='gnb' style='margin-top:12px'>"+ICON_USERS+"<div><b>"+esc(g0.name)+"</b><span>"+(LANG==="ar"?"المركز "+faD(g0.myRank)+" هذا الأسبوع":"#"+(g0.myRank||"-")+" this week")+"</span></div>"+ICON_R+"</button>";var nb=document.getElementById("gnb");if(nb)nb.onclick=function(){openGroup(g0.id)}},function(){})}
+  if(groupsOn()){window.RQGroups.submitDay(day,avg);var gel=document.getElementById("gnudge");if(gel){gel.innerHTML="<button class='mi' id='gnb' style='margin-top:12px'>"+ICON_USERS+"<div><b>"+(LANG==="ar"?"المجموعات":"Groups")+"</b><span id='gnbsub'>"+(LANG==="ar"?"لوحات أسبوعية · ادعُ أصدقاءك":"Weekly leaderboards · invite friends")+"</span></div>"+ICON_R+"</button>";var nb=document.getElementById("gnb");if(nb)nb.onclick=function(){openGroups()};window.RQGroups.listGroups().then(function(gs){var sub=document.getElementById("gnbsub");if(sub&&gs&&gs.length){var best=gs.slice().sort(function(a,b){return (a.myRank||99)-(b.myRank||99)})[0];sub.textContent=(LANG==="ar"?faD(gs.length)+" مجموعات · أفضل #"+faD(best.myRank||"-"):gs.length+" group"+(gs.length>1?"s":"")+" · best #"+(best.myRank||"-")+" this week")}},function(){})}}
 }
 function acctLabel(){var b=document.getElementById("acct");if(!b)return;b.textContent=acct().t?"Account":"Sign in"}
 function streak(){var e=document.getElementById("streak");if(e)e.textContent=stats.streak?stats.streak+" day streak":""}
