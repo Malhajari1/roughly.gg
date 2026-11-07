@@ -62,11 +62,18 @@ service cloud.firestore {
       match /scores/{sid} {
         allow read: if isMember(gid);
         // You may only write your OWN score, in range 1..100, and only if you're a member.
+        // The document id MUST be "<day>__<uid>" so a member can write at most ONE
+        // score per day — this blocks stacking many docs to inflate a weekly total.
         allow create, update: if signedIn()
           && request.resource.data.uid == me()
+          && request.resource.data.day is int
+          && request.resource.data.day >= 20000 && request.resource.data.day <= 30000
+          && sid == string(request.resource.data.day) + '__' + me()
           && request.resource.data.avg is number
           && request.resource.data.avg >= 1
           && request.resource.data.avg <= 100
+          && request.resource.data.name is string
+          && request.resource.data.name.size() <= 24
           && isMember(gid);
         allow delete: if false;
       }
