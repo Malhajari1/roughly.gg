@@ -653,8 +653,9 @@ body:not([data-view=land]) main>.small{display:none}
 .drop0::after{content:"";position:absolute;top:0;bottom:0;left:-45%;width:26%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.7),transparent);transform:skewX(-20deg);animation:bling 3.8s ease-in-out infinite;pointer-events:none}
 .drop0 .pastdrops::after{content:"";position:absolute;top:0;bottom:0;left:-45%;width:32%;background:linear-gradient(100deg,transparent,rgba(var(--cs),.16),transparent);transform:skewX(-20deg);animation:bling 3.8s ease-in-out infinite .5s;pointer-events:none}
 .shareb{margin-top:14px}
-.res .shareb{background:#fff;color:var(--c);box-shadow:0 12px 24px -10px rgba(0,0,0,.3)}
+.res .shareb{height:auto;padding:15px;border-radius:16px;font-weight:700;font-size:1.05rem;background:#fff;color:var(--c);box-shadow:0 10px 22px -10px rgba(0,0,0,.28);position:relative;overflow:hidden}
 .res .shareb:hover{background:#fff;opacity:.95;transform:translateY(-1px)}
+.res .shareb::after{content:"";position:absolute;top:0;bottom:0;left:-45%;width:32%;background:linear-gradient(100deg,transparent,rgba(var(--cs),.16),transparent);transform:skewX(-20deg);animation:bling 3.8s ease-in-out infinite .5s;pointer-events:none}
 .gbtn{display:flex;align-items:center;gap:12px;width:100%;text-align:left;border:0;border-radius:26px;padding:16px 18px;margin-top:12px;cursor:pointer;font-family:inherit;color:#fff;background:linear-gradient(160deg,var(--c),var(--c2));box-shadow:0 18px 38px -16px rgba(var(--cs),.6);position:relative;overflow:hidden;transition:transform .15s}
 .gbtn:active{transform:scale(.98)}
 .gbtn>svg{flex:none;width:24px;height:24px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
@@ -670,7 +671,7 @@ body:not([data-view=land]) main>.small{display:none}
 .hr{display:flex;align-items:center;gap:12px}
 .langbtn{border:1.5px solid var(--line);background:#fff;color:var(--mar);font-weight:700;font-size:.82rem;cursor:pointer;font-family:inherit;padding:7px 14px;border-radius:20px;min-width:48px;text-align:center}
 .langbtn:hover{background:var(--ct)}
-.card.qb .shareb{animation:sharebounce 2.8s ease-in-out infinite}
+.card.qb .shareb{animation:none}
 @keyframes sharebounce{0%,82%,100%{transform:translateY(0)}88%{transform:translateY(-5px)}94%{transform:translateY(0)}}
 /* game screens top-align (see rule above); never clip — scroll if a card is taller than the screen */
 body.fit main{justify-content:center}
@@ -1501,11 +1502,18 @@ function srcTag(q){var k=q.k||"R",K=LANG==="ar"?KINDS_AR[k]:KINDS[k];return "<p 
 /* ===== challenge links ===== */
 function cleanName(t){return String(t||"").replace(/[^\p{L}\p{N} _.'-]/gu,"").replace(/^\s+|\s+$/g,"").slice(0,20)}
 function chInfo(){var x=load("rq-ch-"+day,null);if(!x||!Array.isArray(x.s)||x.s.length!==3)return null;return {s:x.s,n:cleanName(x.n)||"A friend"}}
+function chEnc(s){try{return btoa(unescape(encodeURIComponent(s))).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"")}catch(e){return ""}}
+function chDec(s){try{return decodeURIComponent(escape(atob(String(s).replace(/-/g,"+").replace(/_/g,"/"))))}catch(e){return ""}}
 function parseChallenge(){
-  var m=/[?&]c=(\d{4,6})\.(\d{1,3})-(\d{1,3})-(\d{1,3})(?:\.([^&#]*))?/.exec(location.search||"");if(!m)return false;
+  var raw=/[?&]c=([^&#]+)/.exec(location.search||"");if(!raw)return false;
+  var v=raw[1],dec;
+  if(/^\d{4,6}\.\d{1,3}-\d{1,3}-\d{1,3}/.test(v)){try{dec=decodeURIComponent(v)}catch(e){dec=v}}
+  else{dec=chDec(v)}
+  if(!dec)return false;
+  var m=/^(\d{4,6})\.(\d{1,3})-(\d{1,3})-(\d{1,3})(?:\.([\s\S]*))?$/.exec(dec);if(!m)return false;
   var d=parseInt(m[1],10),s=[m[2],m[3],m[4]].map(function(v){return parseInt(v,10)}),n="";
   if(!(d>=START&&d<=today)||s.some(function(v){return v<1||v>100}))return false;
-  try{n=cleanName(decodeURIComponent(m[5]||""))}catch(e){}
+  try{n=cleanName(m[5]||"")}catch(e){}
   save("rq-ch-"+d,{s:s,n:n});selectDay(d);
   try{window.history.replaceState(null,"",location.pathname)}catch(e){}
   return true}
@@ -1582,7 +1590,7 @@ function rebuildStats(){
   save("tk7-stats",stats)}
 var SITE="roughly.gg/"+COUNTRY;
 function myName(){return cleanName((load("rq-name",{})||{}).n)}
-function chLink(){var n=myName();return "https://"+SITE+"?c="+day+"."+st.s.join("-")+(n?"."+encodeURIComponent(n):"")}
+function chLink(){var n=myName();return "https://"+SITE+"?c="+chEnc(day+"."+st.s.join("-")+(n?"."+n:""))}
 function shareText(tot){
   if(LANG==="ar")return "لعبت Roughly "+COUNTRY+" اليوم. تظن تقدر تتغلب عليّ؟\nنفس الأسئلة الثلاثة — بدون حرق للإجابات.\n"+chLink();
   return "I just played today’s Roughly "+COUNTRY+". Think you can beat me?\nSame three questions, no spoilers.\n"+chLink()}
