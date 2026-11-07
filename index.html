@@ -3,9 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta id="themecolor" name="theme-color" content="#2f6bff">
+<meta id="themecolor" name="theme-color" content="#eaf1ff">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <title>Roughly Qatar – Daily Estimation Game</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap">
@@ -13,7 +13,7 @@
 :root{--c:#2f6bff;--c2:#1b4fd8;--ct:#eef3ff;--cs:47,107,255;--mar:var(--c);--mar2:var(--c2);--tint:var(--ct);--ink:#141018;--mut:#7b7580;--line:#ecebf0;color-scheme:light;box-sizing:border-box;transition:--c .4s}
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%;background:#eaf1ff;transition:background-color .4s}
-body{margin:0;min-height:100vh;min-height:100dvh;color:var(--ink);background:linear-gradient(180deg,var(--ct) 0,#fff 46%) no-repeat #fff;font:500 16px/1.5 "Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums;transition:background .4s}
+body{margin:0;min-height:100vh;min-height:100dvh;color:var(--ink);background:linear-gradient(180deg,#eaf1ff 0,#fff 46%) no-repeat #fff;font:500 16px/1.5 "Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums;transition:background .4s}
 button,input{font:inherit;color:inherit}
 header{padding:calc(env(safe-area-inset-top,0px) + 16px) 20px 0}
 .hd{max-width:480px;margin:0 auto;display:flex;justify-content:space-between;align-items:center}
@@ -1597,7 +1597,8 @@ var THEMES=[
  {c:"#8b5cf6",c2:"#6d28d9",ct:"#f3edff",cs:"139,92,246"}
 ];
 var WIN=THEMES[0];
-function setTheme(t){var s=document.body.style;s.setProperty("--c",t.c);s.setProperty("--c2",t.c2);s.setProperty("--ct",t.ct);s.setProperty("--cs",t.cs);document.documentElement.style.backgroundColor=t.ct;var m=document.getElementById("themecolor");if(m)m.setAttribute("content",t.ct)}
+function setTheme(t){var s=document.body.style;s.setProperty("--c",t.c);s.setProperty("--c2",t.c2);s.setProperty("--ct",t.ct);s.setProperty("--cs",t.cs)}
+/* NB: the status bar / top strip (html bg, body-top tint, theme-color meta) is a constant #eaf1ff set in <head>/CSS and is deliberately NOT changed per theme, so iOS never shows a white seam regardless of whether Safari honours dynamic theme-color. */
 var LANG="en";try{LANG=localStorage.getItem("rq-lang")==="ar"?"ar":"en"}catch(e){}
 function applyLang(){document.documentElement.lang=LANG;document.documentElement.dir=(LANG==="ar"?"rtl":"ltr");var b=document.getElementById("lang");if(b)b.textContent=(LANG==="ar"?"EN":"عربي")}
 function toggleLang(){LANG=(LANG==="ar"?"en":"ar");try{localStorage.setItem("rq-lang",LANG)}catch(e){}applyLang();render()}
