@@ -1701,12 +1701,14 @@ function openInvite(id,name){var AR=LANG==="ar",e=encodeURIComponent,g=function(
   sheetShell(AR?"ادعُ أصدقاء":"Invite friends",
     "<p class='sub'>"+(AR?"أي شخص يفتح الرابط ينضم إلى «"+esc(name)+"».":"Anyone who opens this link joins “"+esc(name)+"”.")+"</p>"+
     "<div class='shg'><a class='shl' id='wa' target='_blank' rel='noopener noreferrer'>WhatsApp</a><a class='shl' id='tg' target='_blank' rel='noopener noreferrer'>Telegram</a><a class='shl' id='tw' target='_blank' rel='noopener noreferrer'>X</a></div>"+
-    "<button class='main' id='cp'>"+(AR?"انسخ الرابط":"Copy invite link")+"</button>"+
+    "<button class='main' id='cp'>"+(navigator.share?(AR?"شارك رابط الدعوة":"Share invite link"):(AR?"انسخ الرابط":"Copy invite link"))+"</button>"+
     "<textarea id='nt' class='sr' readonly rows='2'></textarea>"+
     "<button class='ghost' id='gbk' style='width:100%;margin-top:10px'>"+(AR?"رجوع":"Back")+"</button>");
   var ta=g("nt");ta.value=link;
   g("wa").href="https://wa.me/?text="+e(msg);g("tg").href="https://t.me/share/url?url="+e(link)+"&text="+e(AR?"انضم لمجموعتي في Roughly":"Join my group on Roughly");g("tw").href="https://twitter.com/intent/tweet?text="+e(msg);
-  g("cp").onclick=function(){copyText(link,ta,function(ok){g("cp").textContent=ok?(AR?"تم النسخ":"Copied"):(AR?"حدّد وانسخ":"Select & copy")})};
+  g("cp").onclick=function(){
+    if(navigator.share){try{navigator.share({title:"Roughly "+COUNTRY,text:(AR?"انضم لمجموعتي في Roughly "+COUNTRY:"Join my group on Roughly "+COUNTRY),url:link}).catch(function(){})}catch(e){}return}
+    copyText(link,ta,function(ok){g("cp").textContent=ok?(AR?"تم النسخ":"Copied"):(AR?"حدّد وانسخ":"Select & copy")})};
   g("gbk").onclick=function(){openGroup(id)};
 }
 window.RQ_inviteFlow=function(id){
