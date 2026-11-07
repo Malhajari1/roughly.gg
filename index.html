@@ -1664,7 +1664,7 @@ function openInvite(id,name){var AR=LANG==="ar",e=encodeURIComponent,g=function(
 window.RQ_inviteFlow=function(id){
   if(!groupsOn())return;var AR=LANG==="ar";
   window.RQGroups.groupMeta(id).then(function(m){
-    if(m.isMember)return; // already a member — it's in their Groups list; let them play
+    if(m.isMember){openGroup(id);return;} // already a member — show the group board
     sheetShell(AR?"دعوة لمجموعة":"Group invite",
       "<div class='shp' style='background:linear-gradient(135deg,var(--c),var(--c2))'><small>"+(AR?"دعوة":"Invitation")+"</small><b>"+esc(m.name)+"</b><span>"+faD(m.members)+(AR?" أعضاء":" members")+"</span></div>"+
       "<label class='nl' for='gjn' style='margin-top:4px'>"+(AR?"اسمك":"Your name")+"</label><input id='gjn' class='inp' maxlength='24' autocomplete='off' placeholder='"+(AR?"مثلاً: سلطان":"e.g. Sam")+"'>"+

@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#eaf1ff">
+<title>Roughly</title>
+<style>html,body{height:100%;margin:0;background:#eaf1ff;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:#7a1230}
+.c{height:100%;display:flex;align-items:center;justify-content:center;font-weight:600;letter-spacing:.2px}</style>
+<script>
+/* GitHub Pages serves this for any unknown path (e.g. /Qatar?g=CODE or /Qatar?c=…).
+   Forward to the game at the site root, keeping the query (the group/challenge code) and hash. */
+(function(){
+  try{
+    var s = location.search || "", h = location.hash || "";
+    if(location.pathname !== "/"){ location.replace("/" + s + h); return; }
+  }catch(e){}
+  try{ location.replace("/"); }catch(e){}
+})();
+</script>
+</head>
+<body><div class="c">Loading Roughly…</div></body>
+</html>
