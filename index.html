@@ -305,8 +305,9 @@ html,body{overscroll-behavior-y:none}
 .shp .mb2 u{position:absolute;left:0;top:0;bottom:0;background:#fff;border-radius:4px}
 .shp em{font-style:normal;font-weight:700;font-size:.85rem;opacity:.9}
 .shg{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px}
-a.shl{display:flex;align-items:center;justify-content:center;height:48px;border-radius:14px;border:1.5px solid var(--line);background:#fff;color:var(--mar);font-weight:700;font-size:.85rem;text-decoration:none}
-a.shl:hover{background:var(--tint)}
+.shl{display:flex;align-items:center;justify-content:center;height:48px;border-radius:14px;border:1.5px solid var(--line);background:#fff;color:var(--mar);font-weight:700;font-size:.85rem;text-decoration:none;font-family:inherit;cursor:pointer}
+.shl:hover{background:var(--tint)}
+.shl:active{transform:scale(.98)}
 select.chip.uc{appearance:none;-webkit-appearance:none;border:0;cursor:pointer;font-family:inherit;padding-right:30px;text-align:left;text-align-last:left;background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%237a1230' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat right 10px center/12px;transition:box-shadow .15s}
 select.chip.uc:hover{box-shadow:0 0 0 3px rgba(122,18,48,.12)}
 select.chip.uc:focus-visible{outline:2px solid var(--mar);outline-offset:2px}
@@ -324,9 +325,9 @@ select.chip.uc:focus-visible{outline:2px solid var(--mar);outline-offset:2px}
 .inp{width:100%;border:2px solid transparent;background:var(--tint);border-radius:14px;padding:14px;font-size:1rem;outline:0;font-family:inherit;color:var(--ink);box-sizing:border-box}
 .inp:focus{background:#fff;border-color:var(--mar)}
 .err{color:#b3261e;font-size:.82rem;min-height:1.2em;margin:6px 2px 0}
-.chb{background:var(--tint);border-radius:16px;padding:12px 14px;margin:0 0 16px;border-left:4px solid var(--mar)}
-.chb b{display:block}
-.chb span{font-size:.85rem;color:var(--mut)}
+.chb{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.95);border-radius:14px;padding:8px 12px;margin:0 0 14px;box-shadow:0 2px 10px rgba(0,0,0,.08)}
+.chb svg{width:16px;height:16px;stroke:var(--mar);fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.chb .ct{font-weight:700;font-size:.85rem;color:var(--mar);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .h2h{display:flex;align-items:center;justify-content:center;gap:16px;margin-top:8px}
 .h2h div{text-align:center;background:var(--tint);border-radius:18px;padding:12px 20px;min-width:110px}
 .h2h small{display:block;font-size:.7rem;letter-spacing:1px;text-transform:uppercase;color:var(--mut);font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:120px}
@@ -1484,7 +1485,7 @@ function parseChallenge(){
   try{window.history.replaceState(null,"",location.pathname)}catch(e){}
   return true}
 function chBanner(n){var c=n===0&&st.g.length===0?chInfo():null;
-  return c?"<div class='chb'><b>"+esc(c.n)+(LANG==="ar"?" يتحداك":" challenged you")+"</b><span>"+(LANG==="ar"?"نفس الأسئلة الثلاثة. خمّن أولاً، ثم اعرف ترتيبك.":"Same three questions. Guess first, then see how you stack up.")+"</span></div>":""}
+  return c?"<div class='chb'><svg viewBox='0 0 24 24'><circle cx='12' cy='12' r='8'/><circle cx='12' cy='12' r='3'/></svg><span class='ct'>"+esc(c.n)+(LANG==="ar"?" يتحداك":" challenged you")+"</span></div>":""}
 function h2h(avg){
   var c=chInfo();if(!c)return "";
   var th=Math.round((c.s[0]+c.s[1]+c.s[2])/3),d=avg-th,nm=esc(c.n),
