@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <title>Roughly Qatar – Daily Estimation Game</title>
-<script>window.RQ_BUILD="2026-11-08.3";</script>
+<script>window.RQ_BUILD="2026-11-08.4";</script>
 <meta name="description" content="A fresh set of three how-many questions about Qatar every day. No exact answers — just reason your way close. What would you have guessed?">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Roughly">
@@ -297,12 +297,12 @@ html,body{overscroll-behavior-y:none}
 #sheet{visibility:hidden}
 #sheet.open{visibility:visible}
 @media (max-width:959px){
- #sheet{transition:transform .35s cubic-bezier(.2,.8,.2,1),visibility 0s linear .35s}
- #sheet.open{transition:transform .35s cubic-bezier(.2,.8,.2,1),visibility 0s}
+ #sheet{transition:transform .35s cubic-bezier(.2,.8,.2,1),height .32s cubic-bezier(.2,.8,.2,1),visibility 0s linear .35s}
+ #sheet.open{transition:transform .35s cubic-bezier(.2,.8,.2,1),height .32s cubic-bezier(.2,.8,.2,1),visibility 0s}
 }
 @media (min-width:960px){
- #sheet{transition:transform .3s cubic-bezier(.2,.8,.2,1),opacity .25s,visibility 0s linear .3s}
- #sheet.open{transition:transform .3s cubic-bezier(.2,.8,.2,1),opacity .25s,visibility 0s}
+ #sheet{transition:transform .3s cubic-bezier(.2,.8,.2,1),opacity .25s,height .3s cubic-bezier(.2,.8,.2,1),visibility 0s linear .3s}
+ #sheet.open{transition:transform .3s cubic-bezier(.2,.8,.2,1),opacity .25s,height .3s cubic-bezier(.2,.8,.2,1),visibility 0s}
 }
 .enc{margin:12px 0 0;padding:10px 14px;background:var(--tint);border-radius:12px;font-size:.88rem;font-weight:600;color:var(--mar)}
 .bh{font-size:.72rem;letter-spacing:1.1px;text-transform:uppercase;color:var(--mut);margin:24px 0 2px;font-weight:700}
@@ -1316,7 +1316,7 @@ function press(k){
   calcUpd()}
 function closeSheet(){
   var sh=document.getElementById("sheet"),sc=document.getElementById("scrim");
-  if(sh)sh.classList.remove("open");if(sc)sc.classList.remove("open");document.body.style.overflow=""}
+  if(sh){sh.classList.remove("open");setTimeout(function(){if(sh&&!sh.classList.contains("open"))sh.style.height=""},400);}if(sc)sc.classList.remove("open");document.body.style.overflow=""}
 function openSheet(n,inp){
   var sh=document.getElementById("sheet"),sc=document.getElementById("scrim");
   var keys=["C","(",")","÷","7","8","9","×","4","5","6","−","1","2","3","+","0",".","⌫","="];
@@ -1543,8 +1543,17 @@ function menuRows(){
   (a.t?"<div class='mi static'>"+ICON_USER+"<div><b>"+(AR?"مسجّل الدخول":"Signed in")+"</b><span>"+esc(a.e)+"</span></div><button class='lnk' data-act='signout'>"+(AR?"خروج":"Sign out")+"</button></div>"
       :"<button class='mi' data-act='signin'>"+ICON_USER+"<div><b>"+(AR?"تسجيل الدخول":"Sign in")+"</b><span>"+(AR?"اختياري. احتفظ بسلسلتك بين أجهزتك.":"Optional. Keep your streak across devices.")+"</span></div>"+ICON_R+"</button>")+
   "<button class='mi' data-act='groups'>"+ICON_USERS+"<div><b>"+(AR?"المجموعات":"Groups")+"</b><span>"+(AR?"نافس أصدقاءك على لوحة أسبوعية":"Race friends on a weekly leaderboard")+"</span></div>"+ICON_R+"</button>"+"</div>"}
+var __sf=0;
+function fitSheet(){var sh=document.getElementById("sheet");if(!sh||!sh.classList.contains("open"))return;
+  if(__sf)clearTimeout(__sf);
+  __sf=setTimeout(function(){__sf=0;if(!sh.classList.contains("open"))return;
+    var start=sh.offsetHeight,tr=sh.style.transition;sh.style.transition="none";sh.style.height="auto";
+    var target=Math.min(sh.scrollHeight,Math.round(window.innerHeight*0.9));
+    sh.style.height=start+"px";void sh.offsetHeight;sh.style.transition=tr;sh.style.height=target+"px"},0)}
+(function(){var sh=document.getElementById("sheet");if(sh&&window.MutationObserver)new MutationObserver(function(){fitSheet()}).observe(sh,{childList:true,subtree:true})})();
 function sheetShell(title,body){
   var sh=document.getElementById("sheet"),sc=document.getElementById("scrim");
+  if(!sh.classList.contains("open"))sh.style.height="";
   sh.innerHTML="<div class='grab'></div><div class='shh'><b>"+title+"</b><button class='x' id='sx' aria-label='Close'>"+ICON_X+"</button></div>"+body;
   sh.onclick=null;document.getElementById("sx").onclick=closeSheet;sc.onclick=closeSheet;
   sh.classList.add("open");sc.classList.add("open");document.body.style.overflow="hidden";return sh}
