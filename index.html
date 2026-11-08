@@ -1598,22 +1598,27 @@ function shareText(tot){
   if(LANG==="ar")return "لعبت Roughly "+COUNTRY+" اليوم. تظن تقدر تتغلب عليّ؟\nنفس الأسئلة الثلاثة — بدون حرق للإجابات.\n"+chLink();
   return "I just played today’s Roughly "+COUNTRY+". Think you can beat me?\nSame three questions, no spoilers.\n"+chLink()}
 function copyText(t,ta,cb){
-  // Synchronous copy FIRST, inside the user's tap (iOS blocks copy that runs
-  // after an async clipboard promise rejects — that was the bug).
+  // Reveal the hidden link/text so it can be long-pressed to copy manually.
+  function reveal(){if(ta){try{ta.classList.remove("sr");ta.classList.add("linkbox");ta.readOnly=false;ta.focus();ta.setSelectionRange(0,(t||"").length);}catch(e){}}cb(false);}
+  // Modern Clipboard API first — this is the method that actually works inside a
+  // tap on iOS 13.4+ Safari over https. (execCommand can falsely report success
+  // on iOS, so we do NOT trust it first.)
+  try{
+    if(navigator.clipboard&&navigator.clipboard.writeText&&window.isSecureContext){
+      navigator.clipboard.writeText(t).then(function(){cb(true);},reveal);
+      return;
+    }
+  }catch(e){}
+  // Fallback for browsers without the Clipboard API (older, or insecure context).
   var ok=false,el;
   try{
     el=document.createElement("textarea");el.value=t;el.readOnly=false;
-    el.style.cssText="position:fixed;top:0;left:0;width:1px;height:1px;padding:0;border:0;opacity:0;font-size:16px";
-    document.body.appendChild(el);
-    if(/iP(ad|hone|od)/.test(navigator.userAgent)){el.contentEditable="true";var r=document.createRange();r.selectNodeContents(el);var sel=window.getSelection();sel.removeAllRanges();sel.addRange(r);el.setSelectionRange(0,999999)}
-    else{el.focus();el.select();try{el.setSelectionRange(0,t.length)}catch(e){}}
-    ok=document.execCommand("copy")
-  }catch(x){ok=false}
-  try{if(el)document.body.removeChild(el)}catch(e){}
-  if(ok){cb(true);return}
-  if(navigator.clipboard&&navigator.clipboard.writeText){try{navigator.clipboard.writeText(t).then(function(){cb(true)},function(){cb(false)});return}catch(x){}}
-  if(ta){try{ta.classList.remove("sr");ta.focus();ta.select()}catch(e){}}
-  cb(false)
+    el.style.cssText="position:fixed;top:0;left:0;width:1px;height:1px;opacity:0;font-size:16px";
+    document.body.appendChild(el);el.focus();el.setSelectionRange(0,t.length);
+    ok=document.execCommand("copy");
+    document.body.removeChild(el);
+  }catch(x){try{if(el)document.body.removeChild(el)}catch(e){}}
+  if(ok)cb(true);else reveal();
 }
 function openShare(tot){
   var sh=document.getElementById("sheet"),sc=document.getElementById("scrim"),avg=Math.round(tot/3),e=encodeURIComponent,g=function(i){return document.getElementById(i)};
