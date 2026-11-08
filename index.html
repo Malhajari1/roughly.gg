@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <title>Roughly Qatar – Daily Estimation Game</title>
-<script>window.RQ_BUILD="2026-11-08.1";</script>
+<script>window.RQ_BUILD="2026-11-08.2";</script>
 <meta name="description" content="A fresh set of three how-many questions about Qatar every day. No exact answers — just reason your way close. What would you have guessed?">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Roughly">
@@ -1713,10 +1713,12 @@ function openInvite(id,name){var AR=LANG==="ar",e=encodeURIComponent,g=function(
     "<p class='note' style='margin:6px 2px 10px;text-align:center'>"+(AR?"اضغط مطوّلاً على الرابط لنسخه، أو استخدم الزر.":"Press and hold the link to copy — or use the button.")+"</p>"+
     "<button class='main' id='cp'>"+(AR?"انسخ إلى الحافظة":"Copy to clipboard")+"</button>"+
     "<div class='shg' style='margin-top:10px'><a class='shl' id='wa' target='_blank' rel='noopener noreferrer'>WhatsApp</a><a class='shl' id='tg' target='_blank' rel='noopener noreferrer'>Telegram</a><a class='shl' id='tw' target='_blank' rel='noopener noreferrer'>X</a></div>"+
+    (navigator.share?"<button class='ghost' id='nat' style='width:100%;margin-top:10px'>"+(AR?"خيارات أكثر":"More options")+"</button>":"")+
     "<button class='ghost' id='gbk' style='width:100%;margin-top:10px'>"+(AR?"رجوع":"Back")+"</button>");
   var ta=g("nt");ta.value=link;ta.onclick=function(){try{ta.focus();ta.select()}catch(x){}};
   g("wa").href="https://wa.me/?text="+e(msg);g("tg").href="https://t.me/share/url?url="+e(link)+"&text="+e(AR?"انضم لمجموعتي في Roughly":"Join my group on Roughly");g("tw").href="https://twitter.com/intent/tweet?text="+e(msg);
   g("cp").onclick=function(){copyText(link,ta,function(ok){g("cp").textContent=ok?(AR?"تم النسخ":"Copied!"):(AR?"حدّد الرابط بالأعلى وانسخه":"Select the link above to copy")})};
+  if(g("nat"))g("nat").onclick=function(){try{navigator.share({title:"Roughly "+COUNTRY,text:msg}).catch(function(){})}catch(e){}};
   g("gbk").onclick=function(){openGroup(id)};
 }
 window.RQ_inviteFlow=function(id){
