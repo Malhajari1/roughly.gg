@@ -338,7 +338,7 @@ select.chip.uc:focus-visible{outline:2px solid var(--mar);outline-offset:2px}
 .lnk{border:0;background:none;color:var(--mar);font-weight:700;font-size:.82rem;cursor:pointer;font-family:inherit}
 .inp{width:100%;border:2px solid transparent;background:var(--tint);border-radius:14px;padding:14px;font-size:1rem;outline:0;font-family:inherit;color:var(--ink);box-sizing:border-box}
 .inp:focus{background:#fff;border-color:var(--mar)}
-.linkbox{width:100%;margin-top:12px;border:1.5px solid var(--line);background:var(--tint);border-radius:12px;padding:11px 12px;font-family:inherit;font-size:.82rem;color:var(--ink);resize:none;word-break:break-all;line-height:1.45;box-sizing:border-box;-webkit-user-select:all;user-select:all;cursor:text}.err{color:#b3261e;font-size:.82rem;min-height:1.2em;margin:6px 2px 0}
+.linkbox{width:100%;margin-top:12px;border:1.5px solid var(--line);background:var(--tint);border-radius:12px;padding:11px 12px;font-family:inherit;font-size:.82rem;color:var(--ink);resize:none;overflow-wrap:anywhere;line-height:1.45;box-sizing:border-box;-webkit-user-select:all;user-select:all;cursor:text}.err{color:#b3261e;font-size:.82rem;min-height:1.2em;margin:6px 2px 0}
 .chb{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.95);border-radius:14px;padding:8px 12px;margin:0 0 14px;box-shadow:0 2px 10px rgba(0,0,0,.08)}
 .chb svg{width:16px;height:16px;stroke:var(--mar);fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;flex:none}
 .chb .ct{font-weight:700;font-size:.85rem;color:var(--mar);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -1621,18 +1621,19 @@ function openShare(tot){
   var AR=LANG==="ar";
   sh.innerHTML="<div class='grab'></div><div class='shh'><b>"+(AR?"تحدَّ صديقاً":"Challenge a friend")+"</b><button class='x' id='sx' aria-label='Close'>"+ICON_X+"</button></div>"+
   "<label class='nl' for='shn' style='margin-top:0'>"+(AR?"اسمك في التحدي (اختياري)":"Your name on the challenge (optional)")+"</label><input id='shn' class='inp' maxlength='20' autocomplete='off' placeholder='"+(AR?"مثلاً: سلطان":"e.g. Sam")+"'>"+
-  "<p class='note' style='margin:6px 2px 12px'>"+(AR?"يلعب أصدقاؤك نفس الأسئلة الثلاثة. لا يرون نتيجتك إلا بعد أن يجيبوا.":"Friends play the same three questions. They see your score only after they’ve answered.")+"</p>"+
-  "<div class='shg'><a class='shl' id='wa' target='_blank' rel='noopener noreferrer'>WhatsApp</a><a class='shl' id='tg' target='_blank' rel='noopener noreferrer'>Telegram</a><a class='shl' id='tw' target='_blank' rel='noopener noreferrer'>X</a></div>"+
-  "<button class='main' id='cp2' style='margin-top:0'>"+(AR?"انسخ التحدي":"Copy challenge")+"</button>"+
-  (navigator.share?"<button class='ghost' id='nat' style='width:100%;margin-top:10px'>"+(AR?"خيارات أكثر":"More options")+"</button>":"")+
-  "<textarea id='nt' class='sr' readonly rows='4'></textarea>";
+  "<p class='note' style='margin:6px 2px 8px'>"+(AR?"يلعب أصدقاؤك نفس الأسئلة الثلاثة. لا يرون نتيجتك إلا بعد أن يجيبوا.":"Friends play the same three questions. They see your score only after they’ve answered.")+"</p>"+
+  "<textarea id='nt' class='linkbox' readonly rows='3' aria-label='"+(AR?"رسالة التحدي":"Challenge message")+"'></textarea>"+
+  "<button class='main' id='cp2'>"+(AR?"انسخ إلى الحافظة":"Copy to clipboard")+"</button>"+
+  "<div class='shg' style='margin-top:10px'><a class='shl' id='wa' target='_blank' rel='noopener noreferrer'>WhatsApp</a><a class='shl' id='tg' target='_blank' rel='noopener noreferrer'>Telegram</a><a class='shl' id='tw' target='_blank' rel='noopener noreferrer'>X</a></div>"+
+  (navigator.share?"<button class='ghost' id='nat' style='width:100%;margin-top:10px'>"+(AR?"خيارات أكثر":"More options")+"</button>":"");
   var ta=g("nt"),cp=g("cp2"),nat=g("nat"),ni=g("shn"),t="";
   function refresh(){t=shareText(tot);var body=t.split("\n").slice(0,-1).join("\n");ta.value=t;
     g("wa").href="https://wa.me/?text="+e(t);g("tg").href="https://t.me/share/url?url="+e(chLink())+"&text="+e(body);g("tw").href="https://twitter.com/intent/tweet?text="+e(t)}
   ni.value=myName();refresh();
-  ni.oninput=function(){save("rq-name",{n:cleanName(ni.value)});cp.textContent=AR?"انسخ التحدي":"Copy challenge";refresh()};
+  ni.oninput=function(){save("rq-name",{n:cleanName(ni.value)});cp.textContent=AR?"انسخ إلى الحافظة":"Copy to clipboard";refresh()};
   sh.onclick=null;g("sx").onclick=closeSheet;sc.onclick=closeSheet;
-  cp.onclick=function(){copyText(t,ta,function(ok){cp.textContent=ok?(AR?"تم النسخ":"Copied"):(AR?"حدّد النص بالأسفل وانسخه":"Select the text below and copy it");if(!ok){ta.classList.remove("sr");try{ta.focus();ta.select()}catch(x){}}})};
+  ta.onclick=function(){try{ta.focus();ta.select()}catch(x){}};
+  cp.onclick=function(){copyText(t,ta,function(ok){cp.textContent=ok?(AR?"تم النسخ":"Copied!"):(AR?"حدّد النص بالأعلى وانسخه":"Select the text above")})};
   if(nat)nat.onclick=function(){try{navigator.share({text:t}).catch(function(){})}catch(x){}};
   sh.classList.add("open");sc.classList.add("open");document.body.style.overflow="hidden";
 }
@@ -1680,7 +1681,7 @@ function openGroupJoin(prefill){var AR=LANG==="ar",g=function(i){return document
 }
 function openGroup(id){var AR=LANG==="ar";
   sheetShell(AR?"المجموعة":"Group","<div id='gbox'><p class='note'>"+(AR?"جارٍ التحميل…":"Loading…")+"</p></div>");
-  window.RQGroups.board(id).then(function(b){
+  Promise.race([window.RQGroups.board(id),new Promise(function(_,rej){setTimeout(function(){rej(new Error("__slow__"))},7000)})]).then(function(b){
     var box=document.getElementById("gbox");if(!box)return;
     var u=window.RQGroups.user(),anon=u&&u.anon;
     var rows=b.rows.map(function(r,i){return "<div class='lbr"+(r.you?" me":"")+"'><span class='rk'>"+faD(i+1)+"</span><span class='nm'>"+esc(r.name)+(r.you?(AR?" (أنت)":" (you)"):"")+"</span><span class='pts'>"+faD(r.total)+"</span></div>"}).join("");
@@ -1694,7 +1695,7 @@ function openGroup(id){var AR=LANG==="ar";
     document.getElementById("gback").onclick=openGroups;
     document.getElementById("gleave").onclick=function(){window.RQGroups.leaveGroup(id).then(openGroups,openGroups)};
     var gl=document.getElementById("glink");if(gl)gl.onclick=function(){gl.disabled=true;window.RQGroups.linkGoogle().then(function(){openGroup(id)},function(e){gl.disabled=false;gl.textContent=(e&&e.message)||(AR?"تعذّر تسجيل الدخول":"Sign-in failed")})};
-  },function(e){var box=document.getElementById("gbox");if(box)box.innerHTML="<p class='err'>"+esc((e&&e.message)||"Couldn’t load the group")+"</p><button class='ghost' id='gbk2' style='width:100%;margin-top:12px'>"+(AR?"رجوع":"Back")+"</button>";var bk=document.getElementById("gbk2");if(bk)bk.onclick=openGroups});
+  },function(e){var box=document.getElementById("gbox");if(!box)return;var slow=e&&e.message==="__slow__";box.innerHTML="<p class='"+(slow?"note":"err")+"' style='text-align:center'>"+(slow?(AR?"يستغرق وقتاً أطول من المعتاد. تحقّق من اتصالك.":"Taking longer than usual. Check your connection."):esc((e&&e.message)||"Couldn’t load the group"))+"</p><button class='main' id='gretry'>"+(AR?"إعادة المحاولة":"Retry")+"</button><button class='ghost' id='gbk2' style='width:100%;margin-top:10px'>"+(AR?"رجوع":"Back")+"</button>";document.getElementById("gretry").onclick=function(){openGroup(id)};document.getElementById("gbk2").onclick=openGroups});
 }
 function openInvite(id,name){var AR=LANG==="ar",e=encodeURIComponent,g=function(i){return document.getElementById(i)};
   var link="https://"+SITE+"?g="+id;
