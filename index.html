@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <title>Roughly Qatar – Daily Estimation Game</title>
-<script>window.RQ_BUILD="2026-11-08.2";</script>
+<script>window.RQ_BUILD="2026-11-08.3";</script>
 <meta name="description" content="A fresh set of three how-many questions about Qatar every day. No exact answers — just reason your way close. What would you have guessed?">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Roughly">
@@ -63,6 +63,9 @@ h2.sm{font-size:1.5rem;font-weight:600;margin-bottom:12px;letter-spacing:-.3px;l
 button.main{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;margin-top:18px;background:linear-gradient(135deg,var(--c),var(--c2));color:#fff;border:0;border-radius:18px;height:60px;font-weight:600;font-size:1.15rem;letter-spacing:.2px;cursor:pointer;box-shadow:0 12px 24px -8px rgba(var(--cs),.6);transition:transform .15s,box-shadow .15s,opacity .15s}
 button.main:hover{transform:translateY(-1px);box-shadow:0 18px 30px -8px rgba(var(--cs),.65)}
 button.main:active{transform:scale(.97)}
+@keyframes copiedpop{0%{transform:scale(1)}35%{transform:scale(1.05)}100%{transform:scale(1)}}
+button.copok{animation:copiedpop .4s ease}
+.main.copok{background:linear-gradient(135deg,#22c55e,#16a34a);box-shadow:0 12px 24px -8px rgba(22,163,74,.55)}
 button.main:disabled{background:#e6e4ec;box-shadow:none;cursor:not-allowed;transform:none;color:#fff}
 button.main svg{width:18px;height:18px;stroke:#fff;fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
 .cmp{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
@@ -1640,7 +1643,7 @@ function openShare(tot){
   ni.oninput=function(){save("rq-name",{n:cleanName(ni.value)});cp.textContent=AR?"انسخ إلى الحافظة":"Copy to clipboard";refresh()};
   sh.onclick=null;g("sx").onclick=closeSheet;sc.onclick=closeSheet;
   ta.onclick=function(){try{ta.focus();ta.select()}catch(x){}};
-  cp.onclick=function(){copyText(t,ta,function(ok){cp.textContent=ok?(AR?"تم النسخ":"Copied!"):(AR?"حدّد النص بالأعلى وانسخه":"Select the text above")})};
+  cp.onclick=function(){copyText(t,ta,function(ok){cp.textContent=ok?(AR?"تم النسخ":"Copied!"):(AR?"حدّد النص بالأعلى وانسخه":"Select the text above");if(ok){cp.classList.add("copok");setTimeout(function(){cp.classList.remove("copok");cp.textContent=(AR?"انسخ إلى الحافظة":"Copy to clipboard")},1700)}})};
   if(nat)nat.onclick=function(){try{navigator.share({text:t}).catch(function(){})}catch(x){}};
   sh.classList.add("open");sc.classList.add("open");document.body.style.overflow="hidden";
 }
@@ -1717,7 +1720,7 @@ function openInvite(id,name){var AR=LANG==="ar",e=encodeURIComponent,g=function(
     "<button class='ghost' id='gbk' style='width:100%;margin-top:10px'>"+(AR?"رجوع":"Back")+"</button>");
   var ta=g("nt");ta.value=link;ta.onclick=function(){try{ta.focus();ta.select()}catch(x){}};
   g("wa").href="https://wa.me/?text="+e(msg);g("tg").href="https://t.me/share/url?url="+e(link)+"&text="+e(AR?"انضم لمجموعتي في Roughly":"Join my group on Roughly");g("tw").href="https://twitter.com/intent/tweet?text="+e(msg);
-  g("cp").onclick=function(){copyText(link,ta,function(ok){g("cp").textContent=ok?(AR?"تم النسخ":"Copied!"):(AR?"حدّد الرابط بالأعلى وانسخه":"Select the link above to copy")})};
+  g("cp").onclick=function(){copyText(link,ta,function(ok){var b=g("cp");b.textContent=ok?(AR?"تم النسخ":"Copied!"):(AR?"حدّد الرابط بالأعلى وانسخه":"Select the link above to copy");if(ok){b.classList.add("copok");setTimeout(function(){b.classList.remove("copok");b.textContent=(AR?"انسخ إلى الحافظة":"Copy to clipboard")},1700)}})};
   if(g("nat"))g("nat").onclick=function(){try{navigator.share({title:"Roughly "+COUNTRY,text:msg}).catch(function(){})}catch(e){}};
   g("gbk").onclick=function(){openGroup(id)};
 }
