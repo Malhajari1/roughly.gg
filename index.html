@@ -1622,8 +1622,8 @@ function openShare(tot){
   sh.innerHTML="<div class='grab'></div><div class='shh'><b>"+(AR?"تحدَّ صديقاً":"Challenge a friend")+"</b><button class='x' id='sx' aria-label='Close'>"+ICON_X+"</button></div>"+
   "<label class='nl' for='shn' style='margin-top:0'>"+(AR?"اسمك في التحدي (اختياري)":"Your name on the challenge (optional)")+"</label><input id='shn' class='inp' maxlength='20' autocomplete='off' placeholder='"+(AR?"مثلاً: سلطان":"e.g. Sam")+"'>"+
   "<p class='note' style='margin:6px 2px 8px'>"+(AR?"يلعب أصدقاؤك نفس الأسئلة الثلاثة. لا يرون نتيجتك إلا بعد أن يجيبوا.":"Friends play the same three questions. They see your score only after they’ve answered.")+"</p>"+
-  "<textarea id='nt' class='linkbox' readonly rows='3' aria-label='"+(AR?"رسالة التحدي":"Challenge message")+"'></textarea>"+
-  "<button class='main' id='cp2'>"+(AR?"انسخ إلى الحافظة":"Copy to clipboard")+"</button>"+
+  "<button class='main' id='cp2' style='margin-top:4px'>"+(AR?"انسخ إلى الحافظة":"Copy to clipboard")+"</button>"+
+  "<textarea id='nt' class='sr' readonly rows='3' aria-label='"+(AR?"رسالة التحدي":"Challenge message")+"'></textarea>"+
   "<div class='shg' style='margin-top:10px'><a class='shl' id='wa' target='_blank' rel='noopener noreferrer'>WhatsApp</a><a class='shl' id='tg' target='_blank' rel='noopener noreferrer'>Telegram</a><a class='shl' id='tw' target='_blank' rel='noopener noreferrer'>X</a></div>"+
   (navigator.share?"<button class='ghost' id='nat' style='width:100%;margin-top:10px'>"+(AR?"خيارات أكثر":"More options")+"</button>":"");
   var ta=g("nt"),cp=g("cp2"),nat=g("nat"),ni=g("shn"),t="";
@@ -1702,8 +1702,8 @@ function openInvite(id,name){var AR=LANG==="ar",e=encodeURIComponent,g=function(
   var msg=(AR?"انضم لمجموعتي في Roughly "+COUNTRY+" ونشوف مين يكسب هذا الأسبوع: ":"Join my group on Roughly "+COUNTRY+" and let’s see who wins this week: ")+link;
   sheetShell(AR?"ادعُ أصدقاء":"Invite friends",
     "<p class='sub'>"+(AR?"أي شخص يفتح الرابط ينضم إلى «"+esc(name)+"».":"Anyone who opens this link joins “"+esc(name)+"”.")+"</p>"+
-    "<textarea id='nt' class='linkbox' readonly rows='2' aria-label='"+(AR?"رابط الدعوة":"Invite link")+"'></textarea>"+
-    "<button class='main' id='cp'>"+(AR?"انسخ إلى الحافظة":"Copy to clipboard")+"</button>"+
+    "<button class='main' id='cp' style='margin-top:4px'>"+(AR?"انسخ إلى الحافظة":"Copy to clipboard")+"</button>"+
+    "<textarea id='nt' class='sr' readonly rows='2' aria-label='"+(AR?"رابط الدعوة":"Invite link")+"'></textarea>"+
     "<div class='shg' style='margin-top:10px'><a class='shl' id='wa' target='_blank' rel='noopener noreferrer'>WhatsApp</a><a class='shl' id='tg' target='_blank' rel='noopener noreferrer'>Telegram</a><a class='shl' id='tw' target='_blank' rel='noopener noreferrer'>X</a></div>"+
     "<button class='ghost' id='gbk' style='width:100%;margin-top:10px'>"+(AR?"رجوع":"Back")+"</button>");
   var ta=g("nt");ta.value=link;ta.onclick=function(){try{ta.focus();ta.select()}catch(x){}};
