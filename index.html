@@ -7,6 +7,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <title>Roughly Qatar – Daily Estimation Game</title>
+<script>window.RQ_BUILD="2026-11-08.1";</script>
 <meta name="description" content="A fresh set of three how-many questions about Qatar every day. No exact answers — just reason your way close. What would you have guessed?">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Roughly">
@@ -1627,8 +1628,9 @@ function openShare(tot){
   sh.innerHTML="<div class='grab'></div><div class='shh'><b>"+(AR?"تحدَّ صديقاً":"Challenge a friend")+"</b><button class='x' id='sx' aria-label='Close'>"+ICON_X+"</button></div>"+
   "<label class='nl' for='shn' style='margin-top:0'>"+(AR?"اسمك في التحدي (اختياري)":"Your name on the challenge (optional)")+"</label><input id='shn' class='inp' maxlength='20' autocomplete='off' placeholder='"+(AR?"مثلاً: سلطان":"e.g. Sam")+"'>"+
   "<p class='note' style='margin:6px 2px 8px'>"+(AR?"يلعب أصدقاؤك نفس الأسئلة الثلاثة. لا يرون نتيجتك إلا بعد أن يجيبوا.":"Friends play the same three questions. They see your score only after they’ve answered.")+"</p>"+
-  "<button class='main' id='cp2' style='margin-top:4px'>"+(AR?"انسخ إلى الحافظة":"Copy to clipboard")+"</button>"+
-  "<textarea id='nt' class='sr' readonly rows='3' aria-label='"+(AR?"رسالة التحدي":"Challenge message")+"'></textarea>"+
+  "<textarea id='nt' class='linkbox' readonly rows='3' aria-label='"+(AR?"رسالة التحدي":"Challenge message")+"'></textarea>"+
+  "<p class='note' style='margin:6px 2px 10px;text-align:center'>"+(AR?"اضغط مطوّلاً على النص لنسخه، أو استخدم الزر.":"Press and hold the text to copy — or use the button.")+"</p>"+
+  "<button class='main' id='cp2'>"+(AR?"انسخ إلى الحافظة":"Copy to clipboard")+"</button>"+
   "<div class='shg' style='margin-top:10px'><a class='shl' id='wa' target='_blank' rel='noopener noreferrer'>WhatsApp</a><a class='shl' id='tg' target='_blank' rel='noopener noreferrer'>Telegram</a><a class='shl' id='tw' target='_blank' rel='noopener noreferrer'>X</a></div>"+
   (navigator.share?"<button class='ghost' id='nat' style='width:100%;margin-top:10px'>"+(AR?"خيارات أكثر":"More options")+"</button>":"");
   var ta=g("nt"),cp=g("cp2"),nat=g("nat"),ni=g("shn"),t="";
@@ -1707,8 +1709,9 @@ function openInvite(id,name){var AR=LANG==="ar",e=encodeURIComponent,g=function(
   var msg=(AR?"انضم لمجموعتي في Roughly "+COUNTRY+" ونشوف مين يكسب هذا الأسبوع: ":"Join my group on Roughly "+COUNTRY+" and let’s see who wins this week: ")+link;
   sheetShell(AR?"ادعُ أصدقاء":"Invite friends",
     "<p class='sub'>"+(AR?"أي شخص يفتح الرابط ينضم إلى «"+esc(name)+"».":"Anyone who opens this link joins “"+esc(name)+"”.")+"</p>"+
-    "<button class='main' id='cp' style='margin-top:4px'>"+(AR?"انسخ إلى الحافظة":"Copy to clipboard")+"</button>"+
-    "<textarea id='nt' class='sr' readonly rows='2' aria-label='"+(AR?"رابط الدعوة":"Invite link")+"'></textarea>"+
+    "<textarea id='nt' class='linkbox' readonly rows='2' aria-label='"+(AR?"رابط الدعوة":"Invite link")+"'></textarea>"+
+    "<p class='note' style='margin:6px 2px 10px;text-align:center'>"+(AR?"اضغط مطوّلاً على الرابط لنسخه، أو استخدم الزر.":"Press and hold the link to copy — or use the button.")+"</p>"+
+    "<button class='main' id='cp'>"+(AR?"انسخ إلى الحافظة":"Copy to clipboard")+"</button>"+
     "<div class='shg' style='margin-top:10px'><a class='shl' id='wa' target='_blank' rel='noopener noreferrer'>WhatsApp</a><a class='shl' id='tg' target='_blank' rel='noopener noreferrer'>Telegram</a><a class='shl' id='tw' target='_blank' rel='noopener noreferrer'>X</a></div>"+
     "<button class='ghost' id='gbk' style='width:100%;margin-top:10px'>"+(AR?"رجوع":"Back")+"</button>");
   var ta=g("nt");ta.value=link;ta.onclick=function(){try{ta.focus();ta.select()}catch(x){}};
@@ -1919,6 +1922,16 @@ document.querySelector(".wordmark").onclick=function(){selectDay(today);intro=tr
 document.addEventListener("visibilitychange",function(){if(!document.hidden&&dayNum()!==day){init();streak();render()}});
 applyLang();init();streak();render();
 if(API&&acct().t)pullSync().then(function(c){if(c){streak();selectDay(day);if(!busy)render()}},function(){});
+/* Auto-update: if a newer build is published, reload once (heals stale browser cache). */
+(function(){var B=window.RQ_BUILD;if(!B)return;var KEY="rq-build-seen",last=0;
+  function check(){var now=Date.now();if(now-last<60000)return;last=now;
+    fetch(location.pathname+"?_v="+now,{cache:"no-store",headers:{Range:"bytes=0-3000"}})
+      .then(function(r){return r.text()}).then(function(h){var m=/RQ_BUILD="([^"]+)"/.exec(h);if(!m)return;
+        if(m[1]!==B){if(sessionStorage.getItem(KEY)===m[1])return;try{sessionStorage.setItem(KEY,m[1])}catch(e){}location.reload()}})
+      .catch(function(){})}
+  setTimeout(check,4000);
+  document.addEventListener("visibilitychange",function(){if(!document.hidden)check()});
+})();
 </script>
 <script type="module">
 /* ===== Roughly Groups backend (Firebase) — optional, gated on a real config =====
