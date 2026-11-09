@@ -62,7 +62,7 @@ You do steps 1–8 once (~10 min). No billing — the free **Spark** plan is ple
 ## Testing it works
 - **One group, two people:** create a group on your phone, tap **Invite friends → Copy link**, open that link in a second phone (or a private browser window = a second anonymous player). It should show **Join "<name>"** → join → both of you play today's three → the leaderboard lists both, newest scores summed, "you" highlighted.
 - **Save your spot:** on the group screen tap **Sign in with Google**. You stay the same player (same rank/score) — it just attaches your Google account so you keep the group on a new phone.
-- **Weekly reset:** totals are the sum of each day's score Monday–Sunday (UTC) and start fresh each Monday.
+- **Weekly reset:** totals are the sum of each day's score Sunday–Saturday (UTC) and start fresh each Sunday. Only today's drop (±1 day for time zones) can be written, so past drops never count.
 
 ## Notes & limits
 - **HTTPS:** Google sign-in's popup needs the page on **https**. `localhost` and `malhajari1.github.io` are fine. Finish enabling HTTPS on `roughly.gg` (GitHub → Settings → Pages → Enforce HTTPS) before relying on Google sign-in there; anonymous play + joining work on http regardless.
