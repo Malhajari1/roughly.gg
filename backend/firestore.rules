@@ -68,6 +68,9 @@ service cloud.firestore {
           && request.resource.data.uid == me()
           && request.resource.data.day is int
           && request.resource.data.day >= 20000 && request.resource.data.day <= 30000
+          // Only today's drop counts (±1 day for time zones): past drops never reach the board.
+          && request.resource.data.day >= math.floor(request.time.toMillis() / 86400000) - 1
+          && request.resource.data.day <= math.floor(request.time.toMillis() / 86400000) + 1
           && sid == string(request.resource.data.day) + '__' + me()
           && request.resource.data.avg is number
           && request.resource.data.avg >= 1

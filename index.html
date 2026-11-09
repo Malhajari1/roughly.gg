@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <title>Roughly Qatar – Daily Estimation Game</title>
-<script>window.RQ_BUILD="2026-11-08.4";</script>
+<script>window.RQ_BUILD="2026-11-09.1";</script>
 <meta name="description" content="A fresh set of three how-many questions about Qatar every day. No exact answers — just reason your way close. What would you have guessed?">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Roughly">
@@ -593,6 +593,13 @@ body:not([data-view=land]) main{min-height:calc(100dvh - 76px);display:flex;flex
 .card.qb .drop b{color:#fff}
 .card.qb .h2h div{background:rgba(255,255,255,.14)}
 .card.qb .h2h small,.card.qb .h2h b,.card.qb .h2h>span{color:#fff}
+.gcode{display:flex;align-items:center;gap:10px;margin-top:14px;border:1.5px dashed var(--line);background:var(--tint);border-radius:14px;padding:10px 12px}
+.gcode small{font-size:.7rem;letter-spacing:1px;text-transform:uppercase;color:var(--mut);font-weight:700}
+.gcode b{flex:1;font-size:1.5rem;letter-spacing:3px;font-weight:800;color:var(--ink);text-align:center;font-family:inherit}
+.gcode .shl{flex:none;padding:8px 14px}
+.shl.arm{background:#dc2626;border-color:#dc2626;color:#fff}
+.h2hm{font-weight:700;font-size:1rem;text-align:center;margin:10px 0 0;color:var(--ink)}
+.card.qb .h2hm{color:#fff}
 /* v4: icon small/no-box top-right, Confirm shine */
 .qhead{display:flex;align-items:center;gap:12px;margin-bottom:14px}
 .seg{flex:1}
@@ -1508,7 +1515,10 @@ function srcTag(q){var k=q.k||"R",K=LANG==="ar"?KINDS_AR[k]:KINDS[k];return "<p 
 
 /* ===== challenge links ===== */
 function cleanName(t){return String(t||"").replace(/[^\p{L}\p{N} _.'-]/gu,"").replace(/^\s+|\s+$/g,"").slice(0,20)}
-function chInfo(){var x=load("rq-ch-"+day,null);if(!x||!Array.isArray(x.s)||x.s.length!==3)return null;return {s:x.s,n:cleanName(x.n)||"A friend"}}
+function chSelf(d,s,n){var x=load("tk8-s"+d,null);if(!x||x.day!==d||!Array.isArray(x.s)||x.s.length!==3||!Array.isArray(s)||s.length!==3)return false;
+  for(var i=0;i<3;i++)if(x.s[i]!==s[i])return false;
+  n=cleanName(n||"");return !n||n.toLowerCase()===myName().toLowerCase()}
+function chInfo(){var x=load("rq-ch-"+day,null);if(!x||!Array.isArray(x.s)||x.s.length!==3)return null;if(chSelf(day,x.s,x.n))return null;return {s:x.s,n:cleanName(x.n)||"A friend"}}
 function chEnc(s){try{return btoa(unescape(encodeURIComponent(s))).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"")}catch(e){return ""}}
 function chDec(s){try{return decodeURIComponent(escape(atob(String(s).replace(/-/g,"+").replace(/_/g,"/"))))}catch(e){return ""}}
 function parseChallenge(){
@@ -1521,7 +1531,7 @@ function parseChallenge(){
   var d=parseInt(m[1],10),s=[m[2],m[3],m[4]].map(function(v){return parseInt(v,10)}),n="";
   if(!(d>=START&&d<=today)||s.some(function(v){return v<1||v>100}))return false;
   try{n=cleanName(m[5]||"")}catch(e){}
-  save("rq-ch-"+d,{s:s,n:n});selectDay(d);
+  if(!chSelf(d,s,n))save("rq-ch-"+d,{s:s,n:n});selectDay(d);
   try{window.history.replaceState(null,"",location.pathname)}catch(e){}
   return true}
 function chBanner(n){var c=n===0&&st.g.length===0?chInfo():null;
@@ -1530,7 +1540,7 @@ function h2h(avg){
   var c=chInfo();if(!c)return "";
   var th=Math.round((c.s[0]+c.s[1]+c.s[2])/3),d=avg-th,nm=esc(c.n),
     msg=LANG==="ar"?(Math.abs(d)<=1?"تعادل تام مع "+nm+".":d>0?"تغلّبت على "+nm+" بفارق "+faD(d)+" نقطة.":nm+" يتقدّم عليك بـ "+faD(-d)+" نقطة. إعادة غداً؟"):(Math.abs(d)<=1?"Dead heat with "+nm+".":d>0?"You beat "+nm+" by "+d+" points.":nm+" edges you by "+(-d)+" points. Rematch tomorrow?");
-  return "<h3 class='bh'>"+(LANG==="ar"?"وجهاً لوجه":"Head to head")+"</h3><div class='h2h'><div><small>"+tr("You")+"</small><b>"+faD(avg)+PCT()+"</b></div><span>"+(LANG==="ar"?"ضد":"vs")+"</span><div><small>"+nm+"</small><b>"+faD(th)+PCT()+"</b></div></div><p class='note' style='text-align:center;margin-top:10px'>"+msg+"</p>"}
+  return "<h3 class='bh'>"+(LANG==="ar"?"وجهاً لوجه":"Head to head")+"</h3><div class='h2h'><div><small>"+tr("You")+"</small><b>"+faD(avg)+PCT()+"</b></div><span>"+(LANG==="ar"?"ضد":"vs")+"</span><div><small>"+nm+"</small><b>"+faD(th)+PCT()+"</b></div></div><p class='h2hm'>"+msg+"</p>"}
 
 /* ===== sign in (optional) and sync ===== */
 var ICON_USER="<svg viewBox='0 0 24 24'><circle cx='12' cy='8' r='4'/><path d='M4 21c0-4 4-6 8-6s8 2 8 6'/></svg>",
@@ -1660,6 +1670,8 @@ function shareResult(tot){openShare(tot)}
 /* ===== Groups (optional, backed by Firebase; see the module at the end of the file) ===== */
 function groupsOn(){return !!(window.RQGroups&&window.RQGroups.enabled)}
 window.RQ_today=function(){return today};
+window.RQ_todayAvg=function(){var x=load("tk8-s"+today,null);if(!x||x.day!==today||!Array.isArray(x.s)||x.s.length!==3)return 0;return Math.round((x.s[0]+x.s[1]+x.s[2])/3)};
+window.RQ_onGroupsReady=function(){try{groupNudge()}catch(e){}};
 function openGroups(){
   var AR=LANG==="ar";
   if(!groupsOn()){sheetShell(AR?"المجموعات":"Groups","<p class='sub'>"+(AR?"المجموعات غير مُفعَّلة بعد. ستصبح متاحة عند إطلاق اللعبة، لتنافس أصدقاءك على لوحة أسبوعية.":"Groups aren’t switched on yet. They arrive when the game goes live, so you can race friends on a weekly leaderboard.")+"</p>"+(AR?"":"")+ "<button class='ghost' id='gbk' style='width:100%;margin-top:12px'>"+(AR?"رجوع":"Back")+"</button>");var bk=document.getElementById("gbk");if(bk)bk.onclick=openMenu;return}
@@ -1692,7 +1704,7 @@ function openGroupJoin(prefill){var AR=LANG==="ar",g=function(i){return document
    "<label class='nl' for='gjn'>"+(AR?"اسمك":"Your name")+"</label><input id='gjn' class='inp' maxlength='24' autocomplete='off' placeholder='"+(AR?"مثلاً: سلطان":"e.g. Sam")+"'>"+
    "<p class='err' id='ge'></p><button class='main' id='gok'>"+(AR?"انضم":"Join")+"</button><button class='ghost' id='gbk' style='width:100%;margin-top:10px'>"+(AR?"رجوع":"Back")+"</button>");
   g("gjc").value=prefill||"";g("gjn").value=myName();g("gbk").onclick=openGroups;
-  g("gok").onclick=function(){var raw=g("gjc").value.trim(),m=/[?&]g=([0-9a-z]{7})/.exec(raw)||/([0-9a-z]{7})\s*$/.exec(raw),id=m?m[1]:raw,yn=cleanName(g("gjn").value);
+  g("gok").onclick=function(){var raw=g("gjc").value.trim().toLowerCase(),m=/[?&]g=([0-9a-z]{7})/.exec(raw)||/([0-9a-z]{7})\s*$/.exec(raw),id=m?m[1]:raw,yn=cleanName(g("gjn").value);
     if(!/^[0-9a-z]{7}$/.test(id)){g("ge").textContent=AR?"رمز غير صحيح.":"That code doesn’t look right.";return}
     if(yn)save("rq-name",{n:yn});g("gok").disabled=true;
     window.RQGroups.joinGroup(id,yn).then(function(r){openGroup(r.id)},function(e){g("ge").textContent=(e&&e.message)||"Couldn’t join";g("gok").disabled=false})};
@@ -1706,19 +1718,23 @@ function openGroup(id){var AR=LANG==="ar";
     var rows=b.rows.map(function(r,i){return "<div class='lbr"+(r.you?" me":"")+"'><span class='rk'>"+faD(i+1)+"</span><span class='nm'>"+esc(r.name)+(r.you?(AR?" (أنت)":" (you)"):"")+"</span><span class='pts'>"+faD(r.total)+"</span></div>"}).join("");
     box.innerHTML="<div class='shp' style='background:linear-gradient(135deg,var(--c),var(--c2))'><small>"+(AR?"هذا الأسبوع":"This week")+"</small><b>"+esc(b.name)+"</b><span>"+faD(b.members)+(AR?" أعضاء":" members")+"</span></div>"+
       "<div class='lbd'>"+(rows||"<p class='note' style='text-align:center'>"+(AR?"لا نتائج بعد هذا الأسبوع. العب لتظهر!":"No scores yet this week. Play to get on the board!")+"</p>")+"</div>"+
-      "<p class='note' style='text-align:center;margin:0 0 12px'>"+(AR?"المجموع يُصفَّر كل اثنين.":"Totals reset every Monday.")+"</p>"+
+      "<p class='note' style='text-align:center;margin:0 0 12px'>"+(AR?"المجموع يُصفَّر كل أحد.":"Totals reset every Sunday.")+"</p>"+
       "<button class='main' id='ginv'>"+(AR?"ادعُ أصدقاء":"Invite friends")+"</button>"+
       (anon?"<button class='ghost gsave' id='glink' style='width:100%;margin-top:10px'>"+(AR?"سجّل بجوجل لحفظ مكانك":"Sign in with Google to save your spot")+"</button>":"")+
       "<div class='shg' style='grid-template-columns:1fr 1fr;margin-top:10px'><button class='shl' id='gback'>"+(AR?"كل المجموعات":"All groups")+"</button><button class='shl' id='gleave'>"+(AR?"غادر":"Leave")+"</button></div>";
     document.getElementById("ginv").onclick=function(){openInvite(id,b.name)};
     document.getElementById("gback").onclick=openGroups;
-    document.getElementById("gleave").onclick=function(){window.RQGroups.leaveGroup(id).then(openGroups,openGroups)};
+    var glv=document.getElementById("gleave"),glt=null;
+    glv.onclick=function(){
+      if(!glv.classList.contains("arm")){glv.classList.add("arm");glv.textContent=AR?"اضغط مجدداً للمغادرة":"Tap again to leave";
+        glt=setTimeout(function(){glv.classList.remove("arm");glv.textContent=AR?"غادر":"Leave"},3500);return}
+      clearTimeout(glt);glv.disabled=true;window.RQGroups.leaveGroup(id).then(openGroups,openGroups)};
     var gl=document.getElementById("glink");if(gl)gl.onclick=function(){gl.disabled=true;window.RQGroups.linkGoogle().then(function(){openGroup(id)},function(e){gl.disabled=false;gl.textContent=(e&&e.message)||(AR?"تعذّر تسجيل الدخول":"Sign-in failed")})};
   },function(e){var box=document.getElementById("gbox");if(!box)return;var slow=e&&e.message==="__slow__";box.innerHTML="<p class='"+(slow?"note":"err")+"' style='text-align:center'>"+(slow?(AR?"يستغرق وقتاً أطول من المعتاد. تحقّق من اتصالك.":"Taking longer than usual. Check your connection."):esc((e&&e.message)||"Couldn’t load the group"))+"</p><button class='main' id='gretry'>"+(AR?"إعادة المحاولة":"Retry")+"</button><button class='ghost' id='gbk2' style='width:100%;margin-top:10px'>"+(AR?"رجوع":"Back")+"</button>";document.getElementById("gretry").onclick=function(){openGroup(id)};document.getElementById("gbk2").onclick=openGroups});
 }
 function openInvite(id,name){var AR=LANG==="ar",e=encodeURIComponent,g=function(i){return document.getElementById(i)};
   var link="https://"+SITE+"?g="+id;
-  var msg=(AR?"انضم لمجموعتي في Roughly "+COUNTRY+" ونشوف مين يكسب هذا الأسبوع: ":"Join my group on Roughly "+COUNTRY+" and let’s see who wins this week: ")+link;
+  var msg=(AR?"انضم لمجموعتي في Roughly "+COUNTRY+" ونشوف مين يكسب هذا الأسبوع: ":"Join my group on Roughly "+COUNTRY+" and let’s see who wins this week: ")+link+(AR?"\nأو استخدم الرمز: ":"\nOr use the code: ")+id;
   sheetShell(AR?"ادعُ أصدقاء":"Invite friends",
     "<p class='sub'>"+(AR?"أي شخص يفتح الرابط ينضم إلى «"+esc(name)+"».":"Anyone who opens this link joins “"+esc(name)+"”.")+"</p>"+
     "<textarea id='nt' class='linkbox' readonly rows='2' aria-label='"+(AR?"رابط الدعوة":"Invite link")+"'></textarea>"+
@@ -1726,7 +1742,10 @@ function openInvite(id,name){var AR=LANG==="ar",e=encodeURIComponent,g=function(
     "<button class='main' id='cp'>"+(AR?"انسخ إلى الحافظة":"Copy to clipboard")+"</button>"+
     "<div class='shg' style='margin-top:10px'><a class='shl' id='wa' target='_blank' rel='noopener noreferrer'>WhatsApp</a><a class='shl' id='tg' target='_blank' rel='noopener noreferrer'>Telegram</a><a class='shl' id='tw' target='_blank' rel='noopener noreferrer'>X</a></div>"+
     (navigator.share?"<button class='ghost' id='nat' style='width:100%;margin-top:10px'>"+(AR?"خيارات أكثر":"More options")+"</button>":"")+
+    "<div class='gcode'><small>"+(AR?"رمز المجموعة":"Group code")+"</small><b id='gcd' dir='ltr'>"+esc(id)+"</b><button class='shl' id='gcc'>"+(AR?"انسخ الرمز":"Copy code")+"</button></div>"+
+    "<p class='note' style='margin:6px 2px 0;text-align:center'>"+(AR?"يدخله أصدقاؤك من المجموعات ← انضم برمز.":"Friends enter it under Groups → Join with a code.")+"</p>"+
     "<button class='ghost' id='gbk' style='width:100%;margin-top:10px'>"+(AR?"رجوع":"Back")+"</button>");
+  g("gcc").onclick=function(){var b=g("gcc");copyText(id,null,function(ok){b.textContent=ok?(AR?"تم النسخ":"Copied!"):id;if(ok){b.classList.add("copok");setTimeout(function(){b.classList.remove("copok");b.textContent=(AR?"انسخ الرمز":"Copy code")},1700)}})};
   var ta=g("nt");ta.value=link;ta.onclick=function(){try{ta.focus();ta.select()}catch(x){}};
   g("wa").href="https://wa.me/?text="+e(msg);g("tg").href="https://t.me/share/url?url="+e(link)+"&text="+e(AR?"انضم لمجموعتي في Roughly":"Join my group on Roughly");g("tw").href="https://twitter.com/intent/tweet?text="+e(msg);
   g("cp").onclick=function(){copyText(link,ta,function(ok){var b=g("cp");b.textContent=ok?(AR?"تم النسخ":"Copied!"):(AR?"حدّد الرابط بالأعلى وانسخه":"Select the link above to copy");if(ok){b.classList.add("copok");setTimeout(function(){b.classList.remove("copok");b.textContent=(AR?"انسخ إلى الحافظة":"Copy to clipboard")},1700)}})};
@@ -1925,7 +1944,12 @@ function done(){
   if(cdTimer)clearInterval(cdTimer);
   cdTimer=setInterval(function(){var el=document.getElementById("cdn");if(!el){clearInterval(cdTimer);cdTimer=null;return}el.textContent=fmtDur(nextMidnight())},1000);
   animate(avg,pc);chartLater("day",0,avg,viewTok);
-  if(groupsOn()){window.RQGroups.submitDay(day,avg);var gel=document.getElementById("gnudge");if(gel){gel.innerHTML="<button class='gbtn' id='gnb'>"+ICON_USERS+"<div><b>"+(LANG==="ar"?"المجموعات":"Groups")+"</b><span id='gnbsub'>"+(LANG==="ar"?"لوحات أسبوعية · ادعُ أصدقاءك":"Weekly leaderboards · invite friends")+"</span></div>"+ICON_R+"</button>";var nb=document.getElementById("gnb");if(nb)nb.onclick=function(){openGroups()};window.RQGroups.listGroups().then(function(gs){var sub=document.getElementById("gnbsub");if(sub&&gs&&gs.length){var best=gs.slice().sort(function(a,b){return (a.myRank||99)-(b.myRank||99)})[0];sub.textContent=(LANG==="ar"?faD(gs.length)+" مجموعات · أفضل #"+faD(best.myRank||"-"):gs.length+" group"+(gs.length>1?"s":"")+" · best #"+(best.myRank||"-")+" this week")}},function(){})}}
+  if(groupsOn()&&day===today)window.RQGroups.submitDay(day,avg);
+  groupNudge();
+}
+function groupNudge(){
+  if(!groupsOn())return;var gel=document.getElementById("gnudge");if(!gel||gel.getAttribute("data-on"))return;gel.setAttribute("data-on","1");
+  gel.innerHTML="<button class='gbtn' id='gnb'>"+ICON_USERS+"<div><b>"+(LANG==="ar"?"المجموعات":"Groups")+"</b><span id='gnbsub'>"+(LANG==="ar"?"لوحات أسبوعية · ادعُ أصدقاءك":"Weekly leaderboards · invite friends")+"</span></div>"+ICON_R+"</button>";var nb=document.getElementById("gnb");if(nb)nb.onclick=function(){openGroups()};window.RQGroups.listGroups().then(function(gs){var sub=document.getElementById("gnbsub");if(sub&&gs&&gs.length){var best=gs.slice().sort(function(a,b){return (a.myRank||99)-(b.myRank||99)})[0];sub.textContent=(LANG==="ar"?faD(gs.length)+" مجموعات · أفضل #"+faD(best.myRank||"-"):gs.length+" group"+(gs.length>1?"s":"")+" · best #"+(best.myRank||"-")+" this week")}},function(){});
 }
 function acctLabel(){var b=document.getElementById("acct");if(!b)return;b.textContent=acct().t?"Account":"Sign in"}
 function streak(){var e=document.getElementById("streak");if(e)e.textContent=stats.streak?stats.streak+" day streak":""}
@@ -1966,7 +1990,14 @@ const GID_RE=/^[0-9a-z]{7}$/;
 function gClean(s){return String(s||"").replace(/[^\p{L}\p{N} _.'-]/gu,"").trim().slice(0,24);}
 function gName(){try{return gClean((JSON.parse(localStorage.getItem("rq-name"))||{}).n)||"";}catch(e){return "";}}
 function gGenId(){const a="0123456789abcdefghijklmnopqrstuvwxyz";let s="",x=new Uint8Array(7);try{crypto.getRandomValues(x);}catch(e){for(let i=0;i<7;i++)x[i]=Math.floor(Math.random()*256);}for(let i=0;i<7;i++)s+=a[x[i]%36];return s;}
-function gWeek(day){const dow=new Date(day*864e5).getUTCDay();const mon=day-((dow+6)%7);return [0,1,2,3,4,5,6].map(i=>mon+i);}
+function gWeek(day){const sun=day-new Date(day*864e5).getUTCDay();return [0,1,2,3,4,5,6].map(i=>sun+i);}
+/* Local memory of joined groups + last uid, so a lost anonymous session (new uid) can quietly rejoin. */
+const GKEY="rq-groups",UKEY="rq-guid";
+function gList(){try{const a=JSON.parse(localStorage.getItem(GKEY));return Array.isArray(a)?a.filter(x=>GID_RE.test(x)):[];}catch(e){return [];}}
+function gSaveList(a){try{localStorage.setItem(GKEY,JSON.stringify(a));}catch(e){}}
+function gRemember(id){const a=gList();if(GID_RE.test(id)&&a.indexOf(id)<0){a.push(id);gSaveList(a);}}
+function gForget(id){gSaveList(gList().filter(x=>x!==id));}
+function gTodayAvg(){try{return window.RQ_todayAvg?window.RQ_todayAvg():0;}catch(e){return 0;}}
 function gToday(){try{return window.RQ_today?window.RQ_today():Math.floor(Date.now()/864e5);}catch(e){return Math.floor(Date.now()/864e5);}}
 
 if(!firebaseConfig||!firebaseConfig.apiKey){
@@ -1979,8 +2010,18 @@ if(!firebaseConfig||!firebaseConfig.apiKey){
     const {onAuthStateChanged,signInAnonymously,GoogleAuthProvider,linkWithPopup,signInWithPopup}=AU;
     const {doc,getDoc,setDoc,updateDoc,deleteDoc,collection,getDocs,query,where,arrayUnion,arrayRemove,serverTimestamp}=FS;
     let resolveReady;const ready=new Promise(r=>resolveReady=r);
-    onAuthStateChanged(auth,u=>{if(!u){signInAnonymously(auth).catch(()=>{});}else{resolveReady(u);if(window.RQ_onGroupsReady)window.RQ_onGroupsReady();}});
+    onAuthStateChanged(auth,u=>{if(!u){signInAnonymously(auth).catch(()=>{});}else{resolveReady(u);}});
     const uid=()=>auth.currentUser&&auth.currentUser.uid;
+    // Write today's score (if today's drop is finished) to one group straight away.
+    async function writeToday(id,name){const a=gTodayAvg();if(!a)return;const me=uid(),d=gToday();
+      try{await setDoc(doc(db,"groups",id,"scores",d+"__"+me),{uid:me,name:gClean(name)||gName()||"Player",day:d,avg:Math.max(1,Math.min(100,Math.round(a)))},{merge:true});}catch(e){}}
+    // If the uid changed since last time, rejoin every remembered group this uid isn't in.
+    async function restore(){const u=uid();if(!u)return;let last="";try{last=localStorage.getItem(UKEY)||"";}catch(e){}
+      let ok=true;
+      if(last&&last!==u){for(const id of gList()){try{const s=await getDoc(doc(db,"groups",id));if(!s.exists()){gForget(id);continue;}
+        if((s.data().memberUids||[]).indexOf(u)<0){await updateDoc(doc(db,"groups",id),{memberUids:arrayUnion(u)});
+          await setDoc(doc(db,"groups",id,"members",u),{name:gName()||"Player",joinedAt:serverTimestamp()});}}catch(e){ok=false;}}}
+      if(ok){try{localStorage.setItem(UKEY,u);}catch(e){}}}
     async function myGroupDocs(){await ready;const qs=await getDocs(query(collection(db,"groups"),where("memberUids","array-contains",uid())));return qs.docs;}
     const APIg={
       enabled:true, ready,
@@ -1988,15 +2029,17 @@ if(!firebaseConfig||!firebaseConfig.apiKey){
       async createGroup(name){await ready;name=gClean(name);if(!name)throw new Error("Give the group a name");const id=gGenId(),u=uid();
         await setDoc(doc(db,"groups",id),{name,ownerUid:u,memberUids:[u],createdAt:serverTimestamp()});
         await setDoc(doc(db,"groups",id,"members",u),{name:gName()||"Player",joinedAt:serverTimestamp()});
+        gRemember(id);await writeToday(id);
         return {id,name};},
       async groupMeta(id){await ready;if(!GID_RE.test(id))throw new Error("That code doesn’t look right");const s=await getDoc(doc(db,"groups",id));if(!s.exists())throw new Error("No group with that code");const d=s.data();return {id,name:d.name,isMember:(d.memberUids||[]).indexOf(uid())>=0,members:(d.memberUids||[]).length};},
       async joinGroup(id,name){await ready;const meta=await this.groupMeta(id),u=uid();
         if(!meta.isMember)await updateDoc(doc(db,"groups",id),{memberUids:arrayUnion(u)});
         await setDoc(doc(db,"groups",id,"members",u),{name:gClean(name)||gName()||"Player",joinedAt:serverTimestamp()});
+        gRemember(id);await writeToday(id,name);
         return {id,name:meta.name};},
-      async leaveGroup(id){await ready;const u=uid();await updateDoc(doc(db,"groups",id),{memberUids:arrayRemove(u)});try{await deleteDoc(doc(db,"groups",id,"members",u));}catch(e){}return true;},
+      async leaveGroup(id){await ready;const u=uid();await updateDoc(doc(db,"groups",id),{memberUids:arrayRemove(u)});gForget(id);try{await deleteDoc(doc(db,"groups",id,"members",u));}catch(e){}return true;},
       async listGroups(){const docs=await myGroupDocs(),wk=gWeek(gToday()),me=uid(),out=[];
-        for(const g of docs){let my=0,rank=0;
+        for(const g of docs){let my=0,rank=0;gRemember(g.id);
           try{const ss=await getDocs(query(collection(db,"groups",g.id,"scores"),where("day","in",wk)));const tot={};ss.forEach(x=>{const d=x.data();tot[d.uid]=(tot[d.uid]||0)+(d.avg||0);});my=tot[me]||0;rank=1;for(const k in tot)if(tot[k]>my)rank++;}catch(e){rank=0;}
           out.push({id:g.id,name:g.data().name,members:(g.data().memberUids||[]).length,myTotal:Math.round(my),myRank:rank});}
         return out;},
@@ -2012,15 +2055,19 @@ if(!firebaseConfig||!firebaseConfig.apiKey){
         const uids=g.data().memberUids||[];
         const rows=uids.map(u=>({uid:u,name:names[u]||"Player",total:Math.round(tot[u]||0),you:u===me})).sort((a,b)=>b.total-a.total);
         return {id,name:g.data().name,members:uids.length,rows};},
-      async submitDay(day,avg){try{await ready;avg=Math.max(1,Math.min(100,Math.round(avg)));const docs=await myGroupDocs(),me=uid(),nm=gName()||"Player";
+      async submitDay(day,avg){if(day!==gToday())return;try{await ready;avg=Math.max(1,Math.min(100,Math.round(avg)));const docs=await myGroupDocs(),me=uid(),nm=gName()||"Player";
         await Promise.all(docs.map(g=>setDoc(doc(db,"groups",g.id,"scores",day+"__"+me),{uid:me,name:nm,day,avg},{merge:true}).catch(()=>{})));}catch(e){}},
       async linkGoogle(){await ready;const prov=new GoogleAuthProvider();
         try{await linkWithPopup(auth.currentUser,prov);}
         catch(e){if(e&&e.code==="auth/credential-already-in-use")await signInWithPopup(auth,prov);else throw e;}
+        await restore();const a=gTodayAvg();if(a)await APIg.submitDay(gToday(),a);
         const u=auth.currentUser;return {email:u.email||"",name:u.displayName||gName()};}
     };
     window.RQGroups=APIg;
-    ready.then(()=>{const m=/[?&]g=([0-9a-z]{7})/.exec(location.search||"");const id=(m&&m[1])||window.__rqG;if(id&&window.RQ_inviteFlow)window.RQ_inviteFlow(id);});
+    ready.then(async()=>{try{await restore();}catch(e){}
+      if(window.RQ_onGroupsReady)window.RQ_onGroupsReady();
+      const a=gTodayAvg();if(a)APIg.submitDay(gToday(),a);
+      const m=/[?&]g=([0-9a-z]{7})/.exec(location.search||"");const id=(m&&m[1])||window.__rqG;if(id&&window.RQ_inviteFlow)window.RQ_inviteFlow(id);});
   }catch(e){window.RQGroups={enabled:false};}
 }
 </script>
