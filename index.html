@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <title>Roughly Qatar – Daily Estimation Game</title>
-<script>window.RQ_BUILD="2026-11-10.7";</script>
+<script>window.RQ_BUILD="2026-11-10.8";</script>
 <meta name="description" content="A fresh set of three how-many questions about Qatar every day. No exact answers — just reason your way close. What would you have guessed?">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Roughly">
@@ -591,6 +591,20 @@ body:not([data-view=land]) main{min-height:calc(100dvh - 76px);display:flex;flex
 .rtop{display:grid;grid-template-columns:0.82fr 1.18fr;gap:10px;align-items:center;margin:4px 0 14px;background:none;box-shadow:none;padding:0;border-radius:0}
 .rsc{text-align:center}
 .rtop.nochart{grid-template-columns:1fr;margin-top:30px}
+.revrow.dg{grid-template-columns:1fr;gap:4px;margin:2px 0 8px}
+.revrow.dg .revhit{display:flex;align-items:baseline;justify-content:center;gap:12px;text-align:left}
+.revrow.dg .revhit .rverd{margin:0}
+.dgw{width:100%}
+.dgp{position:relative;height:160px;border-radius:16px;background:rgba(255,255,255,.12);overflow:hidden;direction:ltr}
+.dgb{position:absolute;left:8px;right:8px;top:60px;bottom:0;display:flex;align-items:flex-end;gap:2px}
+.dgb i{flex:1;height:0;border-radius:3px 3px 0 0;background:rgba(255,255,255,.34)}
+.dgs{position:absolute;top:40px;bottom:0;width:0;margin-left:-1px;border-left:2px dashed rgba(255,255,255,.85);transform:scaleY(0);transform-origin:top}
+.dgt{position:absolute;top:60px;left:50%;z-index:2;background:#16a34a;color:#fff;border-radius:10px;padding:3px 10px;font-size:.72rem;font-weight:800;white-space:nowrap;opacity:0;transform:translateX(-50%) scale(0)}
+.dgd{position:absolute;top:26px;z-index:3;width:30px;height:30px;margin:-15px 0 0 -15px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.62rem;background:#fff;color:#1b4fd8;border:3px solid rgba(20,40,120,.35);transform:scale(0)}
+.dga{position:relative;height:16px;margin-top:6px;font-size:.62rem;font-weight:600;color:rgba(255,255,255,.7);direction:ltr}
+.dga span{position:absolute;top:0;white-space:nowrap}
+.dgk{display:flex;flex-wrap:wrap;justify-content:center;gap:4px 12px;margin-top:6px;font-size:.7rem;font-weight:600;color:rgba(255,255,255,.88)}
+.dgk b{display:inline-block;width:9px;height:9px;border-radius:50%;margin:0 5px;vertical-align:-1px}
 .bdate~.rtop .rsc{padding-top:38px}
 .revrow.nochart{grid-template-columns:1fr}
 .bdate{position:absolute;top:16px;right:16px;display:block;margin:0;padding:7px 12px;border-radius:12px;background:rgba(255,255,255,.22);color:#fff;font-weight:800;font-size:.82rem;letter-spacing:.2px;z-index:2}
@@ -1608,6 +1622,34 @@ function fetchStats(kind,qi){
   if(API)return Promise.resolve(pendingSend).then(function(){return getStats(dd)}).then(function(S){return kind==="q"?(S.q&&S.q[qi]):S.avg});
   return teleReady().then(function(ok){if(!ok)throw new Error("off");return Promise.resolve(pendingSend).then(function(){return kind==="q"?window.RQGroups.qStats(dd,qi):window.RQGroups.dayStats(dd,ii)})})}
 function noChart(box){var g=box&&box.parentNode;if(!g)return;g.style.display="none";var r=g.parentNode;if(r&&r.classList&&(r.classList.contains("rtop")||r.classList.contains("revrow")))r.classList.add("nochart")}
+var dgRaf=0;
+function drawGuessGraph(box,o,qi){
+  var i=ids.indexOf(qi),q=Q[qi],g=i>=0?st.g[i]:0;if(!q||!(g>0))return false;
+  var A=LANG==="ar",E=q.m,f=unitOf(q,i)[1],R=Math.log10(4),N=25,k,m;
+  var row=box.parentNode&&box.parentNode.parentNode;if(row&&row.classList)row.classList.add("dg");
+  var lg=Math.log10(g/E),clamped=Math.abs(lg)>R,pos=Math.max(.07,Math.min(.93,(Math.max(-R,Math.min(R,lg))+R)/(2*R)))*100;
+  var r=Math.max(g/E,E/g),hi=g>E,txt;
+  if(r<1.03)txt=tr("Spot on");else{var amt=r<2?faD(Math.round(Math.abs(g/E-1)*100))+(A?"٪":"%"):faD(r>=10?Math.round(r):(Math.round(r*10)/10))+"×";txt=amt+(A?(hi?" أعلى من اللازم":" أقل من اللازم"):(hi?" too high":" too low"))}
+  var mx=Math.max.apply(null,o.rb)||1,H=[],bars="";
+  for(k=0;k<N;k++){H.push(3+68*o.rb[k]/mx);bars+="<i></i>"}
+  var tk="",ms=[.25,.5,1,2,4],ls=[0,25,50,75,100];
+  for(m=0;m<5;m++)tk+="<span style='left:"+ls[m]+"%;transform:translateX(-"+ls[m]+"%);"+(ms[m]===1?"color:#4ade80;font-weight:800":"")+"'>"+short(E*ms[m]/f)+"</span>";
+  box.className="gbox";
+  box.innerHTML="<div class='dgw'><div class='dgp'><div class='dgb'>"+bars+"</div><div class='dgs' style='left:"+pos+"%'></div><div class='dgt'>"+(A?"الإجابة الصحيحة":"Correct answer")+"</div><div class='dgd' style='left:"+pos+"%'>"+tr("You")+"</div></div>"+
+   "<div class='dga'>"+tk+"</div>"+
+   "<div class='dgk'><span><b style='background:#4ade80'></b>"+(A?"الإجابة الصحيحة":"Correct answer")+"</span><span><b style='background:#fff'></b>"+(A?"أنت، ":"You, ")+txt+(clamped?(A?" (خارج الرسم)":" (off the chart)"):"")+"</span></div></div>";
+  var bs=box.querySelectorAll(".dgb i"),L=box.querySelector(".dgs"),T=box.querySelector(".dgt"),Y=box.querySelector(".dgd");
+  bs[12].style.background="#4ade80";
+  function out(p){return 1-Math.pow(1-p,3)}function cl(v){return Math.max(0,Math.min(1,v))}
+  function pop(p){return p<=0?0:p>=1?1:1+2.7*Math.pow(p-1,3)+1.7*Math.pow(p-1,2)}
+  function frame(t){var j;for(j=0;j<N;j++)bs[j].style.height=(H[j]*out(cl((t-.05-j*.012)/.35))).toFixed(1)+"px";
+    var pt=out(cl((t-.4)/.15));T.style.opacity=pt;T.style.transform="translateX(-50%) scale("+pt+")";
+    L.style.transform="scaleY("+out(cl((t-.62)/.15))+")";Y.style.transform="scale("+pop(cl((t-.7)/.15))+")"}
+  cancelAnimationFrame(dgRaf);
+  if(reduce){frame(1);return true}
+  var t0=null;frame(0);
+  (function tick(ts){if(t0===null)t0=ts;if(!document.body.contains(L))return;var t=Math.min(1,(ts-t0)/2600);frame(t);if(t<1)dgRaf=requestAnimationFrame(tick)})(performance.now());
+  return true}
 function chartLater(kind,qi,s,tok,tries){tries=tries||0;
   if(bonus&&!st.bd){var b0=document.getElementById("cbox");noChart(b0);return}
   fetchStats(kind,qi).then(function(o){
@@ -1616,6 +1658,7 @@ function chartLater(kind,qi,s,tok,tries){tries=tries||0;
     var n=o?o.n:0,A=LANG==="ar";
     if((!o||n<MINN)&&tries<3){setTimeout(function(){if(tok===viewTok)chartLater(kind,qi,s,tok,tries+1)},2500*(tries+1));return}
     if(!o||n<MINN){box.innerHTML="<p class='note'>"+(A?"تظهر المقارنة مع اللاعبين الآخرين عندما يجاوب "+faD(MINN)+" لاعباً"+(n?" ("+faD(n)+" حتى الآن)":"")+". أنت من الأوائل.":"Comparison with other players unlocks once "+MINN+" people have answered"+(n?" ("+n+" so far)":"")+". You’re early.")+"</p>";return}
+    if(kind==="q"&&o.rb&&o.rb.length===25&&drawGuessGraph(box,o,qi))return;
     CD={bins:o.dist,n:n,over:o.over||0,under:o.under||0};
     var pc=pctile(s);box.innerHTML=chartInner(kind);
     if(kind==="day"){var pl=document.getElementById("pill");if(pl&&n>=5){pl.textContent=LANG==="ar"?"أفضل "+faD(100-pc)+"٪":"Top "+(100-pc)+"%";pl.style.display=""}}
@@ -2250,8 +2293,8 @@ if(!firebaseConfig||!firebaseConfig.apiKey){
         try{await ready;const me=uid();s=Math.max(1,Math.min(100,Math.round(s)));r=Math.max(-6,Math.min(6,Math.round(r*1000)/1000));
           await setDoc(doc(db,"answers",day+"__"+qi+"__"+me),{uid:me,day,qi,s,r});try{localStorage.setItem(fk,"1");}catch(e){}return true;}catch(e){return false;}},
       async qStats(day,qi){await ready;const qs=await getDocs(query(collection(db,"answers"),where("day","==",day),where("qi","==",qi),limit(5000)));
-        const bins=new Array(20).fill(0);let n=0,over=0,under=0;qs.forEach(x=>{const d=x.data();if(!(d.s>=1&&d.s<=100))return;bins[Math.min(19,Math.floor(d.s/5))]++;n++;if(d.r>0.05)over++;else if(d.r<-0.05)under++;});
-        return {n,dist:bins,over,under};},
+        const bins=new Array(20).fill(0),rb=new Array(25).fill(0),RR=Math.log10(4);let n=0,over=0,under=0;qs.forEach(x=>{const d=x.data();if(!(d.s>=1&&d.s<=100))return;bins[Math.min(19,Math.floor(d.s/5))]++;n++;if(typeof d.r==='number')rb[Math.max(0,Math.min(24,Math.floor((d.r+RR)/(2*RR)*25)))]++;if(d.r>0.05)over++;else if(d.r<-0.05)under++;});
+        return {n,dist:bins,over,under,rb};},
       async dayStats(day,ids){await ready;const qs=await getDocs(query(collection(db,"answers"),where("day","==",day),limit(15000)));
         const per={};qs.forEach(x=>{const d=x.data();if(ids.indexOf(d.qi)<0||!(d.s>=1&&d.s<=100))return;(per[d.uid]=per[d.uid]||{})[d.qi]=d.s;});
         const bins=new Array(20).fill(0);let n=0;for(const u in per){const v=Object.keys(per[u]).map(k=>per[u][k]);if(v.length<3)continue;const a=Math.round(v.reduce((p,c)=>p+c,0)/v.length);bins[Math.min(19,Math.floor(a/5))]++;n++;}

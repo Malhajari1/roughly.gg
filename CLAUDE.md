@@ -93,3 +93,9 @@ No test suite in the repo. Previously verified with jsdom smoke tests and Playwr
 - `MINN=1`: the chart shows as soon as one real player answered. Under `EARLY=30` players the note starts "Early numbers."; under 5 players the "Better than X%" line and "Top X%" pill are hidden (a percentile of 2 people is meaningless). With zero answers a visible "unlocks" note shows (not hidden).
 - `openGroup(id,cb)`: toggling Total / Average / vs group repaints from the already-loaded board (`cb`) with no reload, no "Loading" flash.
 - `chartLater` retries up to 3 times (2.5s, 5s, 7.5s) while a chart has no data yet, because on a reload the answers backfill (`RQ_answers` -> `submitAnswer`) can finish after the first stats fetch. Keeps "Loading…" while retrying.
+
+## Reveal graph: guesses on a real-number axis (10 Nov 2026)
+- The per-question reveal graph (`drawGuessGraph`, `.dg*` CSS) replaces the score-distribution curve. Pale bars = what all players answered, on a log axis from 0.25x to 4x of our estimate (labels in real units via `short()`), left = too low, right = too high. The bar at the correct answer (bin 12 of 25) is green with a "Correct answer" tag. Your dot ("You") has a dashed stem; it is clamped to 7%..93% so it always stays inside the plot, with "(off the chart)" in the legend if your guess is beyond 4x.
+- Data: answers already store `r` = log10(guess / estimate). `RQGroups.qStats` and the node `stats()` now return `rb` (25 bins of `r`, outliers clamped into the end bins). Without `rb` (older backend) the old curve is used. The results-screen day graph is unchanged (score distribution).
+- Score is symmetric (20% high and 20% low both score 94) which is why the old graph put both at the same x. The new graph plots direction.
+- Live font is Plus Jakarta Sans (IBM Plex Sans Arabic for Arabic), not Fredoka.

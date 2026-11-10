@@ -29,7 +29,7 @@ function stats(day) {
   const d = db.answers[day] || {}, q = {}, avg = { n: 0, dist: Array(20).fill(0) };
   for (const p in d) {
     const a = d[p], ks = Object.keys(a);
-    for (const qi of ks) { const o = (q[qi] = q[qi] || { n: 0, over: 0, under: 0, dist: Array(20).fill(0) }); o.n++; o.dist[band(a[qi].s)]++; if (a[qi].r > 0.0212) o.over++; else if (a[qi].r < -0.0212) o.under++; }
+    for (const qi of ks) { const o = (q[qi] = q[qi] || { n: 0, over: 0, under: 0, dist: Array(20).fill(0), rb: Array(25).fill(0) }); o.n++; o.dist[band(a[qi].s)]++; o.rb[Math.max(0, Math.min(24, Math.floor((a[qi].r + Math.log10(4)) / (2 * Math.log10(4)) * 25)))]++; if (a[qi].r > 0.0212) o.over++; else if (a[qi].r < -0.0212) o.under++; }
     if (ks.length === 3) { avg.n++; avg.dist[band(Math.round(ks.reduce((t, k) => t + a[k].s, 0) / 3))]++; }
   }
   return { day, q, avg };
