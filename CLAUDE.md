@@ -105,3 +105,6 @@ No test suite in the repo. Previously verified with jsdom smoke tests and Playwr
 - "You" is inside the axis when within a quarter-span of the data (axis grows slightly to include it); otherwise it sits on the edge and the legend says "off the chart". The green bar is always the bin containing the answer, drawn as a thin stub if nobody guessed there.
 - Data: `rs` = array of rounded `r` values per question (Firestore `qStats` and node `stats()`, capped at 5000). It replaces `rb`. Without `rs` the old score curve is used.
 - Tested with stand-in data in Playwright (tight, wide, 1-3 players, outliers, far-off guess, Arabic, 360/393/1280). Not yet seen with real Firestore answers.
+
+## Reveal graph: answer always centred (10 Nov 2026, build .12)
+- The axis is now symmetric around the correct answer (half-width = the larger of the players' 2nd/98th percentile distance, min 0.3 decades, +6%), so the green bar and tag are always at 50%. Too-low sits left, too-high right. The "You" extension is symmetric too. Trade-off: a lopsided crowd leaves empty bars on the quiet side.
