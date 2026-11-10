@@ -108,3 +108,10 @@ No test suite in the repo. Previously verified with jsdom smoke tests and Playwr
 
 ## Reveal graph: answer always centred (10 Nov 2026, build .12)
 - The axis is now symmetric around the correct answer (half-width = the larger of the players' 2nd/98th percentile distance, min 0.3 decades, +6%), so the green bar and tag are always at 50%. Too-low sits left, too-high right. The "You" extension is symmetric too. Trade-off: a lopsided crowd leaves empty bars on the quiet side.
+
+## Seamless reveal transition (10 Nov 2026, build .13)
+- Bug: the reveal first rendered a side-by-side score/"Loading" layout, then swapped to the stacked graph layout when stats arrived, so cards jumped ~90px and the buttons dropped mid count-up.
+- Fix: `reveal()` renders `.revrow.dg` (final layout) from the first frame, with `qSlot()` as a graph slot the same size as the finished graph (shimmering `.dgp.ld`, legend min-height). The graph builds inside it; "unlocks"/"coming soon"/error notes (`qNote`) show inside the same slot, so nothing collapses. The graph animation waits ~750ms from `revT0` so the score hit lands first.
+- Short screens (max-height 740px) use a smaller plot. At ~667px tall the page still scrolls ~45px (top bar plus margins); not fixed.
+- The old score-curve fallback (no `rs`) still swaps in at its own size; only matters for an old backend. Results-screen chart still uses `noChart()` collapse.
+- Measured by sampling element positions every 40ms with the stats delayed 40ms/700ms/1.8s/never: layout changes once (first paint) and never again.

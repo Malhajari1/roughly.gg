@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <title>Roughly Qatar – Daily Estimation Game</title>
-<script>window.RQ_BUILD="2026-11-10.12";</script>
+<script>window.RQ_BUILD="2026-11-10.13";</script>
 <meta name="description" content="A fresh set of three how-many questions about Qatar every day. No exact answers — just reason your way close. What would you have guessed?">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Roughly">
@@ -603,7 +603,12 @@ body:not([data-view=land]) main{min-height:calc(100dvh - 76px);display:flex;flex
 .dgd{position:absolute;top:26px;z-index:3;width:30px;height:30px;margin:-15px 0 0 -15px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.62rem;background:#fff;color:#1b4fd8;border:3px solid rgba(20,40,120,.35);transform:scale(0)}
 .dga{position:relative;height:16px;margin-top:6px;font-size:.62rem;font-weight:600;color:rgba(255,255,255,.7);direction:ltr}
 .dga span{position:absolute;top:0;white-space:nowrap}
-.dgk{display:flex;flex-wrap:wrap;justify-content:center;gap:4px 12px;margin-top:6px;font-size:.7rem;font-weight:600;color:rgba(255,255,255,.88)}
+@media (max-height:740px){.dgp{height:112px}.dgb{top:40px}.dgt{top:40px}.dgs{top:28px}.dgd{top:17px}.dga{margin-top:4px}.dgk{min-height:28px;margin-top:4px}.revrow.dg{margin:0 0 4px}.card.qb h2.sm{font-size:1.45rem}.cmp{margin-bottom:8px}.revrow.dg .revhit{padding:8px 14px;margin-bottom:6px}.revrow.dg .rscore span{font-size:2.3rem}}
+.dgn{position:absolute;inset:0;margin:0;padding:0 22px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:.8rem;font-weight:600;line-height:1.35;color:rgba(255,255,255,.85)}
+.dgp.ld{animation:dgld 1.4s ease-in-out infinite}
+@keyframes dgld{0%,100%{background:rgba(255,255,255,.10)}50%{background:rgba(255,255,255,.2)}}
+@media (prefers-reduced-motion:reduce){.dgp.ld{animation:none}}
+.dgk{min-height:34px;align-content:flex-start;display:flex;flex-wrap:wrap;justify-content:center;gap:4px 12px;margin-top:6px;font-size:.7rem;font-weight:600;color:rgba(255,255,255,.88)}
 .dgk b{display:inline-block;width:9px;height:9px;border-radius:50%;margin:0 5px;vertical-align:-1px}
 .bdate~.rtop .rsc{padding-top:38px}
 .revrow.nochart{grid-template-columns:1fr}
@@ -1615,6 +1620,11 @@ function chartInner(kind){
 function chartSlot(kind){
   var A=LANG==="ar";
   return "<div id='cbox' class='gbox'><p class='note'>"+(A?"جارٍ تحميل نتائج اللاعبين الآخرين…":"Loading how other players did…")+"</p></div>"}
+var revT0=0;
+/* The reveal graph slot is the same size as the finished graph, so nothing moves when data arrives. */
+function qSlot(msg){
+  return "<div id='cbox' class='gbox'><div class='dgw'><div class='dgp"+(msg?"":" ld")+"'><p class='dgn'>"+(msg||(LANG==="ar"?"جارٍ تحميل نتائج اللاعبين الآخرين…":"Loading how other players did…"))+"</p></div><div class='dga'></div><div class='dgk'>&nbsp;</div></div></div>"}
+function qNote(box,msg){if(box)box.innerHTML=qSlot(msg).replace(/^<div id='cbox' class='gbox'>/,"").replace(/<\/div>$/,"")}
 /* Real player data only. Backend API if configured, otherwise the Firestore answers collection. */
 function teleReady(){return new Promise(function(res){var t=0;(function w(){if(window.RQGroups){res(!!window.RQGroups.enabled&&!!window.RQGroups.qStats);return}if(t++>20){res(false);return}setTimeout(w,150)})()})}
 function fetchStats(kind,qi){
@@ -1662,8 +1672,8 @@ function drawGuessGraph(box,o,qi){
     L.style.transform="scaleY("+out(cl((t-.62)/.15))+")";Y.style.transform="scale("+pop(cl((t-.7)/.15))+")"}
   cancelAnimationFrame(dgRaf);
   if(reduce){frame(1);return true}
-  var t0=null;frame(0);
-  (function tick(ts){if(t0===null)t0=ts;if(!document.body.contains(L))return;var t=Math.min(1,(ts-t0)/2600);frame(t);if(t<1)dgRaf=requestAnimationFrame(tick)})(performance.now());
+  var t0=null,wait=Math.max(0,750-(performance.now()-revT0));frame(0);
+  (function tick(ts){if(t0===null)t0=ts;if(!document.body.contains(L))return;var t=Math.max(0,Math.min(1,(ts-t0-wait)/2600));frame(t);if(t<1)dgRaf=requestAnimationFrame(tick)})(performance.now());
   return true}
 function chartLater(kind,qi,s,tok,tries){tries=tries||0;
   if(bonus&&!st.bd){var b0=document.getElementById("cbox");noChart(b0);return}
@@ -1672,7 +1682,7 @@ function chartLater(kind,qi,s,tok,tries){tries=tries||0;
     var box=document.getElementById("cbox");if(!box)return;
     var n=o?o.n:0,A=LANG==="ar";
     if((!o||n<MINN)&&tries<3){setTimeout(function(){if(tok===viewTok)chartLater(kind,qi,s,tok,tries+1)},2500*(tries+1));return}
-    if(!o||n<MINN){box.innerHTML="<p class='note'>"+(A?"تظهر المقارنة مع اللاعبين الآخرين عندما يجاوب "+faD(MINN)+" لاعباً"+(n?" ("+faD(n)+" حتى الآن)":"")+". أنت من الأوائل.":"Comparison with other players unlocks once "+MINN+" people have answered"+(n?" ("+n+" so far)":"")+". You’re early.")+"</p>";return}
+    if(!o||n<MINN){if(kind==="q"){qNote(box,A?"تظهر المقارنة مع اللاعبين الآخرين عندما يجاوب "+faD(MINN)+" لاعباً. أنت من الأوائل.":"Comparison with other players unlocks once "+MINN+" people have answered. You’re early.");return}box.innerHTML="<p class='note'>"+(A?"تظهر المقارنة مع اللاعبين الآخرين عندما يجاوب "+faD(MINN)+" لاعباً"+(n?" ("+faD(n)+" حتى الآن)":"")+". أنت من الأوائل.":"Comparison with other players unlocks once "+MINN+" people have answered"+(n?" ("+n+" so far)":"")+". You’re early.")+"</p>";return}
     if(kind==="q"&&o.rs&&drawGuessGraph(box,o,qi))return;
     CD={bins:o.dist,n:n,over:o.over||0,under:o.under||0};
     var pc=pctile(s);box.innerHTML=chartInner(kind);
@@ -1680,6 +1690,7 @@ function chartLater(kind,qi,s,tok,tries){tries=tries||0;
     animate(s,pc,"graph")
   }).catch(function(e){
     if(tok!==viewTok)return;var b=document.getElementById("cbox");if(!b)return;
+    if(kind==="q"){qNote(b,e&&e.message==="off"?(LANG==="ar"?"تظهر المقارنة مع اللاعبين الآخرين قريباً.":"Comparison with other players is coming soon."):(LANG==="ar"?"تعذّر تحميل المقارنة الآن. نتيجتك محسوبة.":"Couldn’t load the comparison right now. Your score still counts."));return}
     noChart(b);b.innerHTML="<p class='note'>"+(e&&e.message==="off"?(LANG==="ar"?"تظهر المقارنة مع اللاعبين الآخرين قريباً.":"Comparison with other players is coming soon."):(LANG==="ar"?"تعذّر تحميل المقارنة الآن. نتيجتك محسوبة.":"Couldn’t load the comparison right now. Your score still counts."))+"</p>"})}
 
 /* ===== source tags ===== */
@@ -2095,13 +2106,13 @@ function reveal(i){
   mount("<div class='qhead'>"+seg(i)+"<span class='catico'>"+(ICONS[q.c]||ICONS["Everyday Qatar"])+"</span></div><h2 class='sm' dir='auto'>"+qT(q)+"</h2>"+
   "<div class='cmp'><div class='me'><small>"+tr("Your guess")+"</small><b>"+short(g/f)+"</b><em>"+ul+"</em></div><div class='them'><small>"+(q.c==="Facts"?(LANG==="ar"?"الجواب":"Answer"):tr("Our estimate"))+"</small><b>"+short(q.m/f)+"</b><em>"+ul+"</em></div></div>"+
   (q.asof?"<p class='note' style='text-align:center;margin:-4px 0 8px'>"+(LANG==="ar"?"حتى ":"As of ")+q.asof+"</p>":"")+
-  "<div class='revrow'><div class='revhit'><div class='rscore'><span id='sn'>"+faD(0)+"</span><i>"+PCT()+"</i></div><div class='rverd'>"+verdict(g,q)+"</div></div>"+
-  "<div class='revg'>"+chartSlot("q")+"</div></div>"+
+  "<div class='revrow dg'><div class='revhit'><div class='rscore'><span id='sn'>"+faD(0)+"</span><i>"+PCT()+"</i></div><div class='rverd'>"+verdict(g,q)+"</div></div>"+
+  "<div class='revg'>"+qSlot()+"</div></div>"+
   "<div class='revbtns'><button class='ghost' id='lg'>"+ICON_CHART+tr("See the maths")+"</button><button class='main' id='nx'>"+(last?tr("See results"):tr("Next"))+"</button></div>");
   app.classList.add("qb");
   document.getElementById("lg").onclick=function(){openLogic(i)};
   document.getElementById("nx").onclick=function(){if(busy)return;busy=true;st.r=false;saveState();busy=false;render()};
-  animate(s,pc);chartLater("q",ids[i],s,viewTok);
+  revT0=performance.now();animate(s,pc);chartLater("q",ids[i],s,viewTok);
 }
 var TIERS=[[0,"Fresh Off the Plane","Welcome to Qatar. It’s hot."],[15,"Karak Rookie","Warming up. Needs more sugar."],[35,"Corniche Regular","Solid. Bring karak next time."],[55,"Souq Veteran","You could haggle with a spreadsheet."],[72,"Majlis Elder","Everyone waits for your estimate."],[88,"Desert Oracle","You don’t guess. You just know."]];
 function rankIdx(a){var k=0;TIERS.forEach(function(t,i){if(a>=t[0])k=i});return k}
