@@ -118,3 +118,11 @@ No test suite in the repo. Previously verified with jsdom smoke tests and Playwr
 
 ## Spot-on is dead centre (10 Nov 2026, build .14)
 - The reveal graph uses 31 bins (odd) so one bin is centred on the correct answer; with 30 the green bar sat ~5px right of centre. A guess within 3% ("Spot on") snaps the You dot and dashed line to the exact centre. Measured 0px offset for line, dot, tag and green bar at 393px.
+
+## Coin stack icon, Dev tab, gift links (10 Nov 2026, build .15)
+- `ICON_COIN` is now a flat-colour gold coin stack (explicit fills, so the `.mi`/`.popi` stroke rules don't recolour it). Old dollar-sign outline removed. `.popi svg` is 42px.
+- Menu has a "Dev" row (`data-act='dev'` -> `openDev()`), locked by a code the owner chose. Only a hash (`DEVH`, `h53`) is in the file, not the code itself. Unlock lasts for the page session only (`devOK`), 5 wrong tries lock it until reload.
+- Unlocked: add coins to this device (cap 99, like the rest of the code), reset to 0, and make a gift link for another player.
+- Gift link: `<site>?gift=<n>.<id>.<sig>` (n 1..20, 6-char id, `giftSig` = hash of n, id and `GKEY`). Opening it shows "A gift for you"; Claim adds the coins once per device (ids kept in `rq-gifts`). The param is stripped from the URL and the link skips the landing page. Reused link says "Gift already claimed". Wrong amount or signature is ignored silently.
+- NOT real security: the hash and `GKEY` are in client code, so anyone willing to read the source can open the Dev tab or forge a gift link. Coins are device-only and never touch streaks, stats, boards or server answers, so the worst case is a free bonus round. Real protection would need the node backend to sign gifts.
+- Tested in Playwright (localhost): wrong code, unlock, add 3, lockout after 5 tries, gift link claimed by a fresh browser profile, reuse blocked, forged amount and made-up signature rejected. Not tested: Arabic gift pop-up on a real device, the clipboard Copy button on a phone.

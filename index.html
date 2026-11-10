@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <title>Roughly Qatar – Daily Estimation Game</title>
-<script>window.RQ_BUILD="2026-11-10.14";</script>
+<script>window.RQ_BUILD="2026-11-10.15";</script>
 <meta name="description" content="A fresh set of three how-many questions about Qatar every day. No exact answers — just reason your way close. What would you have guessed?">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Roughly">
@@ -145,7 +145,7 @@ button.main svg{width:18px;height:18px;stroke:#fff;fill:none;stroke-width:2.4;st
 .popc{background:#fff;color:#16213e;border-radius:28px;padding:26px 22px 22px;max-width:360px;width:100%;text-align:center;box-shadow:0 30px 80px rgba(18,28,70,.45);animation:poprise .3s cubic-bezier(.2,.8,.2,1)}
 @keyframes poprise{from{transform:translateY(16px) scale(.97)}to{transform:none}}
 .popi{width:64px;height:64px;margin:0 auto 14px;border-radius:50%;background:#eaf1ff;display:flex;align-items:center;justify-content:center}
-.popi svg{width:34px;height:34px;stroke:#2f6bff;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.popi svg{width:42px;height:42px;stroke:#2f6bff;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .popc h3{margin:0 0 8px;font-size:1.25rem;font-weight:800}
 .popc p{margin:0 0 18px;font-size:.95rem;line-height:1.55;color:#4a5578}
 .popk{display:flex;align-items:center;justify-content:center;gap:8px;margin:-4px 0 16px;font-size:.85rem;color:#4a5578;cursor:pointer}
@@ -1374,6 +1374,8 @@ function init(){
   var d=new Date(today*864e5);cm={y:d.getUTCFullYear(),m:d.getUTCMonth()};
   intro=true;
   if(parseChallenge())intro=false;
+  var gf=/[?&]gift=(\d{1,2})\.([a-z0-9]{6})\.([a-z0-9]{6,14})/.exec(location.search||"");
+  if(gf){window.__rqGift=[parseInt(gf[1],10),gf[2],gf[3]];intro=false;try{window.history.replaceState(null,"",location.pathname)}catch(e){}}
   var gm=/[?&]g=([0-9a-z]{7})/.exec(location.search||"");
   if(gm){window.__rqG=gm[1];intro=false;try{window.history.replaceState(null,"",location.pathname)}catch(e){}}
 }
@@ -1578,7 +1580,7 @@ function openMenu(){
     if(b.hasAttribute("data-d")){selectDay(parseInt(b.getAttribute("data-d"),10));intro=false;closeSheet();render();window.scrollTo(0,0)}
     else if(b.hasAttribute("data-nav")){var v=cm.y*12+cm.m+parseInt(b.getAttribute("data-nav"),10);cm={y:Math.floor(v/12),m:v%12};openMenu()}
     else if(b.hasAttribute("data-home")){closeSheet();selectDay(today);intro=true;render();window.scrollTo(0,0)}
-    else if(b.hasAttribute("data-act")){var a=b.getAttribute("data-act");if(a==="signin")openSignIn(1,"");else if(a==="groups")openGroups();else if(a==="signout"){setAcct(null);openMenu()}}
+    else if(b.hasAttribute("data-act")){var a=b.getAttribute("data-act");if(a==="signin")openSignIn(1,"");else if(a==="groups")openGroups();else if(a==="dev")openDev();else if(a==="signout"){setAcct(null);openMenu()}}
     else if(b.id==="mspend"){closeSheet();spendCoin()}
     else if(b.id==="sx")closeSheet()};
   sc.onclick=closeSheet;sh.classList.add("open");sc.classList.add("open");document.body.style.overflow="hidden";
@@ -1733,14 +1735,16 @@ function h2h(avg){
 var ICON_USER="<svg viewBox='0 0 24 24'><circle cx='12' cy='8' r='4'/><path d='M4 21c0-4 4-6 8-6s8 2 8 6'/></svg>",
 ICON_BAL="<svg viewBox='0 0 24 24'><path d='M12 4v16M6 20h12M5 8h14M7 8l-3 7a3 3 0 0 0 6 0L7 8zM17 8l-3 7a3 3 0 0 0 6 0l-3-7z'/></svg>",
 ICON_HOME="<svg viewBox='0 0 24 24'><path d='M4 20V10l8-6 8 6v10M4 20h16M10 20v-5h4v5'/></svg>",
-ICON_COIN="<svg viewBox='0 0 24 24'><circle cx='12' cy='12' r='9'/><path d='M12 6.5v11M9.2 9.4h4.2a1.9 1.9 0 0 1 0 3.8h-2.8a1.9 1.9 0 0 0 0 3.8h4.2'/></svg>",
+ICON_COIN="<svg viewBox='0 0 64 64' stroke-linejoin='round'><g stroke='#c97a00' stroke-width='2.5'><path d='M10 44v6c0 4.4 9.8 8 22 8s22-3.6 22-8v-6z' fill='#f2a200'/><ellipse cx='32' cy='44' rx='22' ry='8' fill='#ffc933'/><path d='M10 31v6c0 4.4 9.8 8 22 8s22-3.6 22-8v-6z' fill='#f2a200'/><ellipse cx='32' cy='31' rx='22' ry='8' fill='#ffc933'/><path d='M10 18v6c0 4.4 9.8 8 22 8s22-3.6 22-8v-6z' fill='#f2a200'/><ellipse cx='32' cy='18' rx='22' ry='8' fill='#ffd24a'/></g><ellipse cx='32' cy='18' rx='13' ry='4.2' fill='none' stroke='#fff' stroke-opacity='.7' stroke-width='2'/></svg>",
+ICON_DEV="<svg viewBox='0 0 24 24'><path d='M14.7 6.3a4 4 0 0 0-5.4 5.4L3.5 17.5a1.8 1.8 0 0 0 2.5 2.5l5.8-5.8a4 4 0 0 0 5.4-5.4l-2.6 2.6-2.2-.4-.4-2.2z'/></svg>",
 ICON_USERS="<svg viewBox='0 0 24 24'><circle cx='9' cy='8' r='3.2'/><circle cx='17' cy='9' r='2.4'/><path d='M3.5 20c0-3 2.8-5 5.5-5s5.5 2 5.5 5M15.5 20c0-2.2 1-3.8 3.4-3.8'/></svg>";
 function menuRows(){
   var a=acct(),AR=LANG==="ar";
   return "<div class='mis'>"+
   (a.t?"<div class='mi static'>"+ICON_USER+"<div><b>"+(AR?"مسجّل الدخول":"Signed in")+"</b><span>"+esc(a.e)+"</span></div><button class='lnk' data-act='signout'>"+(AR?"خروج":"Sign out")+"</button></div>"
       :"<button class='mi' data-act='signin'>"+ICON_USER+"<div><b>"+(AR?"تسجيل الدخول":"Sign in")+"</b><span>"+(AR?"اختياري. احتفظ بسلسلتك بين أجهزتك.":"Optional. Keep your streak across devices.")+"</span></div>"+ICON_R+"</button>")+
-  "<button class='mi' data-act='groups'>"+ICON_USERS+"<div><b>"+(AR?"المجموعات":"Groups")+"</b><span>"+(AR?"نافس أصدقاءك على لوحة أسبوعية":"Race friends on a weekly leaderboard")+"</span></div>"+ICON_R+"</button>"+"</div>"}
+  "<button class='mi' data-act='groups'>"+ICON_USERS+"<div><b>"+(AR?"المجموعات":"Groups")+"</b><span>"+(AR?"نافس أصدقاءك على لوحة أسبوعية":"Race friends on a weekly leaderboard")+"</span></div>"+ICON_R+"</button>"+
+  "<button class='mi' data-act='dev'>"+ICON_DEV+"<div><b>Dev</b><span>Locked. Owner tools.</span></div>"+ICON_R+"</button></div>"}
 var __sf=0;
 function fitSheet(){return;var sh=document.getElementById("sheet");if(!sh||!sh.classList.contains("open"))return;
   if(__sf)clearTimeout(__sf);
@@ -2164,6 +2168,54 @@ function giftShow(){
     body:A?"كنت معنا في أيام التجربة، وملاحظاتك تصنع اللعبة. هديتنا لك عملتان من عملات السلسلة، وكل عملة تفتح جولة إضافية بثلاثة أسئلة جديدة.":"You’ve been with Roughly Qatar through its testing days, and your support is shaping the game. As a thank you, here are 2 streak coins. Each one unlocks an extra game of three fresh questions.",
     btn:A?"استلم العملتين":"Claim my 2 coins",
     done:function(){var c=coinsGet();c.n=Math.min(99,c.n+2);coinsSet(c);try{localStorage.setItem("rq-gift","d")}catch(e){}streak();if(!intro&&st.g.length>=3&&!st.r)render()}})}
+/* ===== Dev tab: coins for this device, and gift links for other players =====
+   Not real security. The password and the gift key live in this file, so anyone who reads the source can get past them.
+   Coins are device-only and never touch streaks, stats or boards, so the worst case is a free bonus game. */
+function h53(s){var h1=0xdeadbeef,h2=0x41c6ce57,i,c;for(i=0;i<s.length;i++){c=s.charCodeAt(i);h1=Math.imul(h1^c,2654435761);h2=Math.imul(h2^c,1597334677)}h1=Math.imul(h1^(h1>>>16),2246822507)^Math.imul(h2^(h2>>>13),3266489909);h2=Math.imul(h2^(h2>>>16),2246822507)^Math.imul(h1^(h1>>>13),3266489909);return (4294967296*(2097151&h2)+(h1>>>0)).toString(36)}
+var DEVH="1ufnauzhjdw",GKEY="rq-gift-v1",devOK=false,devTries=0;
+function giftSig(n,id){return h53("gift|"+n+"|"+id+"|"+GKEY)}
+function giftBase(){return location.protocol==="file:"?"https://"+SITE:location.origin+location.pathname}
+function devClose(){closeSheet();if(!intro&&st.g.length>=3&&!st.r)render()}
+function openDev(msg){
+  var g=function(i){return document.getElementById(i)},c=coinsGet(),body;
+  if(!devOK){
+    body="<p class='sub'>Owner tools. Enter the code to continue.</p><input id='dpw' class='inp' type='password' inputmode='numeric' autocomplete='off' maxlength='12' placeholder='Code'><p class='err' id='dpe'></p><button class='main' id='dgo' style='margin-top:12px'>Unlock</button>"}
+  else{
+    body="<p class='sub'>This device has <b id='dcn'>"+c.n+"</b> coin"+(c.n===1?"":"s")+".</p>"+
+    "<label class='nl' for='dn' style='margin-top:6px'>Add coins to this device</label><input id='dn' class='inp' type='number' inputmode='numeric' min='1' max='99' value='1'>"+
+    "<button class='main' id='dadd' style='margin-top:10px'>Add coins</button>"+
+    "<button class='ghost' id='dzero' style='width:100%;margin-top:8px;flex:none'>Reset to 0</button>"+
+    "<h3 class='bh' style='margin-top:22px'>Gift another player</h3><p class='sub'>Coins stay on each device, so this makes a link. When they open it they get the coins once, on that device.</p>"+
+    "<label class='nl' for='gn' style='margin-top:6px'>Coins in the gift</label><input id='gn' class='inp' type='number' inputmode='numeric' min='1' max='20' value='1'>"+
+    "<button class='main' id='gmk' style='margin-top:10px'>Make gift link</button><div id='gout'></div>"+
+    "<button class='lnk' id='dlock' style='margin:16px auto 0;display:block'>Lock again</button>"}
+  var sh=sheetShell("Dev",body);
+  g("sx").onclick=devClose;document.getElementById("scrim").onclick=devClose;
+  if(!devOK){
+    var tryIt=function(){
+      if(devTries>=5){g("dpe").textContent="Too many tries. Reload the page to try again.";return}
+      if(h53("rq-dev|"+g("dpw").value)===DEVH){devOK=true;devTries=0;openDev()}
+      else{devTries++;g("dpe").textContent="That isn’t it.";g("dpw").value="";g("dpw").focus()}};
+    g("dgo").onclick=tryIt;g("dpw").onkeydown=function(e){if(e.key==="Enter")tryIt()};
+    setTimeout(function(){try{g("dpw").focus()}catch(e){}},50);return}
+  var num=function(id,mx){var v=parseInt(g(id).value,10);return isNaN(v)?1:Math.max(1,Math.min(mx,v))};
+  g("dadd").onclick=function(){var cc=coinsGet();cc.n=Math.min(99,cc.n+num("dn",99));coinsSet(cc);g("dcn").textContent=cc.n;};
+  g("dzero").onclick=function(){var cc=coinsGet();cc.n=0;coinsSet(cc);g("dcn").textContent="0"};
+  g("dlock").onclick=function(){devOK=false;openDev()};
+  g("gmk").onclick=function(){
+    var n=num("gn",20),id=Math.random().toString(36).slice(2,8).replace(/[^a-z0-9]/g,"x");while(id.length<6)id+="x";
+    var url=giftBase()+"?gift="+n+"."+id+"."+giftSig(n,id);
+    g("gout").innerHTML="<textarea class='linkbox' id='glk' rows='3' readonly></textarea><button class='ghost' id='gcp' style='width:100%;margin-top:8px;flex:none'>Copy link</button>";
+    g("glk").value=url;
+    g("gcp").onclick=function(){var t=g("glk");t.focus();t.select();var ok=false;try{ok=document.execCommand("copy")}catch(e){}
+      if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(url).then(function(){g("gcp").textContent="Copied"},function(){g("gcp").textContent=ok?"Copied":"Press and hold to copy"})}else g("gcp").textContent=ok?"Copied":"Press and hold to copy"}}}
+function devGiftShow(){
+  var gf=window.__rqGift;if(!gf)return;window.__rqGift=null;
+  var A=LANG==="ar",n=gf[0],id=gf[1],used=load("rq-gifts",[]);if(!Array.isArray(used))used=[];
+  if(n<1||n>20||giftSig(n,id)!==gf[2])return;
+  if(used.indexOf(id)>=0){popup({title:A?"استُخدمت هذه الهدية":"Gift already claimed",body:A?"استلمت هذه الهدية من قبل على هذا الجهاز.":"This gift link has already been used on this device.",btn:A?"حسناً":"OK"});return}
+  popup({title:A?"هدية لك":"A gift for you",body:A?"وصلتك "+faD(n)+(n===1?" عملة":" عملات")+" من عملات السلسلة. كل عملة تفتح جولة إضافية بثلاثة أسئلة جديدة.":"You got "+n+" streak coin"+(n===1?"":"s")+". Each one unlocks a bonus round of three fresh questions.",btn:A?"استلم":"Claim",
+    done:function(){var u=load("rq-gifts",[]);if(!Array.isArray(u))u=[];if(u.indexOf(id)<0){u.push(id);save("rq-gifts",u.slice(-50));var c=coinsGet();c.n=Math.min(99,c.n+n);coinsSet(c)}if(!intro&&st.g.length>=3&&!st.r)render()}})}
 function explainCoins(){
   var A=LANG==="ar",left=STREAK_COIN_EVERY-(stats.streak%STREAK_COIN_EVERY);
   popup({title:A?"كيف تعمل عملات السلسلة":"How streak coins work",
@@ -2207,7 +2259,7 @@ document.getElementById("menu").onclick=function(){var d=new Date(day*864e5);cm=
 document.getElementById("lang").onclick=toggleLang;
 document.querySelector(".wordmark").onclick=function(){selectDay(today);intro=true;render();window.scrollTo(0,0)};
 document.addEventListener("visibilitychange",function(){if(!document.hidden&&dayNum()!==day){init();streak();render()}});
-applyLang();init();streak();render();setTimeout(giftShow,900);
+applyLang();init();streak();render();setTimeout(function(){devGiftShow();giftShow()},900);
 if(API&&acct().t)pullSync().then(function(c){if(c){streak();selectDay(day);if(!busy)render()}},function(){});
 /* Auto-update: if a newer build is published, reload once (heals stale browser cache). */
 (function(){var B=window.RQ_BUILD;if(!B)return;var KEY="rq-build-seen",last=0;
