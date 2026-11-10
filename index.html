@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <title>Roughly Qatar – Daily Estimation Game</title>
-<script>window.RQ_BUILD="2026-11-10.5";</script>
+<script>window.RQ_BUILD="2026-11-10.6";</script>
 <meta name="description" content="A fresh set of three how-many questions about Qatar every day. No exact answers — just reason your way close. What would you have guessed?">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Roughly">
@@ -590,7 +590,7 @@ body:not([data-view=land]) main{min-height:calc(100dvh - 76px);display:flex;flex
 .res .hcat svg{stroke:#fff}
 .rtop{display:grid;grid-template-columns:0.82fr 1.18fr;gap:10px;align-items:center;margin:4px 0 14px;background:none;box-shadow:none;padding:0;border-radius:0}
 .rsc{text-align:center}
-.rtop.nochart{grid-template-columns:1fr}
+.rtop.nochart{grid-template-columns:1fr;margin-top:30px}
 .bdate~.rtop .rsc{padding-top:38px}
 .revrow.nochart{grid-template-columns:1fr}
 .bdate{position:absolute;top:16px;right:16px;display:block;margin:0;padding:7px 12px;border-radius:12px;background:rgba(255,255,255,.22);color:#fff;font-weight:800;font-size:.82rem;letter-spacing:.2px;z-index:2}
@@ -1566,7 +1566,7 @@ function openMenu(){
 }
 /* ===== config, api, helpers ===== */
 var API=((document.querySelector("meta[name=roughly-api]")||{}).content||"").replace(/\/+$/,"");
-var MINN=30,MINCAL=6,viewTok=0,pendingSend=null,CD=null;
+var MINN=1,EARLY=30,MINCAL=6,viewTok=0,pendingSend=null,CD=null;
 function esc(t){return String(t).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]})}
 function acct(){try{return {t:localStorage.getItem("rq-tok")||"",e:localStorage.getItem("rq-email")||""}}catch(x){return {t:"",e:""}}}
 function setAcct(t,e){try{if(t){localStorage.setItem("rq-tok",t);localStorage.setItem("rq-email",e)}else{localStorage.removeItem("rq-tok");localStorage.removeItem("rq-email")}}catch(x){}}
@@ -1595,8 +1595,9 @@ function chartInner(kind){
   if(kind==="q"&&D.n>0){
     var po=Math.round(100*(D.over||0)/D.n),pu=Math.round(100*(D.under||0)/D.n);
     ov="<p class='ovl'>"+(AR?(Math.max(po,pu)<50?"اللاعبون انقسموا على هذا.":po>=pu?po+"٪ من اللاعبين خمّنوا أعلى من اللازم.":pu+"٪ من اللاعبين خمّنوا أقل من اللازم."):(Math.max(po,pu)<50?"Players were split on this one.":po>=pu?po+"% of players guessed too high.":pu+"% of players guessed too low."))+"</p>"}
-  return "<div class='graph'>"+graph()+"</div><div class='pct'><span>"+tr("Better than")+"</span><b><span id='pn'>"+faD(0)+"</span>"+(AR?"٪ من اللاعبين":"% of players")+"</b></div>"+ov+
-    ("<p class='note'>"+(AR?"بناءً على "+D.n.toLocaleString("ar-EG")+" لاعب جاوبوا "+(kind==="q"?"على هذا السؤال":"أسئلة اليوم الثلاثة")+".":"Based on "+D.n.toLocaleString("en-US")+" players who answered "+(kind==="q"?"this question":"today’s three")+".")+"</p>")}
+  var tiny=D.n<5;
+  return "<div class='graph'>"+graph()+"</div>"+(tiny?"":"<div class='pct'><span>"+tr("Better than")+"</span><b><span id='pn'>"+faD(0)+"</span>"+(AR?"٪ من اللاعبين":"% of players")+"</b></div>")+ov+
+    ("<p class='note'>"+(D.n<EARLY?(AR?"أرقام مبكرة. ":"Early numbers. "):"")+(AR?"بناءً على "+D.n.toLocaleString("ar-EG")+" لاعب جاوبوا "+(kind==="q"?"على هذا السؤال":"أسئلة اليوم الثلاثة")+".":"Based on "+D.n.toLocaleString("en-US")+" players who answered "+(kind==="q"?"this question":"today’s three")+".")+"</p>")}
 function chartSlot(kind){
   var A=LANG==="ar";
   return "<div id='cbox' class='gbox'><p class='note'>"+(A?"جارٍ تحميل نتائج اللاعبين الآخرين…":"Loading how other players did…")+"</p></div>"}
@@ -1613,10 +1614,10 @@ function chartLater(kind,qi,s,tok){
     if(tok!==viewTok)return;
     var box=document.getElementById("cbox");if(!box)return;
     var n=o?o.n:0,A=LANG==="ar";
-    if(!o||n<MINN){noChart(box);box.innerHTML="<p class='note'>"+(A?"تظهر المقارنة مع اللاعبين الآخرين عندما يجاوب "+faD(MINN)+" لاعباً"+(n?" ("+faD(n)+" حتى الآن)":"")+". أنت من الأوائل.":"Comparison with other players unlocks once "+MINN+" people have answered"+(n?" ("+n+" so far)":"")+". You’re early.")+"</p>";return}
+    if(!o||n<MINN){box.innerHTML="<p class='note'>"+(A?"تظهر المقارنة مع اللاعبين الآخرين عندما يجاوب "+faD(MINN)+" لاعباً"+(n?" ("+faD(n)+" حتى الآن)":"")+". أنت من الأوائل.":"Comparison with other players unlocks once "+MINN+" people have answered"+(n?" ("+n+" so far)":"")+". You’re early.")+"</p>";return}
     CD={bins:o.dist,n:n,over:o.over||0,under:o.under||0};
     var pc=pctile(s);box.innerHTML=chartInner(kind);
-    if(kind==="day"){var pl=document.getElementById("pill");if(pl){pl.textContent=LANG==="ar"?"أفضل "+faD(100-pc)+"٪":"Top "+(100-pc)+"%";pl.style.display=""}}
+    if(kind==="day"){var pl=document.getElementById("pill");if(pl&&n>=5){pl.textContent=LANG==="ar"?"أفضل "+faD(100-pc)+"٪":"Top "+(100-pc)+"%";pl.style.display=""}}
     animate(s,pc,"graph")
   }).catch(function(e){
     if(tok!==viewTok)return;var b=document.getElementById("cbox");if(!b)return;
@@ -1830,9 +1831,8 @@ function openGroupJoin(prefill){var AR=LANG==="ar",g=function(i){return document
     window.RQGroups.joinGroup(id,yn).then(function(r){openGroup(r.id)},function(e){g("ge").textContent=(e&&e.message)||"Couldn’t join";g("gok").disabled=false})};
   setTimeout(function(){try{g("gjc").focus()}catch(e){}},300);
 }
-function openGroup(id){var AR=LANG==="ar";
-  sheetShell(AR?"المجموعة":"Group","<div id='gbox'><p class='note'>"+(AR?"جارٍ التحميل…":"Loading…")+"</p></div>");
-  Promise.race([window.RQGroups.board(id),new Promise(function(_,rej){setTimeout(function(){rej(new Error("__slow__"))},7000)})]).then(function(b){
+function openGroup(id,cb){var AR=LANG==="ar";
+  function paint(b){
     var box=document.getElementById("gbox");if(!box)return;
     var u=window.RQGroups.user(),anon=u&&u.anon;
     var mode="total";try{mode=localStorage.getItem("rq-gmode")||"total"}catch(e){}if(mode!=="avg"&&mode!=="var")mode="total";
@@ -1853,7 +1853,7 @@ function openGroup(id){var AR=LANG==="ar";
       (anon?"<button class='ghost gsave' id='glink' style='width:100%;margin-top:10px'>"+(AR?"سجّل بجوجل لحفظ مكانك":"Sign in with Google to save your spot")+"</button>":"")+
       "<div class='shg' style='grid-template-columns:1fr 1fr;margin-top:10px'><button class='shl' id='gback'>"+(AR?"كل المجموعات":"All groups")+"</button><button class='shl' id='gleave'>"+(AR?"غادر":"Leave")+"</button></div>";
     document.getElementById("ginv").onclick=function(){openInvite(id,b.name)};
-    Array.prototype.forEach.call(box.querySelectorAll("[data-gm]"),function(bt){bt.onclick=function(){try{localStorage.setItem("rq-gmode",bt.getAttribute("data-gm"))}catch(e){}openGroup(id)}});
+    Array.prototype.forEach.call(box.querySelectorAll("[data-gm]"),function(bt){bt.onclick=function(){try{localStorage.setItem("rq-gmode",bt.getAttribute("data-gm"))}catch(e){}openGroup(id,b)}});
     document.getElementById("gback").onclick=openGroups;
     var glv=document.getElementById("gleave"),glt=null;
     glv.onclick=function(){
@@ -1861,7 +1861,10 @@ function openGroup(id){var AR=LANG==="ar";
         glt=setTimeout(function(){glv.classList.remove("arm");glv.textContent=AR?"غادر":"Leave"},3500);return}
       clearTimeout(glt);glv.disabled=true;window.RQGroups.leaveGroup(id).then(openGroups,openGroups)};
     var gl=document.getElementById("glink");if(gl)gl.onclick=function(){gl.disabled=true;window.RQGroups.linkGoogle().then(function(){openGroup(id)},function(e){gl.disabled=false;gl.textContent=(e&&e.message)||(AR?"تعذّر تسجيل الدخول":"Sign-in failed")})};
-  },function(e){var box=document.getElementById("gbox");if(!box)return;var slow=e&&e.message==="__slow__";box.innerHTML="<p class='"+(slow?"note":"err")+"' style='text-align:center'>"+(slow?(AR?"يستغرق وقتاً أطول من المعتاد. تحقّق من اتصالك.":"Taking longer than usual. Check your connection."):esc((e&&e.message)||"Couldn’t load the group"))+"</p><button class='main' id='gretry'>"+(AR?"إعادة المحاولة":"Retry")+"</button><button class='ghost' id='gbk2' style='width:100%;margin-top:10px'>"+(AR?"رجوع":"Back")+"</button>";document.getElementById("gretry").onclick=function(){openGroup(id)};document.getElementById("gbk2").onclick=openGroups});
+  }
+  if(cb){paint(cb);return}
+  sheetShell(AR?"المجموعة":"Group","<div id='gbox'><p class='note'>"+(AR?"جارٍ التحميل…":"Loading…")+"</p></div>");
+  Promise.race([window.RQGroups.board(id),new Promise(function(_,rej){setTimeout(function(){rej(new Error("__slow__"))},7000)})]).then(paint,function(e){var box=document.getElementById("gbox");if(!box)return;var slow=e&&e.message==="__slow__";box.innerHTML="<p class='"+(slow?"note":"err")+"' style='text-align:center'>"+(slow?(AR?"يستغرق وقتاً أطول من المعتاد. تحقّق من اتصالك.":"Taking longer than usual. Check your connection."):esc((e&&e.message)||"Couldn’t load the group"))+"</p><button class='main' id='gretry'>"+(AR?"إعادة المحاولة":"Retry")+"</button><button class='ghost' id='gbk2' style='width:100%;margin-top:10px'>"+(AR?"رجوع":"Back")+"</button>";document.getElementById("gretry").onclick=function(){openGroup(id)};document.getElementById("gbk2").onclick=openGroups});
 }
 function openInvite(id,name){var AR=LANG==="ar",e=encodeURIComponent,g=function(i){return document.getElementById(i)};
   var link="https://"+SITE+"?g="+id;

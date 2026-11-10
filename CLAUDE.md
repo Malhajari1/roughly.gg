@@ -88,3 +88,7 @@ No test suite in the repo. Previously verified with jsdom smoke tests and Playwr
 - The results/reveal chart container id is `cbox` (was `gbox`, which collided with the Groups board `gbox` and made group scores render inside the score card). Never reuse `gbox` for charts.
 - Bonus games fetch stats for their source drop (`st.bd`), so the reveal curve and results chart work in bonus mode.
 - `.bdate` ("9 Nov drop") is absolutely positioned top-right of the score card; `.rtop.nochart` / `.revrow.nochart` collapse to one column when there is no chart data.
+
+## Graphs show early data, smooth group toggle (10 Nov 2026)
+- `MINN=1`: the chart shows as soon as one real player answered. Under `EARLY=30` players the note starts "Early numbers."; under 5 players the "Better than X%" line and "Top X%" pill are hidden (a percentile of 2 people is meaningless). With zero answers a visible "unlocks" note shows (not hidden).
+- `openGroup(id,cb)`: toggling Total / Average / vs group repaints from the already-loaded board (`cb`) with no reload, no "Loading" flash.
