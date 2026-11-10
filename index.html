@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <title>Roughly Qatar – Daily Estimation Game</title>
-<script>window.RQ_BUILD="2026-11-10.15";</script>
+<script>window.RQ_BUILD="2026-11-10.17";</script>
 <meta name="description" content="A fresh set of three how-many questions about Qatar every day. No exact answers — just reason your way close. What would you have guessed?">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Roughly">
@@ -1587,6 +1587,27 @@ function openMenu(){
 }
 /* ===== config, api, helpers ===== */
 var API=((document.querySelector("meta[name=roughly-api]")||{}).content||"").replace(/\/+$/,"");
+/* Sample answers (DEMO_FILL): fake players topped up per question and per day so the graphs have something to show.
+   They are drawn in yellow and labelled "Sample data". Real answers always show and replace samples one for one.
+   Set DEMO_FILL=false to remove all of it. */
+var DEMO_FILL=true,DEMO_Q=140,DEMO_D=160;
+function rng(seed){var a=seed>>>0;return function(){a=a+0x6D2B79F5>>>0;var t=a;t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return((t^t>>>14)>>>0)/4294967296}}
+function gs(r){var u=1-r(),v=r();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v)}
+function scoreOf(r){return Math.max(1,Math.round(100/(1+r*r/0.36)))}
+function qBias(qi){return((qi*37+11)%100-50)/100*0.5}
+function demoQ(dd,qi,k){var r=rng(dd*7919+qi*104729+13),out=[],i,x;for(i=0;i<DEMO_Q+((qi*53+dd)%60);i++){x=qBias(qi)+gs(r)*0.32;if(r()<0.04)x+=(r()<.5?-1:1)*(0.8+r()*0.7);out.push(Math.round(x*100)/100)}return out.slice(0,k)}
+function demoDay(dd,ii,k){var r=rng(dd*6151+99),bins=new Array(20).fill(0),u,j,a,p;for(u=0;u<k;u++){p=gs(r)*0.15;a=0;for(j=0;j<ii.length;j++)a+=scoreOf(qBias(ii[j])+p+gs(r)*0.28);a=Math.round(a/ii.length);bins[Math.min(19,Math.floor(a/5))]++}return bins}
+function mixStats(kind,qi,dd,ii,real){
+  if(!DEMO_FILL)return real;
+  var rn=real&&real.n?real.n:0,i,dist=new Array(20).fill(0);
+  if(kind==="q"){
+    var fs=demoQ(dd,qi,Math.max(0,DEMO_Q+((qi*53+dd)%60)-rn)),rs=(real&&real.rs)||[],over=real?real.over||0:0,under=real?real.under||0:0;
+    for(i=0;i<fs.length;i++){dist[Math.min(19,Math.floor(scoreOf(fs[i])/5))]++;if(fs[i]>0.05)over++;else if(fs[i]<-0.05)under++}
+    if(real&&real.dist)for(i=0;i<20;i++)dist[i]+=real.dist[i]||0;
+    return {n:rn+fs.length,dist:dist,over:over,under:under,rs:rs,fs:fs}}
+  var k=Math.max(0,DEMO_D-rn),fb=demoDay(dd,ii,k);
+  for(i=0;i<20;i++)dist[i]=fb[i]+(real&&real.dist?real.dist[i]||0:0);
+  return {n:rn+k,dist:dist,fk:k,fb:fb}}
 var MINN=1,EARLY=30,MINCAL=6,viewTok=0,pendingSend=null,CD=null;
 function esc(t){return String(t).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]})}
 function acct(){try{return {t:localStorage.getItem("rq-tok")||"",e:localStorage.getItem("rq-email")||""}}catch(x){return {t:"",e:""}}}
@@ -1618,7 +1639,7 @@ function chartInner(kind){
     ov="<p class='ovl'>"+(AR?(Math.max(po,pu)<50?"اللاعبون انقسموا على هذا.":po>=pu?po+"٪ من اللاعبين خمّنوا أعلى من اللازم.":pu+"٪ من اللاعبين خمّنوا أقل من اللازم."):(Math.max(po,pu)<50?"Players were split on this one.":po>=pu?po+"% of players guessed too high.":pu+"% of players guessed too low."))+"</p>"}
   var tiny=D.n<5;
   return "<div class='graph'>"+graph()+"</div>"+(tiny?"":"<div class='pct'><span>"+tr("Better than")+"</span><b><span id='pn'>"+faD(0)+"</span>"+(AR?"٪ من اللاعبين":"% of players")+"</b></div>")+ov+
-    ("<p class='note'>"+(D.n<EARLY?(AR?"أرقام مبكرة. ":"Early numbers. "):"")+(AR?"بناءً على "+D.n.toLocaleString("ar-EG")+" لاعب جاوبوا "+(kind==="q"?"على هذا السؤال":"أسئلة اليوم الثلاثة")+".":"Based on "+D.n.toLocaleString("en-US")+" players who answered "+(kind==="q"?"this question":"today’s three")+".")+"</p>")}
+    ("<p class='note'>"+(D.n<EARLY?(AR?"أرقام مبكرة. ":"Early numbers. "):"")+(AR?"بناءً على "+D.n.toLocaleString("ar-EG")+" لاعب جاوبوا "+(kind==="q"?"على هذا السؤال":"أسئلة اليوم الثلاثة")+"."+(D.fk?" تتضمن "+faD(D.fk)+" إجابة تجريبية، بالأصفر.":""):"Based on "+D.n.toLocaleString("en-US")+" players who answered "+(kind==="q"?"this question":"today’s three")+"."+(D.fk?" Includes "+D.fk+" sample answers, shown in yellow.":""))+"</p>")}
 function chartSlot(kind){
   var A=LANG==="ar";
   return "<div id='cbox' class='gbox'><p class='note'>"+(A?"جارٍ تحميل نتائج اللاعبين الآخرين…":"Loading how other players did…")+"</p></div>"}
@@ -1631,13 +1652,14 @@ function qNote(box,msg){if(box)box.innerHTML=qSlot(msg).replace(/^<div id='cbox'
 function teleReady(){return new Promise(function(res){var t=0;(function w(){if(window.RQGroups){res(!!window.RQGroups.enabled&&!!window.RQGroups.qStats);return}if(t++>20){res(false);return}setTimeout(w,150)})()})}
 function fetchStats(kind,qi){
   var dd=bonus&&st.bd?st.bd:day,ii=ids.slice();
-  if(API)return Promise.resolve(pendingSend).then(function(){return getStats(dd)}).then(function(S){return kind==="q"?(S.q&&S.q[qi]):S.avg});
-  return teleReady().then(function(ok){if(!ok)throw new Error("off");return Promise.resolve(pendingSend).then(function(){return kind==="q"?window.RQGroups.qStats(dd,qi):window.RQGroups.dayStats(dd,ii)})})}
+  var mix=function(r){return mixStats(kind,qi,dd,ii,r)},bad=function(e){if(DEMO_FILL)return mixStats(kind,qi,dd,ii,null);throw e};
+  if(API)return Promise.resolve(pendingSend).then(function(){return getStats(dd)}).then(function(S){return mix(kind==="q"?(S.q&&S.q[qi]):S.avg)},bad);
+  return teleReady().then(function(ok){if(!ok)throw new Error("off");return Promise.resolve(pendingSend).then(function(){return kind==="q"?window.RQGroups.qStats(dd,qi):window.RQGroups.dayStats(dd,ii)})}).then(mix,bad)}
 function noChart(box){var g=box&&box.parentNode;if(!g)return;g.style.display="none";var r=g.parentNode;if(r&&r.classList&&(r.classList.contains("rtop")||r.classList.contains("revrow")))r.classList.add("nochart")}
 var dgRaf=0;
 function drawGuessGraph(box,o,qi){
-  var i=ids.indexOf(qi),q=Q[qi],g=i>=0?st.g[i]:0;if(!q||!(g>0)||!o.rs||!o.rs.length)return false;
-  var A=LANG==="ar",E=q.m,f=unitOf(q,i)[1],N=31,k,m,rs=o.rs.slice().sort(function(a,b){return a-b}),n=rs.length;
+  var i=ids.indexOf(qi),q=Q[qi],g=i>=0?st.g[i]:0;if(!q||!(g>0)||!((o.rs&&o.rs.length)||(o.fs&&o.fs.length)))return false;
+  var A=LANG==="ar",E=q.m,f=unitOf(q,i)[1],N=31,k,m,real=o.rs||[],fk=o.fs||[],rs=real.concat(fk).sort(function(a,b){return a-b}),n=rs.length;
   function pc(p){return rs[Math.min(n-1,Math.max(0,Math.round(p*(n-1))))]}
   /* axis fits the data: players' middle 96%, the correct answer, and a little padding */
   var hf=Math.max(Math.abs(pc(.02)),Math.abs(pc(.98)),.3);hf*=1.06;
@@ -1649,8 +1671,10 @@ function drawGuessGraph(box,o,qi){
   var row=box.parentNode&&box.parentNode.parentNode;if(row&&row.classList)row.classList.add("dg");
   var r=Math.max(g/E,E/g),hiG=g>E,txt;
   if(r<1.03)txt=tr("Spot on");else{var amt=r<2?faD(Math.round(Math.abs(g/E-1)*100))+(A?"٪":"%"):faD(r>=10?Math.round(r):(Math.round(r*10)/10))+"×";txt=amt+(A?(hiG?" أعلى من اللازم":" أقل من اللازم"):(hiG?" too high":" too low"))}
-  var cnt=[],H=[],bars="",mx=1;for(k=0;k<N;k++)cnt.push(0);
-  for(k=0;k<n;k++)cnt[Math.max(0,Math.min(N-1,Math.floor((rs[k]-lo)/W*N)))]++;
+  var cnt=[],cf=[],H=[],bars="",mx=1;for(k=0;k<N;k++){cnt.push(0);cf.push(0)}
+  for(k=0;k<real.length;k++)cnt[Math.max(0,Math.min(N-1,Math.floor((real[k]-lo)/W*N)))]++;
+  for(k=0;k<fk.length;k++)cf[Math.max(0,Math.min(N-1,Math.floor((fk[k]-lo)/W*N)))]++;
+  for(k=0;k<N;k++)cnt[k]+=cf[k];
   for(k=0;k<N;k++)if(cnt[k]>mx)mx=cnt[k];
   for(k=0;k<N;k++){H.push(cnt[k]?3+68*cnt[k]/mx:0);bars+="<i></i>"}
   var kz=Math.max(0,Math.min(N-1,Math.floor((0-lo)/W*N)));
@@ -1663,9 +1687,10 @@ function drawGuessGraph(box,o,qi){
   box.className="gbox";
   box.innerHTML="<div class='dgw'><div class='dgp'><div class='dgb'>"+bars+"</div><div class='dgs' style='left:"+pos+"%'></div><div class='dgt' style='left:"+zp+"%'>"+(A?"الإجابة الصحيحة":"Correct answer")+"</div><div class='dgd' style='left:"+pos+"%'>"+tr("You")+"</div>"+"</div>"+
    "<div class='dga'>"+tk+"</div>"+
-   "<div class='dgk'><span><b style='background:#4ade80'></b>"+(A?"الإجابة الصحيحة":"Correct answer")+"</span><span><b style='background:#fff'></b>"+(A?"أنت، ":"You, ")+short(g/f)+(A?" (":" (")+txt+(clamped?(A?"، خارج الرسم":", off the chart"):"")+")</span></div></div>";
+   "<div class='dgk'><span><b style='background:#4ade80'></b>"+(A?"الإجابة الصحيحة":"Correct answer")+"</span><span><b style='background:#fff'></b>"+(A?"أنت، ":"You, ")+short(g/f)+(A?" (":" (")+txt+(clamped?(A?"، خارج الرسم":", off the chart"):"")+")</span>"+(fk.length?"<span><b style='background:#ffd84d'></b>"+(A?"بيانات تجريبية":"Sample data")+"</span>":"")+"</div></div>";
   var bs=box.querySelectorAll(".dgb i"),L=box.querySelector(".dgs"),T=box.querySelector(".dgt"),Y=box.querySelector(".dgd");
   bs[kz].style.background="#4ade80";
+  for(k=0;k<N;k++)if(cf[k]&&k!==kz){var sh=Math.round(100*cf[k]/cnt[k]);bs[k].style.background="linear-gradient(to top,#ffd84d 0,#ffd84d "+sh+"%,rgba(255,255,255,.34) "+sh+"%)"}
   function out(p){return 1-Math.pow(1-p,3)}function cl(v){return Math.max(0,Math.min(1,v))}
   function pop(p){return p<=0?0:p>=1?1:1+2.7*Math.pow(p-1,3)+1.7*Math.pow(p-1,2)}
   function frame(t){var j;for(j=0;j<N;j++)bs[j].style.height=(H[j]*out(cl((t-.05-j*.008)/.3))).toFixed(1)+"px";
@@ -1685,8 +1710,8 @@ function chartLater(kind,qi,s,tok,tries){tries=tries||0;
     var n=o?o.n:0,A=LANG==="ar";
     if((!o||n<MINN)&&tries<3){setTimeout(function(){if(tok===viewTok)chartLater(kind,qi,s,tok,tries+1)},2500*(tries+1));return}
     if(!o||n<MINN){if(kind==="q"){qNote(box,A?"تظهر المقارنة مع اللاعبين الآخرين عندما يجاوب "+faD(MINN)+" لاعباً. أنت من الأوائل.":"Comparison with other players unlocks once "+MINN+" people have answered. You’re early.");return}box.innerHTML="<p class='note'>"+(A?"تظهر المقارنة مع اللاعبين الآخرين عندما يجاوب "+faD(MINN)+" لاعباً"+(n?" ("+faD(n)+" حتى الآن)":"")+". أنت من الأوائل.":"Comparison with other players unlocks once "+MINN+" people have answered"+(n?" ("+n+" so far)":"")+". You’re early.")+"</p>";return}
-    if(kind==="q"&&o.rs&&drawGuessGraph(box,o,qi))return;
-    CD={bins:o.dist,n:n,over:o.over||0,under:o.under||0};
+    if(kind==="q"&&(o.rs||o.fs)&&drawGuessGraph(box,o,qi))return;
+    CD={bins:o.dist,n:n,over:o.over||0,under:o.under||0,fk:o.fk||0,fb:o.fb||null};
     var pc=pctile(s);box.innerHTML=chartInner(kind);
     if(kind==="day"){var pl=document.getElementById("pill");if(pl&&n>=5){pl.textContent=LANG==="ar"?"أفضل "+faD(100-pc)+"٪":"Top "+(100-pc)+"%";pl.style.display=""}}
     animate(s,pc,"graph")
@@ -2080,8 +2105,9 @@ function graph(){
   var p="",i,bars="",bw=(gx(5)-gx(0))-3,YM=ymax(),B=CD.bins;
   for(i=0;i<=100;i+=2)p+=(i?"L":"M")+gx(i).toFixed(1)+","+gy(i).toFixed(1);
   for(i=0;i<20;i++){var hh=82*B[i]/YM;bars+="<rect x='"+(gx(i*5)+1.5).toFixed(1)+"' y='"+(114-hh).toFixed(1)+"' width='"+bw.toFixed(1)+"' height='"+Math.max(.5,hh).toFixed(1)+"' rx='2.5'></rect>"}
+  var ys="";if(CD.fb)for(i=0;i<20;i++){var fh=82*CD.fb[i]/YM;if(fh>0)ys+="<rect x='"+(gx(i*5)+1.5).toFixed(1)+"' y='"+(114-fh).toFixed(1)+"' width='"+bw.toFixed(1)+"' height='"+Math.max(.5,fh).toFixed(1)+"' rx='2.5'></rect>"}
   return "<svg viewBox='0 0 300 146' role='img' aria-label='Score distribution with your position'><defs><clipPath id='cp'><rect id='cr' x='0' y='0' width='0' height='146'/></clipPath></defs>"+
-  "<g class='gbar' fill='#ecedf4'>"+bars+"</g><g class='gbar2' fill='#cdd5e3' clip-path='url(#cp)'>"+bars+"</g>"+
+  "<g class='gbar' fill='#ecedf4'>"+bars+"</g><g class='gbar2' fill='#cdd5e3' clip-path='url(#cp)'>"+bars+"</g><g fill='#ffd84d'>"+ys+"</g>"+
   "<path class='gcurve' d='"+p+"' fill='none' stroke='#aab2bf' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'/><line x1='14' y1='114' x2='284' y2='114' stroke='#e9e7ef'/>"+
   "<line id='dl' class='gyline' x1='14' x2='14' y1='114' y2='114' stroke='#2f6bff' stroke-width='2' stroke-dasharray='3 3'/><circle id='dt' class='gydot' cx='14' cy='114' r='8' fill='#2f6bff' stroke='#fff' stroke-width='3'/>"+
   "<text id='yt' class='gyt' x='14' y='14' text-anchor='middle' font-size='11' font-weight='800' fill='#2f6bff'>"+tr("You")+"</text>"+
