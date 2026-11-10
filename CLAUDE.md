@@ -99,3 +99,9 @@ No test suite in the repo. Previously verified with jsdom smoke tests and Playwr
 - Data: answers already store `r` = log10(guess / estimate). `RQGroups.qStats` and the node `stats()` now return `rb` (41 bins of `r` over +-1 decade, outliers clamped into the end bins; the correct-answer bin is index 20). Without `rb` (older backend) the old curve is used. The results-screen day graph is unchanged (score distribution).
 - Score is symmetric (20% high and 20% low both score 94) which is why the old graph put both at the same x. The new graph plots direction.
 - Live font is Plus Jakarta Sans (IBM Plex Sans Arabic for Arabic), not Fredoka.
+
+## Reveal graph is data-fitted (10 Nov 2026, build .11)
+- Supersedes the fixed 0.1x-10x axis above. `drawGuessGraph` now fits the axis to the players' answers: from the 2nd to the 98th percentile of `r` plus the correct answer (0), minimum span 0.6 decades, 6% padding, 30 bins. No long runs of empty bars. Ticks are round numbers (1/2/5 x 10^k) that fit, plus the green answer tick.
+- "You" is inside the axis when within a quarter-span of the data (axis grows slightly to include it); otherwise it sits on the edge and the legend says "off the chart". The green bar is always the bin containing the answer, drawn as a thin stub if nobody guessed there.
+- Data: `rs` = array of rounded `r` values per question (Firestore `qStats` and node `stats()`, capped at 5000). It replaces `rb`. Without `rs` the old score curve is used.
+- Tested with stand-in data in Playwright (tight, wide, 1-3 players, outliers, far-off guess, Arabic, 360/393/1280). Not yet seen with real Firestore answers.
