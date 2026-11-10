@@ -81,5 +81,22 @@ service cloud.firestore {
         allow delete: if false;
       }
     }
+
+    // Live player data for the score curve and "Top X%". One doc per player per question, created once, never edited.
+    //   answers/{day}__{qi}__{uid}  { uid, day, qi, s (score 1..100), r (log10 of guess/estimate) }
+    match /answers/{aid} {
+      allow read: if signedIn();
+      allow create: if signedIn()
+        && request.resource.data.keys().hasOnly(['uid','day','qi','s','r'])
+        && request.resource.data.uid == me()
+        && request.resource.data.day is int
+        && request.resource.data.day >= math.floor(request.time.toMillis() / 86400000) - 1
+        && request.resource.data.day <= math.floor(request.time.toMillis() / 86400000) + 1
+        && request.resource.data.qi is int && request.resource.data.qi >= 0 && request.resource.data.qi < 5000
+        && aid == string(request.resource.data.day) + '__' + string(request.resource.data.qi) + '__' + me()
+        && request.resource.data.s is int && request.resource.data.s >= 1 && request.resource.data.s <= 100
+        && request.resource.data.r is number && request.resource.data.r >= -6 && request.resource.data.r <= 6;
+      allow update, delete: if false;
+    }
   }
 }

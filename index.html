@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <title>Roughly Qatar – Daily Estimation Game</title>
-<script>window.RQ_BUILD="2026-11-10.2";</script>
+<script>window.RQ_BUILD="2026-11-10.3";</script>
 <meta name="description" content="A fresh set of three how-many questions about Qatar every day. No exact answers — just reason your way close. What would you have guessed?">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Roughly">
@@ -137,6 +137,7 @@ button.main svg{width:18px;height:18px;stroke:#fff;fill:none;stroke-width:2.4;st
 .spendb{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;border:0;border-radius:22px;padding:17px 20px;margin-top:12px;font:inherit;font-weight:800;font-size:1.05rem;text-align:start;color:#fff;cursor:pointer;background:linear-gradient(135deg,#ff4d6d,#e11d48);box-shadow:0 16px 32px -14px rgba(225,29,72,.7);animation:vib 3s ease-in-out infinite}
 .spendb small{flex:none;background:rgba(255,255,255,.24);border-radius:12px;padding:3px 10px;font-size:.8rem;font-weight:700}
 .spendb:active{transform:scale(.98)}
+.bdate{display:inline-block;background:rgba(255,255,255,.22);border-radius:14px;padding:8px 14px;margin:0 0 10px;font-weight:800;font-size:1rem;color:#fff}
 .cback{display:block;width:100%;margin-top:12px;padding:14px;border:2px solid rgba(47,107,255,.35);border-radius:18px;background:#fff;color:var(--c,#2f6bff);font:inherit;font-weight:700;cursor:pointer}
 @keyframes vib{0%,60%,100%{transform:none}64%{transform:translateX(-4px) rotate(-1deg)}68%{transform:translateX(4px) rotate(1deg)}72%{transform:translateX(-4px) rotate(-1deg)}76%{transform:translateX(4px) rotate(1deg)}80%{transform:translateX(-3px)}84%{transform:translateX(3px)}88%{transform:none}}
 @media (prefers-reduced-motion:reduce){.spendb{animation:none}}
@@ -727,7 +728,12 @@ body.fit main{justify-content:center}
 .lbr:last-child{border-bottom:0}
 .lbr .rk{width:22px;text-align:center;font-weight:800;color:var(--mut)}
 .lbr .nm{flex:1;min-width:0;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.lbr .pts{font-weight:800;color:var(--mar)}
+.lbr .pts{font-weight:800;color:var(--mar);width:72px;text-align:end;flex:none}
+.lbr .td{width:48px;text-align:center;font-weight:700;color:var(--mut);flex:none}
+.lbr.lbh{border-bottom:2px solid var(--line);padding-bottom:6px}.lbr.lbh .td,.lbr.lbh .pts{font-size:.68rem;letter-spacing:.8px;text-transform:uppercase;font-weight:800;color:var(--mut)}
+.lbm{display:flex;gap:4px;background:var(--tint);border-radius:14px;padding:4px;margin:12px 0 0}
+.lbm button{flex:1;border:0;border-radius:10px;padding:9px 4px;background:transparent;font:inherit;font-weight:700;font-size:.82rem;color:var(--mut);cursor:pointer}
+.lbm button.on{background:#fff;color:var(--mar);box-shadow:0 2px 8px rgba(0,0,0,.08)}
 .lbr.me{background:var(--tint);border-radius:12px;border-bottom:0}
 .lbr.me .rk,.lbr.me .nm{color:var(--mar)}
 .gsave{color:var(--mar)}
@@ -1315,13 +1321,23 @@ function pickBonus(n){
   if(o.length<2)o=o.concat(sh(O.filter(function(i){return o.indexOf(i)<0})));
   if(!h.length)h=sh(H);
   return [o[0],o[1],h[0]]}
+function bonusDrop(){
+  var seen=seenIds(),used={},now={},i,k,x,d,p,ids2,strict,ok;
+  loadState(today).ids.forEach(function(q){now[q]=1});
+  try{for(i=0;i<localStorage.length;i++){k=localStorage.key(i)||"";if(/^tk8-b/.test(k)){x=load(k,null);if(x&&x.bd)used[x.bd]=1}}}catch(e){}
+  for(p=0;p<2;p++){strict=p===0;
+    for(d=today-1;d>=START;d--){
+      if(used[d])continue;x=load("tk8-s"+d,null);if(x&&x.day===d&&Array.isArray(x.g)&&x.g.length)continue;
+      ids2=pick(d);ok=true;ids2.forEach(function(q){if(now[q]||(strict&&seen[q]))ok=false});
+      if(ok)return {d:d,ids:ids2}}}
+  return null}
 function dailyDone(){var x=load("tk8-s"+today,null);return !!(x&&x.day===today&&Array.isArray(x.g)&&x.g.length>=3&&!x.r)}
 function bonusOpen(){return !!(bonus&&(st.g.length<3||st.r))}
 function spendCoin(){
   var c=coinsGet(),n=0;if(c.n<1||!dailyDone()||bonusOpen())return false;
   try{while(localStorage.getItem("tk8-b"+today+"-"+n)!==null)n++}catch(e){}
   c.n--;coinsSet(c);
-  var x={day:today,b:n,ids:pickBonus(n),g:[],s:[],un:[],r:false,hu:[0,0,0],nt:["","",""]};
+  var bd=bonusDrop(),x={day:today,b:n,bd:bd?bd.d:0,ids:bd?bd.ids:pickBonus(n),g:[],s:[],un:[],r:false,hu:[0,0,0],nt:["","",""]};
   save("tk8-b"+today+"-"+n,x);saveActive({d:today,n:n});
   bonus={n:n};st=x;ids=x.ids;intro=false;streak();render();window.scrollTo(0,0);return true}
 function exitBonus(){bonus=null;saveActive(null);selectDay(today);intro=false;render();window.scrollTo(0,0)}
@@ -1365,8 +1381,6 @@ function times(x){return x<10?(Math.round(x*10)/10):Math.round(x)}
 function verdict(g,q){var x=ratio(g,q);if(x<=1.05)return tr("Spot on");var hi=g>q.m;return faD(times(x))+"× "+(LANG==="ar"?(hi?"أعلى":"أقل"):"too "+(hi?"high":"low"))}
 function vClass(g,q,s){return (g>=q.lo&&g<=q.hi)||s>=80?"good":s>=40?"mid":"bad"}
 function erf(x){var s=x<0?-1:1;x=Math.abs(x);var t=1/(1+.3275911*x);return s*(1-(((((1.061405429*t-1.453152027)*t)+1.421413741)*t-.284496736)*t+.254829592)*t*Math.exp(-x*x))}
-var DEMO=[3,6,11,19,30,44,60,76,89,97,97,89,76,60,44,30,19,11,6,3],DEMO_N=DEMO.reduce(function(a,b){return a+b},0);
-function demoDist(){return {bins:DEMO,n:DEMO_N,demo:true}}
 function binSum(b){return b.reduce(function(a,c){return a+c},0)}
 function pctile(s){var B=CD.bins,N=binSum(B)||1,i=Math.max(0,Math.min(19,Math.floor(s/5))),f=Math.min(1,(s-i*5)/5),c=0,k;for(k=0;k<i;k++)c+=B[k];c+=B[i]*f;return Math.max(1,Math.min(99,Math.round(100*c/N)))}
 function dens(s){var B=CD.bins,a=0,b=0,i,w;for(i=0;i<20;i++){w=Math.exp(-Math.pow((s-(i*5+2.5))/7,2)/2);a+=w*B[i];b+=w}return a/b}
@@ -1565,8 +1579,9 @@ function api(path,o){
   return fetch(API+path,{method:o.method||"GET",headers:h,body:o.body?JSON.stringify(o.body):undefined,signal:ctl?ctl.signal:undefined}).then(function(r){
     clearTimeout(t);return r.json().then(function(j){if(!r.ok)throw new Error((j&&j.error)||"Something went wrong");return j})},function(){clearTimeout(t);throw new Error("Couldn’t reach the server")})}
 function sendAnswer(i){
-  if(!API||bonus)return Promise.resolve();
-  var q=Q[ids[i]];
+  if(bonus)return Promise.resolve();
+  var q=Q[ids[i]],r0=Math.round(L(st.g[i]/q.m)*1000)/1000;
+  if(!API){if(day!==today)return Promise.resolve();return teleReady().then(function(ok){return ok?window.RQGroups.submitAnswer(day,ids[i],st.s[i],r0):false}).catch(function(){})}
   return api("/answer",{method:"POST",body:{pid:pid(),day:day,qi:ids[i],r:Math.round(L(st.g[i]/q.m)*1000)/1000,s:st.s[i]}}).catch(function(){})}
 function getStats(d){return api("/stats?day="+d)}
 
@@ -1574,29 +1589,35 @@ function getStats(d){return api("/stats?day="+d)}
 function chartInner(kind){
   var D=CD,ov="";
   var AR=LANG==="ar";
-  if(kind==="q"&&!D.demo&&D.n>0){
+  if(kind==="q"&&D.n>0){
     var po=Math.round(100*(D.over||0)/D.n),pu=Math.round(100*(D.under||0)/D.n);
     ov="<p class='ovl'>"+(AR?(Math.max(po,pu)<50?"اللاعبون انقسموا على هذا.":po>=pu?po+"٪ من اللاعبين خمّنوا أعلى من اللازم.":pu+"٪ من اللاعبين خمّنوا أقل من اللازم."):(Math.max(po,pu)<50?"Players were split on this one.":po>=pu?po+"% of players guessed too high.":pu+"% of players guessed too low."))+"</p>"}
   return "<div class='graph'>"+graph()+"</div><div class='pct'><span>"+tr("Better than")+"</span><b><span id='pn'>"+faD(0)+"</span>"+(AR?"٪ من اللاعبين":"% of players")+"</b></div>"+ov+
-    (D.demo?"":"<p class='note'>"+(AR?"بناءً على "+D.n.toLocaleString("ar-EG")+" لاعب جاوبوا "+(kind==="q"?"على هذا السؤال":"أسئلة اليوم الثلاثة")+".":"Based on "+D.n.toLocaleString("en-US")+" players who answered "+(kind==="q"?"this question":"today’s three")+".")+"</p>")}
+    ("<p class='note'>"+(AR?"بناءً على "+D.n.toLocaleString("ar-EG")+" لاعب جاوبوا "+(kind==="q"?"على هذا السؤال":"أسئلة اليوم الثلاثة")+".":"Based on "+D.n.toLocaleString("en-US")+" players who answered "+(kind==="q"?"this question":"today’s three")+".")+"</p>")}
 function chartSlot(kind){
-  if(bonus&&API)return "<p class='note'>"+(LANG==="ar"?"الجولات الإضافية لا تُقارن بلاعبين آخرين.":"Bonus games aren’t compared with other players.")+"</p>";
-  if(!API){CD=demoDist();return chartInner(kind)}
-  return "<div id='gbox' class='gbox'><p class='note'>Loading how other players did…</p></div>"}
+  var A=LANG==="ar";
+  if(bonus)return "<p class='note'>"+(A?"الجولات الإضافية لا تُقارن بلاعبين آخرين.":"Bonus games aren’t compared with other players.")+"</p>";
+  return "<div id='gbox' class='gbox'><p class='note'>"+(A?"جارٍ تحميل نتائج اللاعبين الآخرين…":"Loading how other players did…")+"</p></div>"}
+/* Real player data only. Backend API if configured, otherwise the Firestore answers collection. */
+function teleReady(){return new Promise(function(res){var t=0;(function w(){if(window.RQGroups){res(!!window.RQGroups.enabled&&!!window.RQGroups.qStats);return}if(t++>40){res(false);return}setTimeout(w,150)})()})}
+function fetchStats(kind,qi){
+  var dd=day,ii=ids.slice();
+  if(API)return Promise.resolve(pendingSend).then(function(){return getStats(dd)}).then(function(S){return kind==="q"?(S.q&&S.q[qi]):S.avg});
+  return teleReady().then(function(ok){if(!ok)throw new Error("off");return Promise.resolve(pendingSend).then(function(){return kind==="q"?window.RQGroups.qStats(dd,qi):window.RQGroups.dayStats(dd,ii)})})}
 function chartLater(kind,qi,s,tok){
-  if(!API||bonus)return;
-  Promise.resolve(pendingSend).then(function(){return getStats(day)}).then(function(S){
+  if(bonus)return;
+  fetchStats(kind,qi).then(function(o){
     if(tok!==viewTok)return;
     var box=document.getElementById("gbox");if(!box)return;
-    var o=kind==="q"?(S.q&&S.q[qi]):S.avg,n=o?o.n:0;
-    if(!o||n<MINN){box.innerHTML="<p class='note'>Comparison with other players unlocks once "+MINN+" people have answered"+(n?" ("+n+" so far)":"")+". You’re early.</p>";return}
-    CD={bins:o.dist,n:n,demo:false,over:o.over||0,under:o.under||0};
+    var n=o?o.n:0,A=LANG==="ar";
+    if(!o||n<MINN){box.innerHTML="<p class='note'>"+(A?"تظهر المقارنة مع اللاعبين الآخرين عندما يجاوب "+faD(MINN)+" لاعباً"+(n?" ("+faD(n)+" حتى الآن)":"")+". أنت من الأوائل.":"Comparison with other players unlocks once "+MINN+" people have answered"+(n?" ("+n+" so far)":"")+". You’re early.")+"</p>";return}
+    CD={bins:o.dist,n:n,over:o.over||0,under:o.under||0};
     var pc=pctile(s);box.innerHTML=chartInner(kind);
     if(kind==="day"){var pl=document.getElementById("pill");if(pl){pl.textContent=LANG==="ar"?"أفضل "+faD(100-pc)+"٪":"Top "+(100-pc)+"%";pl.style.display=""}}
     animate(s,pc,"graph")
-  }).catch(function(){
-    if(tok!==viewTok)return;var b=document.getElementById("gbox");
-    if(b)b.innerHTML="<p class='note'>Couldn’t load the comparison right now. Your score still counts.</p>"})}
+  }).catch(function(e){
+    if(tok!==viewTok)return;var b=document.getElementById("gbox");if(!b)return;
+    b.innerHTML="<p class='note'>"+(e&&e.message==="off"?(LANG==="ar"?"تظهر المقارنة مع اللاعبين الآخرين قريباً.":"Comparison with other players is coming soon."):(LANG==="ar"?"تعذّر تحميل المقارنة الآن. نتيجتك محسوبة.":"Couldn’t load the comparison right now. Your score still counts."))+"</p>"})}
 
 /* ===== source tags ===== */
 var KINDS={O:["Official","Taken straight from a published figure."],D:["Derived","Built from published figures plus simple maths."],R:["Rough estimate","Built on rounded assumptions, not published data."]};
@@ -1626,7 +1647,7 @@ function parseChallenge(){
   if(!chSelf(d,s,n))save("rq-ch-"+d,{s:s,n:n});bonus=null;selectDay(d);
   try{window.history.replaceState(null,"",location.pathname)}catch(e){}
   return true}
-function chBanner(n){if(bonus&&n===0&&st.g.length===0)return "<div class='chb'><svg viewBox='0 0 24 24'><circle cx='12' cy='12' r='8'/><circle cx='12' cy='12' r='3'/></svg><span class='ct'>"+(LANG==="ar"?"جولة إضافية · أسئلة جديدة":"Bonus game · three fresh questions")+"</span></div>";var c=n===0&&st.g.length===0?chInfo():null;
+function chBanner(n){if(bonus&&n===0&&st.g.length===0)return "<div class='chb'><svg viewBox='0 0 24 24'><circle cx='12' cy='12' r='8'/><circle cx='12' cy='12' r='3'/></svg><span class='ct'>"+(st.bd?(LANG==="ar"?"جولة إضافية · أسئلة يوم "+dlabel(st.bd):"Bonus game · questions from the "+dlabel(st.bd)+" drop"):(LANG==="ar"?"جولة إضافية · أسئلة جديدة":"Bonus game · three fresh questions"))+"</span></div>";var c=n===0&&st.g.length===0?chInfo():null;
   return c?"<div class='chb'><svg viewBox='0 0 24 24'><circle cx='12' cy='12' r='8'/><circle cx='12' cy='12' r='3'/></svg><span class='ct'>"+esc(c.n)+(LANG==="ar"?" يتحداك":" challenged you")+"</span></div>":""}
 function h2h(avg){
   var c=chInfo();if(!c)return "";
@@ -1765,6 +1786,7 @@ function shareResult(tot){openShare(tot)}
 function groupsOn(){return !!(window.RQGroups&&window.RQGroups.enabled)}
 window.RQ_today=function(){return today};
 window.RQ_dayAvg=function(d){var x=load("tk8-s"+d,null);if(!x||x.day!==d||!Array.isArray(x.s)||x.s.length!==3)return 0;return Math.round((x.s[0]+x.s[1]+x.s[2])/3)};
+window.RQ_answers=function(){var x=load("tk8-s"+today,null),o=[],i;if(!x||x.day!==today||!Array.isArray(x.s)||!Array.isArray(x.ids))return o;for(i=0;i<x.s.length&&i<3;i++){var q=Q[x.ids[i]];if(q&&x.g[i]>0)o.push({day:today,qi:x.ids[i],s:x.s[i],r:Math.round(L(x.g[i]/q.m)*1000)/1000})}return o};
 window.RQ_todayAvg=function(){var x=load("tk8-s"+today,null);if(!x||x.day!==today||!Array.isArray(x.s)||x.s.length!==3)return 0;return Math.round((x.s[0]+x.s[1]+x.s[2])/3)};
 window.RQ_onGroupsReady=function(){try{groupNudge()}catch(e){}};
 function openGroups(){
@@ -1810,14 +1832,25 @@ function openGroup(id){var AR=LANG==="ar";
   Promise.race([window.RQGroups.board(id),new Promise(function(_,rej){setTimeout(function(){rej(new Error("__slow__"))},7000)})]).then(function(b){
     var box=document.getElementById("gbox");if(!box)return;
     var u=window.RQGroups.user(),anon=u&&u.anon;
-    var rows=b.rows.map(function(r,i){return "<div class='lbr"+(r.you?" me":"")+"'><span class='rk'>"+faD(i+1)+"</span><span class='nm'>"+esc(r.name)+(r.you?(AR?" (أنت)":" (you)"):"")+"</span><span class='pts'>"+faD(r.total)+"</span></div>"}).join("");
+    var mode="total";try{mode=localStorage.getItem("rq-gmode")||"total"}catch(e){}if(mode!=="avg"&&mode!=="var")mode="total";
+    var act=b.rows.filter(function(r){return r.days>0}),gAvg=act.length?act.reduce(function(t,r){return t+r.avg},0)/act.length:0;
+    b.rows.forEach(function(r){r.varp=(r.days>0&&gAvg)?Math.round((r.avg-gAvg)/gAvg*100):null});
+    function met(r){return mode==="avg"?r.avg:mode==="var"?(r.varp===null?-1e9:r.varp):r.total}
+    function wk(r){return mode==="avg"?(r.days?faD(Math.round(r.avg)):"–"):mode==="var"?(r.varp===null?"–":(r.varp>0?"+":"")+faD(r.varp)+PCT()):faD(r.total)}
+    var sorted=b.rows.slice().sort(function(x,y){return met(y)-met(x)});
+    var rows=sorted.map(function(r,i){return "<div class='lbr"+(r.you?" me":"")+"'><span class='rk'>"+faD(i+1)+"</span><span class='nm'>"+esc(r.name)+(r.you?(AR?" (أنت)":" (you)"):"")+"</span><span class='td'>"+(r.today?faD(r.today):"–")+"</span><span class='pts'>"+wk(r)+"</span></div>"}).join("");
+    var MODES=[["total",AR?"المجموع":"Total"],["avg",AR?"المتوسط":"Average"],["var",AR?"مقابل المجموعة":"vs group"]],
+      WKH={total:AR?"الأسبوع":"Week",avg:AR?"متوسط الأسبوع":"Week avg","var":AR?"مقابل المجموعة":"vs group"};
+    var lbt="<div class='lbm' role='tablist'>"+MODES.map(function(m){return "<button role='tab' aria-selected='"+(m[0]===mode)+"' class='"+(m[0]===mode?"on":"")+"' data-gm='"+m[0]+"'>"+m[1]+"</button>"}).join("")+"</div>",
+      lbh="<div class='lbr lbh'><span class='rk'></span><span class='nm'></span><span class='td'>"+(AR?"اليوم":"Today")+"</span><span class='pts'>"+WKH[mode]+"</span></div>";
     box.innerHTML="<div class='shp' style='background:linear-gradient(135deg,var(--c),var(--c2))'><small>"+(AR?"هذا الأسبوع":"This week")+"</small><b>"+esc(b.name)+"</b><span>"+faD(b.members)+(AR?" أعضاء":" members")+"</span></div>"+
-      "<div class='lbd'>"+(rows||"<p class='note' style='text-align:center'>"+(AR?"لا نتائج بعد هذا الأسبوع. العب لتظهر!":"No scores yet this week. Play to get on the board!")+"</p>")+"</div>"+
+      lbt+"<div class='lbd'>"+(rows?(lbh+rows):"<p class='note' style='text-align:center'>"+(AR?"لا نتائج بعد هذا الأسبوع. العب لتظهر!":"No scores yet this week. Play to get on the board!")+"</p>")+"</div>"+
       "<p class='note' style='text-align:center;margin:0 0 12px'>"+(AR?"المجموع يُصفَّر كل أحد.":"Totals reset every Sunday.")+"</p>"+
       "<button class='main' id='ginv'>"+(AR?"ادعُ أصدقاء":"Invite friends")+"</button>"+
       (anon?"<button class='ghost gsave' id='glink' style='width:100%;margin-top:10px'>"+(AR?"سجّل بجوجل لحفظ مكانك":"Sign in with Google to save your spot")+"</button>":"")+
       "<div class='shg' style='grid-template-columns:1fr 1fr;margin-top:10px'><button class='shl' id='gback'>"+(AR?"كل المجموعات":"All groups")+"</button><button class='shl' id='gleave'>"+(AR?"غادر":"Leave")+"</button></div>";
     document.getElementById("ginv").onclick=function(){openInvite(id,b.name)};
+    Array.prototype.forEach.call(box.querySelectorAll("[data-gm]"),function(bt){bt.onclick=function(){try{localStorage.setItem("rq-gmode",bt.getAttribute("data-gm"))}catch(e){}openGroup(id)}});
     document.getElementById("gback").onclick=openGroups;
     var glv=document.getElementById("gleave"),glt=null;
     glv.onclick=function(){
@@ -1993,7 +2026,7 @@ function openLogic(i){
   "<p class='note' style='margin-top:10px'>"+(LANG==="ar"?"الإجابة الصحيحة = 100، والخطأ بمقدار الضعف ≈ 80، وعشرة أضعاف ≈ 26. ولا تصل أبداً إلى الصفر.":"Spot on scores 100, twice off about 80, ten times off about 26. Never zero.")+"</p></div>");
 }
 function reveal(i){
-  var q=Q[ids[i]],g=st.g[i],s=st.s[i],pc=API?0:(CD=demoDist(),pctile(s)),last=st.g.length>=3,U=unitOf(q,i),f=U[1],ul=qUL(q,U[0]);
+  var q=Q[ids[i]],g=st.g[i],s=st.s[i],pc=0,last=st.g.length>=3,U=unitOf(q,i),f=U[1],ul=qUL(q,U[0]);
   mount("<div class='qhead'>"+seg(i)+"<span class='catico'>"+(ICONS[q.c]||ICONS["Everyday Qatar"])+"</span></div><h2 class='sm' dir='auto'>"+qT(q)+"</h2>"+
   "<div class='cmp'><div class='me'><small>"+tr("Your guess")+"</small><b>"+short(g/f)+"</b><em>"+ul+"</em></div><div class='them'><small>"+(q.c==="Facts"?(LANG==="ar"?"الجواب":"Answer"):tr("Our estimate"))+"</small><b>"+short(q.m/f)+"</b><em>"+ul+"</em></div></div>"+
   (q.asof?"<p class='note' style='text-align:center;margin:-4px 0 8px'>"+(LANG==="ar"?"حتى ":"As of ")+q.asof+"</p>":"")+
@@ -2028,12 +2061,12 @@ function last7(){var out=[],i,d,inf;for(i=6;i>=0;i--){d=today-i;inf=(d<START||d>
 function coinCard(){
   if(day!==today)return "";
   var A=LANG==="ar",c=coinsGet(),h="";
-  if(c.n>0)h+="<button class='spendb' id='cspend'><span>"+(A?"اصرف عملة للعب مرة أخرى":"Spend a coin to play another")+"</span><small>"+(A?faD(c.n)+" متبقية":c.n+" left")+"</small></button>";
+  h+="<button class='spendb' id='cspend'><span>"+(A?"اصرف عملة للعب مرة أخرى":"Spend a coin to play another")+"</span><small>"+(A?faD(c.n)+" متبقية":c.n+" left")+"</small></button>";
   if(bonus)h+="<button class='cback' id='cback'>"+(A?"الرجوع لنتيجة اليوم":"Back to today’s result")+"</button>";
   return h?"<div id='coin'>"+h+"</div>":""}
 function wireCoin(){
   var g=function(i){return document.getElementById(i)};
-  if(g("cspend"))g("cspend").onclick=spendCoin;
+  if(g("cspend"))g("cspend").onclick=function(){if(coinsGet().n<1)explainCoins();else spendCoin()};
   if(g("cback"))g("cback").onclick=exitBonus}
 /* ===== pop-ups: welcome gift for existing players, and the 'you earned a coin' message ===== */
 function popup(o){
@@ -2055,6 +2088,11 @@ function giftShow(){
     body:A?"كنت معنا في أيام التجربة، وملاحظاتك تصنع اللعبة. هديتنا لك عملتان من عملات السلسلة، وكل عملة تفتح جولة إضافية بثلاثة أسئلة جديدة.":"You’ve been with Roughly Qatar through its testing days, and your support is shaping the game. As a thank you, here are 2 streak coins. Each one unlocks an extra game of three fresh questions.",
     btn:A?"استلم العملتين":"Claim my 2 coins",
     done:function(){var c=coinsGet();c.n=Math.min(99,c.n+2);coinsSet(c);try{localStorage.setItem("rq-gift","d")}catch(e){}streak();if(!intro&&st.g.length>=3&&!st.r)render()}})}
+function explainCoins(){
+  var A=LANG==="ar",left=STREAK_COIN_EVERY-(stats.streak%STREAK_COIN_EVERY);
+  popup({title:A?"كيف تعمل عملات السلسلة":"How streak coins work",
+    body:A?"العب "+faD(STREAK_COIN_EVERY)+" أيام متتالية لتحصل على عملة. اصرف العملة بعد أن تنهي لعبة اليوم لتلعب جولة إضافية بثلاثة أسئلة من يوم فاتك. ليس لديك عملات الآن، وتبقّى "+faD(left)+" "+(left===1?"يوم":"أيام")+" للحصول على التالية.":"Play "+STREAK_COIN_EVERY+" days in a row and you earn a coin. Spend a coin right after you finish today’s game to play another round, with three questions from a drop you missed. You have no coins right now, and you’re "+left+" day"+(left===1?"":"s")+" away from your next one.",
+    btn:A?"فهمت":"Got it"})}
 function earnedShow(){
   var off="";try{off=localStorage.getItem("rq-nocp")||""}catch(e){}
   if(off||document.getElementById("pop"))return;var A=LANG==="ar";
@@ -2063,10 +2101,10 @@ function earnedShow(){
     check:A?"لا تُظهر لي هذا مرة أخرى":"Don’t show me this again",btn:A?"رائع":"Nice",
     done:function(on){if(on){try{localStorage.setItem("rq-nocp","1")}catch(e){}}}})}
 function done(){
-  var tot=st.s.reduce(function(a,b){return a+b},0),avg=Math.round(tot/3),pc=API?0:(CD=demoDist(),pctile(avg)),qrows="",w7,i,q;
+  var tot=st.s.reduce(function(a,b){return a+b},0),avg=Math.round(tot/3),pc=0,qrows="",w7,i,q;
   for(i=0;i<3;i++){q=Q[ids[i]];qrows+="<div class='qr'>"+catIcon(q.c)+"<div class='qt'><b dir='auto'>"+qT(q)+"</b>"+(chInfo()?"<span>"+esc(chInfo().n)+(LANG==="ar"?" سجّل ":" scored ")+faD(chInfo().s[i])+PCT()+"</span>":"")+"</div><div><span class='qs'>"+faD(st.s[i])+PCT()+"</span><span class='qv'>"+verdict(st.g[i],q)+"</span></div></div>"}
-  mount("<div class='res card qb'><span class='hcat'>"+ICON_TARGET+"</span>"+
-  "<div class='rtop'><div class='rsc'><small>"+(bonus?(LANG==="ar"?"نتيجة الجولة الإضافية":"Bonus game score"):(LANG==="ar"?"نتيجتك":"Your score"))+"</small><div class='hs'><span id='sn'>"+faD(0)+"</span><i>"+PCT()+"</i></div><div class='pillrow'><span class='hpill' id='pill'"+(API?" style='display:none'":"")+">"+(LANG==="ar"?"أفضل "+faD(100-pc)+"٪":"Top "+(100-pc)+"%")+"</span>"+(stats.streak?"<span class='stk'>"+ICON_FLAME+faD(stats.streak)+(LANG==="ar"?" يوم متتالي":" day streak")+"</span>":"")+(coinsGet().n?"<span class='stk'>"+ICON_COIN+faD(coinsGet().n)+(LANG==="ar"?" عملة":(coinsGet().n===1?" coin":" coins"))+"</span>":"")+"</div></div>"+
+  mount("<div class='res card qb'><span class='hcat'>"+ICON_TARGET+"</span>"+(bonus&&st.bd?"<div class='bdate'>"+(LANG==="ar"?"أسئلة من يوم "+dlabel(st.bd):"Questions from the "+dlabel(st.bd)+" drop")+"</div>":"")+
+  "<div class='rtop'><div class='rsc'><small>"+(bonus?(LANG==="ar"?"نتيجة الجولة الإضافية":"Bonus game score"):(LANG==="ar"?"نتيجتك":"Your score"))+"</small><div class='hs'><span id='sn'>"+faD(0)+"</span><i>"+PCT()+"</i></div><div class='pillrow'><span class='hpill' id='pill' style='display:none'>"+(LANG==="ar"?"أفضل "+faD(100-pc)+"٪":"Top "+(100-pc)+"%")+"</span>"+(stats.streak?"<span class='stk'>"+ICON_FLAME+faD(stats.streak)+(LANG==="ar"?" يوم متتالي":" day streak")+"</span>":"")+(coinsGet().n?"<span class='stk'>"+ICON_COIN+faD(coinsGet().n)+(LANG==="ar"?" عملة":(coinsGet().n===1?" coin":" coins"))+"</span>":"")+"</div></div>"+
   "<div class='revg'>"+chartSlot("day")+"</div></div>"+
   h2h(avg)+
   "<div class='qres'>"+qrows+"</div><button class='main shareb' id='sh'>"+tr("Share result")+"</button></div>"+
@@ -2143,7 +2181,7 @@ if(!firebaseConfig||!firebaseConfig.apiKey){
     const [A,AU,FS]=await Promise.all([import(B+"firebase-app.js"),import(B+"firebase-auth.js"),import(B+"firebase-firestore.js")]);
     const app=A.initializeApp(firebaseConfig),auth=AU.getAuth(app),db=FS.getFirestore(app);
     const {onAuthStateChanged,signInAnonymously,GoogleAuthProvider,linkWithPopup,signInWithPopup}=AU;
-    const {doc,getDoc,setDoc,updateDoc,deleteDoc,collection,getDocs,query,where,arrayUnion,arrayRemove,serverTimestamp}=FS;
+    const {doc,getDoc,setDoc,updateDoc,deleteDoc,collection,getDocs,query,where,limit,arrayUnion,arrayRemove,serverTimestamp}=FS;
     let resolveReady;const ready=new Promise(r=>resolveReady=r);
     onAuthStateChanged(auth,u=>{if(!u){signInAnonymously(auth).catch(()=>{});}else{resolveReady(u);}});
     const uid=()=>auth.currentUser&&auth.currentUser.uid;
@@ -2186,9 +2224,9 @@ if(!firebaseConfig||!firebaseConfig.apiKey){
         ]);
         if(!g.exists())throw new Error("Group not found");
         const names={};if(ms)ms.forEach(x=>names[x.id]=(x.data().name||"Player"));
-        const tot={};if(ss)ss.forEach(x=>{const d=x.data();tot[d.uid]=(tot[d.uid]||0)+(d.avg||0);if(d.name&&!names[d.uid])names[d.uid]=d.name;});
+        const tot={},cnt={},tdy={},t0=gToday();if(ss)ss.forEach(x=>{const d=x.data();tot[d.uid]=(tot[d.uid]||0)+(d.avg||0);cnt[d.uid]=(cnt[d.uid]||0)+1;if(d.day===t0)tdy[d.uid]=d.avg||0;if(d.name&&!names[d.uid])names[d.uid]=d.name;});
         const uids=g.data().memberUids||[];
-        const rows=uids.map(u=>({uid:u,name:names[u]||"Player",total:Math.round(tot[u]||0),you:u===me})).sort((a,b)=>b.total-a.total);
+        const rows=uids.map(u=>({uid:u,name:names[u]||"Player",total:Math.round(tot[u]||0),days:cnt[u]||0,avg:cnt[u]?tot[u]/cnt[u]:0,today:Math.round(tdy[u]||0),you:u===me})).sort((a,b)=>b.total-a.total);
         return {id,name:g.data().name,members:uids.length,rows};},
       // Writes one finished day (today or yesterday) to every group I'm in. Returns true only if every write landed.
       // If anything fails it is remembered (rq-gdirty) and retried: a few times right away, on reconnect, and whenever the app is reopened.
@@ -2200,6 +2238,17 @@ if(!firebaseConfig||!firebaseConfig.apiKey){
         try{localStorage.setItem("rq-gdirty","1");}catch(e){}
         if(!quiet)gRetry(0);
         return false;},
+      // ---- live player data (replaces the old demo curve). One answer doc per player per question, created once.
+      async submitAnswer(day,qi,s,r){if(day!==gToday())return false;const fk="rq-as-"+day+"-"+qi;try{if(localStorage.getItem(fk))return true;}catch(e){}
+        try{await ready;const me=uid();s=Math.max(1,Math.min(100,Math.round(s)));r=Math.max(-6,Math.min(6,Math.round(r*1000)/1000));
+          await setDoc(doc(db,"answers",day+"__"+qi+"__"+me),{uid:me,day,qi,s,r});try{localStorage.setItem(fk,"1");}catch(e){}return true;}catch(e){return false;}},
+      async qStats(day,qi){await ready;const qs=await getDocs(query(collection(db,"answers"),where("day","==",day),where("qi","==",qi),limit(5000)));
+        const bins=new Array(20).fill(0);let n=0,over=0,under=0;qs.forEach(x=>{const d=x.data();if(!(d.s>=1&&d.s<=100))return;bins[Math.min(19,Math.floor(d.s/5))]++;n++;if(d.r>0.05)over++;else if(d.r<-0.05)under++;});
+        return {n,dist:bins,over,under};},
+      async dayStats(day,ids){await ready;const qs=await getDocs(query(collection(db,"answers"),where("day","==",day),limit(15000)));
+        const per={};qs.forEach(x=>{const d=x.data();if(ids.indexOf(d.qi)<0||!(d.s>=1&&d.s<=100))return;(per[d.uid]=per[d.uid]||{})[d.qi]=d.s;});
+        const bins=new Array(20).fill(0);let n=0;for(const u in per){const v=Object.keys(per[u]).map(k=>per[u][k]);if(v.length<3)continue;const a=Math.round(v.reduce((p,c)=>p+c,0)/v.length);bins[Math.min(19,Math.floor(a/5))]++;n++;}
+        return {n,dist:bins};},
       async linkGoogle(){await ready;const prov=new GoogleAuthProvider();
         try{await linkWithPopup(auth.currentUser,prov);}
         catch(e){if(e&&e.code==="auth/credential-already-in-use")await signInWithPopup(auth,prov);else throw e;}
@@ -2214,6 +2263,7 @@ if(!firebaseConfig||!firebaseConfig.apiKey){
     document.addEventListener("visibilitychange",()=>{if(!document.hidden)gFlush();});
     ready.then(async()=>{try{await restore();}catch(e){}
       if(window.RQ_onGroupsReady)window.RQ_onGroupsReady();
+      try{(window.RQ_answers?window.RQ_answers():[]).forEach(function(a){APIg.submitAnswer(a.day,a.qi,a.s,a.r);});}catch(e){}
       const a=gTodayAvg();if(a)APIg.submitDay(gToday(),a);
       try{const y=window.RQ_dayAvg?window.RQ_dayAvg(gToday()-1):0;if(y)APIg.submitDay(gToday()-1,y,true);}catch(e){}
       const m=/[?&]g=([0-9a-z]{7})/.exec(location.search||"");const id=(m&&m[1])||window.__rqG;if(id&&window.RQ_inviteFlow)window.RQ_inviteFlow(id);});
