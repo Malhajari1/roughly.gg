@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <title>Roughly Qatar – Daily Estimation Game</title>
-<script>window.RQ_BUILD="2026-11-10.13";</script>
+<script>window.RQ_BUILD="2026-11-10.14";</script>
 <meta name="description" content="A fresh set of three how-many questions about Qatar every day. No exact answers — just reason your way close. What would you have guessed?">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Roughly">
@@ -1635,11 +1635,11 @@ function noChart(box){var g=box&&box.parentNode;if(!g)return;g.style.display="no
 var dgRaf=0;
 function drawGuessGraph(box,o,qi){
   var i=ids.indexOf(qi),q=Q[qi],g=i>=0?st.g[i]:0;if(!q||!(g>0)||!o.rs||!o.rs.length)return false;
-  var A=LANG==="ar",E=q.m,f=unitOf(q,i)[1],N=30,k,m,rs=o.rs.slice().sort(function(a,b){return a-b}),n=rs.length;
+  var A=LANG==="ar",E=q.m,f=unitOf(q,i)[1],N=31,k,m,rs=o.rs.slice().sort(function(a,b){return a-b}),n=rs.length;
   function pc(p){return rs[Math.min(n-1,Math.max(0,Math.round(p*(n-1))))]}
   /* axis fits the data: players' middle 96%, the correct answer, and a little padding */
   var hf=Math.max(Math.abs(pc(.02)),Math.abs(pc(.98)),.3);hf*=1.06;
-  var lg=Math.log10(g/E);
+  var lg=Math.log10(g/E);if(Math.max(g/E,E/g)<1.03)lg=0;
   if(Math.abs(lg)>hf&&Math.abs(lg)<=hf*1.25)hf=Math.abs(lg)*1.03;
   var lo=-hf,hi=hf;
   var clamped=lg<lo||lg>hi,W=hi-lo;

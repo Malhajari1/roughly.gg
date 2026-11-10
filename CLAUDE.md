@@ -115,3 +115,6 @@ No test suite in the repo. Previously verified with jsdom smoke tests and Playwr
 - Short screens (max-height 740px) use a smaller plot. At ~667px tall the page still scrolls ~45px (top bar plus margins); not fixed.
 - The old score-curve fallback (no `rs`) still swaps in at its own size; only matters for an old backend. Results-screen chart still uses `noChart()` collapse.
 - Measured by sampling element positions every 40ms with the stats delayed 40ms/700ms/1.8s/never: layout changes once (first paint) and never again.
+
+## Spot-on is dead centre (10 Nov 2026, build .14)
+- The reveal graph uses 31 bins (odd) so one bin is centred on the correct answer; with 30 the green bar sat ~5px right of centre. A guess within 3% ("Spot on") snaps the You dot and dashed line to the exact centre. Measured 0px offset for line, dot, tag and green bar at 393px.
