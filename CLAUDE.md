@@ -38,7 +38,7 @@ Owner: SWISS, solo founder based in Doha. Tone in copy: human, warm, a bit funny
 - Day number = days since epoch (UTC date of the player's local date). `START` = 1 Oct 2026 (archive start). `today`/`day` globals.
 - Question bank `Q` (133 questions, ~98 regular + 35 category "Doha life"). Shape: `{c category, t text, u unit, m our estimate, lo, hi plausible range, s [logic steps], f fun fact, k optional kind}`. `HINTS` is a parallel array (same index) of `["Good to know", text]`.
 - APPEND new questions and hints at the end only. Never reorder: stats, saved games and sync match questions by index.
-- `pick(d)` is a seeded shuffle: 2 regular + 1 Doha life question per day, same for everyone.
+- `pick(d)`: days before `ROT_START` (11 Nov 2026) use the old seeded random picker (`legacyPick`, kept so past days stay as played). From `ROT_START` on, questions rotate with no repeats: every question is used once per cycle and none returns sooner than about half a cycle. The first cycle serves questions that were never dropped under the old picker first. 2 regular + 1 Doha life per day, same for everyone. Pool order matters, so only append to `Q`/`HINTS`.
 - Answers are stored in base units. `UNITS` lets players answer in other units (km/miles, kg/lb, litres/gallons, hours/minutes, QAR/USD/EUR/GBP/INR/PKR/PHP, tonnes/US tons). Currency rates are fixed approximations in `UNITS`.
 - Scoring: `score = max(1, round(100 / (1 + d²/0.36)))` where `d = log10(ratio)`, ratio = how many times too high/low. Spot on 100, 2x off about 80, 10x off about 26, never 0.
 - Ranks (average of three): Fresh Off the Plane, Karak Rookie, Corniche Regular, Souq Veteran, Majlis Elder, Desert Oracle (thresholds 0/15/35/55/72/88).
@@ -69,3 +69,10 @@ No test suite in the repo. Previously verified with jsdom smoke tests and Playwr
 - Question wording sometimes says "kilometres" while the player answers in miles. Consider making titles follow the chosen unit.
 - Hardening if scores become competitive: players can clear storage and answer twice.
 - More questions (append only), special editions, friend streak-free progress ideas.
+
+## Archive lock, streak coins, bonus games (10 Nov 2026)
+- `ARCHIVE_OPEN=false` locks past days. The calendar, the "Play past drops" button and past-day challenge links are switched off, not deleted. Set the flag to true to bring them back.
+- `STREAK_COIN_EVERY=3`: finishing today's game on a streak that is a multiple of 3 awards one coin (`rq-coins`, once per day). The results screen has a yellow coin card: "Spend a streak coin to play another" or "Save it for another day". The menu has a Streak coins section.
+- Spending a coin starts a bonus game: 3 questions never seen on this device (2 regular + 1 Doha life), stored as `tk8-b<day>-<n>`, active pointer `rq-active`. Bonus games never touch streak, stats, server answers, sync, challenge links or group scores. Coins are device-only for now.
+- Popups (`#sheet`) are full screen on phones and one fixed 520px modal on desktop. `fitSheet()` is a no-op on purpose.
+- Groups: `submitDay` now returns success, retries (4s, 15s, 60s), remembers failures in `rq-gdirty`, retries on reconnect/reopen, and also back-fills yesterday's finished score (the rules allow today and yesterday only).
