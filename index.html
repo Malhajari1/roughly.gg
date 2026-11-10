@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <title>Roughly Qatar – Daily Estimation Game</title>
-<script>window.RQ_BUILD="2026-11-10.3";</script>
+<script>window.RQ_BUILD="2026-11-10.5";</script>
 <meta name="description" content="A fresh set of three how-many questions about Qatar every day. No exact answers — just reason your way close. What would you have guessed?">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Roughly">
@@ -137,7 +137,6 @@ button.main svg{width:18px;height:18px;stroke:#fff;fill:none;stroke-width:2.4;st
 .spendb{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;border:0;border-radius:22px;padding:17px 20px;margin-top:12px;font:inherit;font-weight:800;font-size:1.05rem;text-align:start;color:#fff;cursor:pointer;background:linear-gradient(135deg,#ff4d6d,#e11d48);box-shadow:0 16px 32px -14px rgba(225,29,72,.7);animation:vib 3s ease-in-out infinite}
 .spendb small{flex:none;background:rgba(255,255,255,.24);border-radius:12px;padding:3px 10px;font-size:.8rem;font-weight:700}
 .spendb:active{transform:scale(.98)}
-.bdate{display:inline-block;background:rgba(255,255,255,.22);border-radius:14px;padding:8px 14px;margin:0 0 10px;font-weight:800;font-size:1rem;color:#fff}
 .cback{display:block;width:100%;margin-top:12px;padding:14px;border:2px solid rgba(47,107,255,.35);border-radius:18px;background:#fff;color:var(--c,#2f6bff);font:inherit;font-weight:700;cursor:pointer}
 @keyframes vib{0%,60%,100%{transform:none}64%{transform:translateX(-4px) rotate(-1deg)}68%{transform:translateX(4px) rotate(1deg)}72%{transform:translateX(-4px) rotate(-1deg)}76%{transform:translateX(4px) rotate(1deg)}80%{transform:translateX(-3px)}84%{transform:translateX(3px)}88%{transform:none}}
 @media (prefers-reduced-motion:reduce){.spendb{animation:none}}
@@ -591,6 +590,10 @@ body:not([data-view=land]) main{min-height:calc(100dvh - 76px);display:flex;flex
 .res .hcat svg{stroke:#fff}
 .rtop{display:grid;grid-template-columns:0.82fr 1.18fr;gap:10px;align-items:center;margin:4px 0 14px;background:none;box-shadow:none;padding:0;border-radius:0}
 .rsc{text-align:center}
+.rtop.nochart{grid-template-columns:1fr}
+.bdate~.rtop .rsc{padding-top:38px}
+.revrow.nochart{grid-template-columns:1fr}
+.bdate{position:absolute;top:16px;right:16px;display:block;margin:0;padding:7px 12px;border-radius:12px;background:rgba(255,255,255,.22);color:#fff;font-weight:800;font-size:.82rem;letter-spacing:.2px;z-index:2}
 .rsc>small{font-size:.66rem;letter-spacing:1.2px;text-transform:uppercase;font-weight:700;opacity:.82}
 .card.qb .hs{color:#fff}
 .card.qb .hpill{background:rgba(255,255,255,.2);color:#fff}
@@ -1596,28 +1599,28 @@ function chartInner(kind){
     ("<p class='note'>"+(AR?"بناءً على "+D.n.toLocaleString("ar-EG")+" لاعب جاوبوا "+(kind==="q"?"على هذا السؤال":"أسئلة اليوم الثلاثة")+".":"Based on "+D.n.toLocaleString("en-US")+" players who answered "+(kind==="q"?"this question":"today’s three")+".")+"</p>")}
 function chartSlot(kind){
   var A=LANG==="ar";
-  if(bonus)return "<p class='note'>"+(A?"الجولات الإضافية لا تُقارن بلاعبين آخرين.":"Bonus games aren’t compared with other players.")+"</p>";
-  return "<div id='gbox' class='gbox'><p class='note'>"+(A?"جارٍ تحميل نتائج اللاعبين الآخرين…":"Loading how other players did…")+"</p></div>"}
+  return "<div id='cbox' class='gbox'><p class='note'>"+(A?"جارٍ تحميل نتائج اللاعبين الآخرين…":"Loading how other players did…")+"</p></div>"}
 /* Real player data only. Backend API if configured, otherwise the Firestore answers collection. */
-function teleReady(){return new Promise(function(res){var t=0;(function w(){if(window.RQGroups){res(!!window.RQGroups.enabled&&!!window.RQGroups.qStats);return}if(t++>40){res(false);return}setTimeout(w,150)})()})}
+function teleReady(){return new Promise(function(res){var t=0;(function w(){if(window.RQGroups){res(!!window.RQGroups.enabled&&!!window.RQGroups.qStats);return}if(t++>20){res(false);return}setTimeout(w,150)})()})}
 function fetchStats(kind,qi){
-  var dd=day,ii=ids.slice();
+  var dd=bonus&&st.bd?st.bd:day,ii=ids.slice();
   if(API)return Promise.resolve(pendingSend).then(function(){return getStats(dd)}).then(function(S){return kind==="q"?(S.q&&S.q[qi]):S.avg});
   return teleReady().then(function(ok){if(!ok)throw new Error("off");return Promise.resolve(pendingSend).then(function(){return kind==="q"?window.RQGroups.qStats(dd,qi):window.RQGroups.dayStats(dd,ii)})})}
+function noChart(box){var g=box&&box.parentNode;if(!g)return;g.style.display="none";var r=g.parentNode;if(r&&r.classList&&(r.classList.contains("rtop")||r.classList.contains("revrow")))r.classList.add("nochart")}
 function chartLater(kind,qi,s,tok){
-  if(bonus)return;
+  if(bonus&&!st.bd){var b0=document.getElementById("cbox");noChart(b0);return}
   fetchStats(kind,qi).then(function(o){
     if(tok!==viewTok)return;
-    var box=document.getElementById("gbox");if(!box)return;
+    var box=document.getElementById("cbox");if(!box)return;
     var n=o?o.n:0,A=LANG==="ar";
-    if(!o||n<MINN){box.innerHTML="<p class='note'>"+(A?"تظهر المقارنة مع اللاعبين الآخرين عندما يجاوب "+faD(MINN)+" لاعباً"+(n?" ("+faD(n)+" حتى الآن)":"")+". أنت من الأوائل.":"Comparison with other players unlocks once "+MINN+" people have answered"+(n?" ("+n+" so far)":"")+". You’re early.")+"</p>";return}
+    if(!o||n<MINN){noChart(box);box.innerHTML="<p class='note'>"+(A?"تظهر المقارنة مع اللاعبين الآخرين عندما يجاوب "+faD(MINN)+" لاعباً"+(n?" ("+faD(n)+" حتى الآن)":"")+". أنت من الأوائل.":"Comparison with other players unlocks once "+MINN+" people have answered"+(n?" ("+n+" so far)":"")+". You’re early.")+"</p>";return}
     CD={bins:o.dist,n:n,over:o.over||0,under:o.under||0};
     var pc=pctile(s);box.innerHTML=chartInner(kind);
     if(kind==="day"){var pl=document.getElementById("pill");if(pl){pl.textContent=LANG==="ar"?"أفضل "+faD(100-pc)+"٪":"Top "+(100-pc)+"%";pl.style.display=""}}
     animate(s,pc,"graph")
   }).catch(function(e){
-    if(tok!==viewTok)return;var b=document.getElementById("gbox");if(!b)return;
-    b.innerHTML="<p class='note'>"+(e&&e.message==="off"?(LANG==="ar"?"تظهر المقارنة مع اللاعبين الآخرين قريباً.":"Comparison with other players is coming soon."):(LANG==="ar"?"تعذّر تحميل المقارنة الآن. نتيجتك محسوبة.":"Couldn’t load the comparison right now. Your score still counts."))+"</p>"})}
+    if(tok!==viewTok)return;var b=document.getElementById("cbox");if(!b)return;
+    noChart(b);b.innerHTML="<p class='note'>"+(e&&e.message==="off"?(LANG==="ar"?"تظهر المقارنة مع اللاعبين الآخرين قريباً.":"Comparison with other players is coming soon."):(LANG==="ar"?"تعذّر تحميل المقارنة الآن. نتيجتك محسوبة.":"Couldn’t load the comparison right now. Your score still counts."))+"</p>"})}
 
 /* ===== source tags ===== */
 var KINDS={O:["Official","Taken straight from a published figure."],D:["Derived","Built from published figures plus simple maths."],R:["Rough estimate","Built on rounded assumptions, not published data."]};
@@ -2103,8 +2106,8 @@ function earnedShow(){
 function done(){
   var tot=st.s.reduce(function(a,b){return a+b},0),avg=Math.round(tot/3),pc=0,qrows="",w7,i,q;
   for(i=0;i<3;i++){q=Q[ids[i]];qrows+="<div class='qr'>"+catIcon(q.c)+"<div class='qt'><b dir='auto'>"+qT(q)+"</b>"+(chInfo()?"<span>"+esc(chInfo().n)+(LANG==="ar"?" سجّل ":" scored ")+faD(chInfo().s[i])+PCT()+"</span>":"")+"</div><div><span class='qs'>"+faD(st.s[i])+PCT()+"</span><span class='qv'>"+verdict(st.g[i],q)+"</span></div></div>"}
-  mount("<div class='res card qb'><span class='hcat'>"+ICON_TARGET+"</span>"+(bonus&&st.bd?"<div class='bdate'>"+(LANG==="ar"?"أسئلة من يوم "+dlabel(st.bd):"Questions from the "+dlabel(st.bd)+" drop")+"</div>":"")+
-  "<div class='rtop'><div class='rsc'><small>"+(bonus?(LANG==="ar"?"نتيجة الجولة الإضافية":"Bonus game score"):(LANG==="ar"?"نتيجتك":"Your score"))+"</small><div class='hs'><span id='sn'>"+faD(0)+"</span><i>"+PCT()+"</i></div><div class='pillrow'><span class='hpill' id='pill' style='display:none'>"+(LANG==="ar"?"أفضل "+faD(100-pc)+"٪":"Top "+(100-pc)+"%")+"</span>"+(stats.streak?"<span class='stk'>"+ICON_FLAME+faD(stats.streak)+(LANG==="ar"?" يوم متتالي":" day streak")+"</span>":"")+(coinsGet().n?"<span class='stk'>"+ICON_COIN+faD(coinsGet().n)+(LANG==="ar"?" عملة":(coinsGet().n===1?" coin":" coins"))+"</span>":"")+"</div></div>"+
+  mount("<div class='res card qb'><span class='hcat'>"+ICON_TARGET+"</span>"+(bonus&&st.bd?"<div class='bdate'>"+(LANG==="ar"?"جولة "+dlabel(st.bd):dlabel(st.bd)+" drop")+"</div>":"")+
+  "<div class='rtop'><div class='rsc'><small>"+(bonus?(LANG==="ar"?"نتيجة الجولة الإضافية":"Bonus game score"):(LANG==="ar"?"نتيجتك":"Your score"))+"</small><div class='hs'><span id='sn'>"+faD(0)+"</span><i>"+PCT()+"</i></div><div class='pillrow'><span class='hpill' id='pill' style='display:none'>"+(LANG==="ar"?"أفضل "+faD(100-pc)+"٪":"Top "+(100-pc)+"%")+"</span>"+(stats.streak&&!bonus?"<span class='stk'>"+ICON_FLAME+faD(stats.streak)+(LANG==="ar"?" يوم متتالي":" day streak")+"</span>":"")+(coinsGet().n?"<span class='stk'>"+ICON_COIN+faD(coinsGet().n)+(LANG==="ar"?" عملة":(coinsGet().n===1?" coin":" coins"))+"</span>":"")+"</div></div>"+
   "<div class='revg'>"+chartSlot("day")+"</div></div>"+
   h2h(avg)+
   "<div class='qres'>"+qrows+"</div><button class='main shareb' id='sh'>"+tr("Share result")+"</button></div>"+

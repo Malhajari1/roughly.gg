@@ -53,8 +53,8 @@ Owner: SWISS, solo founder based in Doha. Tone in copy: human, warm, a bit funny
 `tk8-s<day>` per-day game state (ids, g, s, un, hu, nt, r, pd), `tk7-stats` (streak, played, total), `rq-units`, `rq-pid` (anonymous player id), `rq-tok` and `rq-email` (signed in), `rq-name` (challenge name), `rq-ch-<day>` (received challenge).
 
 ## Two modes
-- No backend (default): `<meta name="roughly-api" content="">` is empty. Charts use clearly labelled DEMO data (`DEMO` array), sign-in shows "not switched on yet".
-- Backend on: set that meta tag to the API address. Charts and "X% guessed too high" come from real players, only shown once `MINN`=30 players answered that question, otherwise an "unlocks soon" note. Never show invented numbers when the backend is on.
+- No backend and no Firestore answers: charts show an honest "coming soon" note and collapse (`noChart()` adds `.nochart` to `.rtop`/`.revrow` so the layout centres). Never show invented numbers.
+- Real data: node backend if `<meta name="roughly-api">` is set, otherwise Firestore `answers`. Shown only once `MINN`=30 players answered that question.
 
 ## Backend API (backend/server.js)
 `POST /answer {pid,day,qi,r,s}`, `GET /stats?day=`, `POST /auth/start {email}`, `POST /auth/verify {email,code}`, `GET|PUT /sync` (Bearer token). Data in `DATA_DIR/db.json`. Env: PORT, DATA_DIR, ORIGIN, DEV=1 (shows codes, testing only), RESEND_API_KEY + MAIL_FROM for email.
@@ -83,3 +83,8 @@ No test suite in the repo. Previously verified with jsdom smoke tests and Playwr
 - All demo/placeholder data is gone (`DEMO`/`demoDist` removed). The score curve, "Better than X%" and "Top X%" come only from real players, and only once `MINN`=30 people answered. Source: the node backend if `roughly-api` is set, otherwise the Firestore `answers` collection (`RQGroups.submitAnswer/qStats/dayStats`). Without either, an honest "coming soon" note is shown. The `answers` rules in `backend/firestore.rules` must be published in the Firebase console or writes are refused.
 - Group board shows Today and Week columns, with a Total / Average / vs group toggle (`rq-gmode`). vs group is each member's average against the mean of members' averages.
 - "Spend a coin to play another" is shown to everyone on the results page; with 0 coins it opens an explainer pop-up instead. A bonus game now serves the most recent past drop the player hasn't played (stored as `bd` on the bonus state) and the results page names its date. Pre-11 Nov drops are rebuilt from `legacyPick` on the current pool, so they may not match what was originally dropped.
+
+## Chart box and bonus-date fixes (10 Nov 2026)
+- The results/reveal chart container id is `cbox` (was `gbox`, which collided with the Groups board `gbox` and made group scores render inside the score card). Never reuse `gbox` for charts.
+- Bonus games fetch stats for their source drop (`st.bd`), so the reveal curve and results chart work in bonus mode.
+- `.bdate` ("9 Nov drop") is absolutely positioned top-right of the score card; `.rtop.nochart` / `.revrow.nochart` collapse to one column when there is no chart data.
