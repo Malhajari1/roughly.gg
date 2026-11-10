@@ -92,3 +92,4 @@ No test suite in the repo. Previously verified with jsdom smoke tests and Playwr
 ## Graphs show early data, smooth group toggle (10 Nov 2026)
 - `MINN=1`: the chart shows as soon as one real player answered. Under `EARLY=30` players the note starts "Early numbers."; under 5 players the "Better than X%" line and "Top X%" pill are hidden (a percentile of 2 people is meaningless). With zero answers a visible "unlocks" note shows (not hidden).
 - `openGroup(id,cb)`: toggling Total / Average / vs group repaints from the already-loaded board (`cb`) with no reload, no "Loading" flash.
+- `chartLater` retries up to 3 times (2.5s, 5s, 7.5s) while a chart has no data yet, because on a reload the answers backfill (`RQ_answers` -> `submitAnswer`) can finish after the first stats fetch. Keeps "Loading…" while retrying.

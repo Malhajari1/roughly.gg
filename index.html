@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <title>Roughly Qatar – Daily Estimation Game</title>
-<script>window.RQ_BUILD="2026-11-10.6";</script>
+<script>window.RQ_BUILD="2026-11-10.7";</script>
 <meta name="description" content="A fresh set of three how-many questions about Qatar every day. No exact answers — just reason your way close. What would you have guessed?">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Roughly">
@@ -1608,12 +1608,13 @@ function fetchStats(kind,qi){
   if(API)return Promise.resolve(pendingSend).then(function(){return getStats(dd)}).then(function(S){return kind==="q"?(S.q&&S.q[qi]):S.avg});
   return teleReady().then(function(ok){if(!ok)throw new Error("off");return Promise.resolve(pendingSend).then(function(){return kind==="q"?window.RQGroups.qStats(dd,qi):window.RQGroups.dayStats(dd,ii)})})}
 function noChart(box){var g=box&&box.parentNode;if(!g)return;g.style.display="none";var r=g.parentNode;if(r&&r.classList&&(r.classList.contains("rtop")||r.classList.contains("revrow")))r.classList.add("nochart")}
-function chartLater(kind,qi,s,tok){
+function chartLater(kind,qi,s,tok,tries){tries=tries||0;
   if(bonus&&!st.bd){var b0=document.getElementById("cbox");noChart(b0);return}
   fetchStats(kind,qi).then(function(o){
     if(tok!==viewTok)return;
     var box=document.getElementById("cbox");if(!box)return;
     var n=o?o.n:0,A=LANG==="ar";
+    if((!o||n<MINN)&&tries<3){setTimeout(function(){if(tok===viewTok)chartLater(kind,qi,s,tok,tries+1)},2500*(tries+1));return}
     if(!o||n<MINN){box.innerHTML="<p class='note'>"+(A?"تظهر المقارنة مع اللاعبين الآخرين عندما يجاوب "+faD(MINN)+" لاعباً"+(n?" ("+faD(n)+" حتى الآن)":"")+". أنت من الأوائل.":"Comparison with other players unlocks once "+MINN+" people have answered"+(n?" ("+n+" so far)":"")+". You’re early.")+"</p>";return}
     CD={bins:o.dist,n:n,over:o.over||0,under:o.under||0};
     var pc=pctile(s);box.innerHTML=chartInner(kind);
