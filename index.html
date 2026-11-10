@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <title>Roughly Qatar – Daily Estimation Game</title>
-<script>window.RQ_BUILD="2026-11-10.1";</script>
+<script>window.RQ_BUILD="2026-11-10.2";</script>
 <meta name="description" content="A fresh set of three how-many questions about Qatar every day. No exact answers — just reason your way close. What would you have guessed?">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Roughly">
@@ -133,14 +133,24 @@ button.main svg{width:18px;height:18px;stroke:#fff;fill:none;stroke-width:2.4;st
 #sheet.open{transform:none}
 .grab{display:none}
 .shh{display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:3;background:#fff;padding:calc(env(safe-area-inset-top,0px) + 16px) 0 12px;margin-bottom:6px}
-.coin{position:relative;overflow:hidden;background:linear-gradient(135deg,#ffe066,#ffc400);color:#241c00;border-radius:26px;padding:18px;margin-top:12px;box-shadow:0 16px 32px -16px rgba(255,196,0,.6);text-align:start}
-.coin .cb{display:inline-flex;align-items:center;gap:6px;background:#241c00;color:#ffe066;border-radius:20px;padding:5px 12px 5px 8px;font-size:.78rem;font-weight:800;margin-bottom:10px}
-.coin .cb svg,.cn2 svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-.coin b.t{display:block;font-size:1.1rem;font-weight:800}
-.coin p{margin:6px 0 14px;font-size:.9rem;line-height:1.5;color:rgba(36,28,0,.8)}
-.coin .cbtn{display:block;width:100%;border:0;border-radius:16px;padding:15px;font:inherit;font-weight:800;font-size:1rem;cursor:pointer;background:#241c00;color:#fff}
-.coin .gl{display:block;width:100%;margin-top:10px;padding:13px;border:2px solid rgba(36,28,0,.3);border-radius:16px;background:transparent;color:#241c00;font:inherit;font-weight:700;cursor:pointer}
 .drop0.nb .dropin b{margin-bottom:2px}
+.spendb{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;border:0;border-radius:22px;padding:17px 20px;margin-top:12px;font:inherit;font-weight:800;font-size:1.05rem;text-align:start;color:#fff;cursor:pointer;background:linear-gradient(135deg,#ff4d6d,#e11d48);box-shadow:0 16px 32px -14px rgba(225,29,72,.7);animation:vib 3s ease-in-out infinite}
+.spendb small{flex:none;background:rgba(255,255,255,.24);border-radius:12px;padding:3px 10px;font-size:.8rem;font-weight:700}
+.spendb:active{transform:scale(.98)}
+.cback{display:block;width:100%;margin-top:12px;padding:14px;border:2px solid rgba(47,107,255,.35);border-radius:18px;background:#fff;color:var(--c,#2f6bff);font:inherit;font-weight:700;cursor:pointer}
+@keyframes vib{0%,60%,100%{transform:none}64%{transform:translateX(-4px) rotate(-1deg)}68%{transform:translateX(4px) rotate(1deg)}72%{transform:translateX(-4px) rotate(-1deg)}76%{transform:translateX(4px) rotate(1deg)}80%{transform:translateX(-3px)}84%{transform:translateX(3px)}88%{transform:none}}
+@media (prefers-reduced-motion:reduce){.spendb{animation:none}}
+.pop{position:fixed;inset:0;z-index:80;display:flex;align-items:center;justify-content:center;padding:24px;background:rgba(18,28,70,.55);animation:popin .25s ease}
+@keyframes popin{from{opacity:0}to{opacity:1}}
+.popc{background:#fff;color:#16213e;border-radius:28px;padding:26px 22px 22px;max-width:360px;width:100%;text-align:center;box-shadow:0 30px 80px rgba(18,28,70,.45);animation:poprise .3s cubic-bezier(.2,.8,.2,1)}
+@keyframes poprise{from{transform:translateY(16px) scale(.97)}to{transform:none}}
+.popi{width:64px;height:64px;margin:0 auto 14px;border-radius:50%;background:#eaf1ff;display:flex;align-items:center;justify-content:center}
+.popi svg{width:34px;height:34px;stroke:#2f6bff;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.popc h3{margin:0 0 8px;font-size:1.25rem;font-weight:800}
+.popc p{margin:0 0 18px;font-size:.95rem;line-height:1.55;color:#4a5578}
+.popk{display:flex;align-items:center;justify-content:center;gap:8px;margin:-4px 0 16px;font-size:.85rem;color:#4a5578;cursor:pointer}
+.popk input{width:18px;height:18px;accent-color:#2f6bff}
+.popb{display:block;width:100%;border:0;border-radius:18px;padding:15px;font:inherit;font-weight:800;font-size:1rem;color:#fff;cursor:pointer;background:linear-gradient(135deg,#2f6bff,#1b4fd8)}
 .cn2{display:flex;align-items:center;gap:10px;color:var(--c)}.cn2 b{font-size:1.6rem}.cn2 span{font-size:.82rem;color:var(--mut)}
 .shh b{font-size:1.05rem;font-weight:800}
 .x{width:36px;height:36px;border-radius:12px;border:0;background:var(--tint);display:flex;align-items:center;justify-content:center;cursor:pointer}
@@ -1316,7 +1326,7 @@ function spendCoin(){
   bonus={n:n};st=x;ids=x.ids;intro=false;streak();render();window.scrollTo(0,0);return true}
 function exitBonus(){bonus=null;saveActive(null);selectDay(today);intro=false;render();window.scrollTo(0,0)}
 function init(){
-  today=dayNum();bonus=null;selectDay(today);
+  giftInit();today=dayNum();bonus=null;selectDay(today);
   var ra=load("rq-active",null);
   if(ra&&ra.d===today&&typeof ra.n==="number"){var bs=loadBonus(ra.n);if(bs&&(bs.g.length<3||bs.r)){bonus={n:ra.n};st=bs;ids=bs.ids}else saveActive(null)}
   else if(ra)saveActive(null);
@@ -1508,11 +1518,8 @@ function dayInfo(d){var x=load("tk8-s"+d,null);if(!x||x.day!==d||!Array.isArray(
 function coinMenu(){
   var A=LANG==="ar",c=coinsGet(),dd=dailyDone(),bo=bonusOpen(),can=c.n>0&&dd&&!bo,note;
   if(c.n<1)note=A?"الأيام السابقة مقفلة. حافظ على سلسلتك لتحصل على عملة، ثم اصرفها على لعبة إضافية بثلاثة أسئلة جديدة.":"Past days are locked. Keep your streak going to earn a coin, then spend it on an extra game of three fresh questions.";
-  else if(!dd)note=A?"أنهِ أسئلة اليوم الثلاثة أولاً، ثم يمكنك صرف عملة.":"Finish today’s three questions first, then you can spend a coin.";
-  else if(bo)note=A?"أنهِ جولتك الإضافية أولاً.":"Finish your bonus game first.";
-  else note=A?"الأيام السابقة مقفلة. العملة تفتح لعبة إضافية بثلاثة أسئلة جديدة، أو احتفظ بها ليوم آخر.":"Past days are locked. A coin unlocks one extra game with three fresh questions. Or keep it for another day.";
+      else note=A?"تصرف العملة من صفحة النتيجة بعد أن تنهي لعبة اليوم، أو احتفظ بها ليوم آخر.":"Spend a coin on your results page once today’s game is done, or keep it for another day.";
   return "<h3 class='bh' style='margin-top:20px'>"+(A?"عملات السلسلة":"Streak coins")+"</h3><div class='mi static'>"+ICON_COIN+"<div><b>"+(A?faD(c.n)+" عملة":c.n+" coin"+(c.n===1?"":"s"))+"</b><span>"+(A?"عملة لكل "+faD(STREAK_COIN_EVERY)+" أيام متتالية":"One for every "+STREAK_COIN_EVERY+" days of streak")+"</span></div></div>"+
-  "<button class='main' id='mspend' style='margin-top:12px'"+(can?"":" disabled")+">"+(A?"اصرف عملة للعب مرة أخرى":"Spend a coin to play another")+"</button>"+
   "<p class='note' style='margin-top:10px'>"+note+"</p>"}
 function openMenu(){
   var sh=document.getElementById("sheet"),sc=document.getElementById("scrim");
@@ -2018,23 +2025,43 @@ var cdTimer=null;
 function nextMidnight(){var n=new Date(),m=new Date(n.getFullYear(),n.getMonth(),n.getDate()+1,0,0,0,0);return m-n}
 function fmtDur(ms){ms=Math.max(0,ms);var s=Math.floor(ms/1000),h=Math.floor(s/3600),m=Math.floor(s%3600/60),ss=s%60;function z(x){return (x<10?"0":"")+x}return faD(z(h)+":"+z(m)+":"+z(ss))}
 function last7(){var out=[],i,d,inf;for(i=6;i>=0;i--){d=today-i;inf=(d<START||d>today)?{n:0,t:0}:dayInfo(d);out.push({d:d,avg:inf.n>=3?Math.round(inf.t/3):null})}return out}
-function coinInner(saved){
-  var A=LANG==="ar",c=coinsGet(),earned=!bonus&&st.cg,left=STREAK_COIN_EVERY-(stats.streak%STREAK_COIN_EVERY),h="";
-  if(earned)h+="<span class='cb'>"+ICON_COIN+(A?"+١ عملة سلسلة":"+1 streak coin")+"</span>";
-  if(saved)h+="<b class='t'>"+(A?"تم حفظ العملة":"Coin saved")+"</b><p>"+(A?"ستجدها في القائمة متى أردت جولة جديدة.":"It’s waiting in your menu whenever you want another game.")+"</p>";
-  else if(c.n>0)h+="<b class='t'>"+(earned?(A?"حصلت على عملة سلسلة":"You earned a streak coin"):(A?"لديك "+faD(c.n)+" عملة":"You have "+c.n+" streak coin"+(c.n===1?"":"s")))+"</b><p>"+(A?"اصرف عملة للعب جولة جديدة بثلاثة أسئلة جديدة، أو احتفظ بها ليوم آخر.":(earned?"Keeping your streak alive pays off. ":"")+"Spend one to play another game with three fresh questions, or save it for another day.")+"</p>"+
-    "<button class='cbtn' id='cspend'>"+(A?"اصرف عملة للعب مرة أخرى":"Spend a streak coin to play another")+"</button><button class='gl' id='csave'>"+(A?"احتفظ بها ليوم آخر":"Save it for another day")+"</button>";
-  else h+="<b class='t'>"+(A?"عملات السلسلة":"Streak coins")+"</b><p>"+(A?"العب "+faD(left)+" أيام متتالية لتحصل على عملة. العملة تفتح جولة إضافية بثلاثة أسئلة جديدة.":"Play "+left+" more day"+(left===1?"":"s")+" in a row to earn a coin. A coin buys one extra game of three fresh questions.")+"</p>";
-  if(bonus)h+="<button class='gl' id='cback'>"+(A?"الرجوع لنتيجة اليوم":"Back to today’s result")+"</button>";
-  return h}
-function coinCard(){return day===today?"<div class='coin' id='coin'>"+coinInner(false)+"</div>":""}
-function wireCoin(saved){
-  var el=document.getElementById("coin");if(!el)return;
+function coinCard(){
+  if(day!==today)return "";
+  var A=LANG==="ar",c=coinsGet(),h="";
+  if(c.n>0)h+="<button class='spendb' id='cspend'><span>"+(A?"اصرف عملة للعب مرة أخرى":"Spend a coin to play another")+"</span><small>"+(A?faD(c.n)+" متبقية":c.n+" left")+"</small></button>";
+  if(bonus)h+="<button class='cback' id='cback'>"+(A?"الرجوع لنتيجة اليوم":"Back to today’s result")+"</button>";
+  return h?"<div id='coin'>"+h+"</div>":""}
+function wireCoin(){
   var g=function(i){return document.getElementById(i)};
-  if(saved)el.innerHTML=coinInner(true);
   if(g("cspend"))g("cspend").onclick=spendCoin;
-  if(g("csave"))g("csave").onclick=function(){wireCoin(true)};
   if(g("cback"))g("cback").onclick=exitBonus}
+/* ===== pop-ups: welcome gift for existing players, and the 'you earned a coin' message ===== */
+function popup(o){
+  var old=document.getElementById("pop");if(old)old.parentNode.removeChild(old);
+  var el=document.createElement("div");el.id="pop";el.className="pop";
+  el.innerHTML="<div class='popc' role='dialog' aria-modal='true'><div class='popi'>"+ICON_COIN+"</div><h3>"+o.title+"</h3><p>"+o.body+"</p>"+
+    (o.check?"<label class='popk'><input type='checkbox' id='popk'><span>"+o.check+"</span></label>":"")+"<button class='popb' id='popb'>"+o.btn+"</button></div>";
+  document.body.appendChild(el);
+  document.getElementById("popb").onclick=function(){var k=document.getElementById("popk"),on=!!(k&&k.checked);el.parentNode.removeChild(el);if(o.done)o.done(on)}}
+function giftInit(){
+  try{if(localStorage.getItem("rq-gift")!==null)return;var had=false,i,k;
+    for(i=0;i<localStorage.length;i++){k=localStorage.key(i)||"";if(/^(tk8-|tk7-|rq-units|rq-name|rq-ch-|rq-lang)/.test(k)){had=true;break}}
+    localStorage.setItem("rq-gift",had?"p":"n")}catch(e){}}
+function giftShow(){
+  var v="";try{v=localStorage.getItem("rq-gift")||""}catch(e){}
+  if(v!=="p"||document.getElementById("pop"))return;
+  var A=LANG==="ar";
+  popup({title:A?"شكراً لدعمك":"Thank you for playing",
+    body:A?"كنت معنا في أيام التجربة، وملاحظاتك تصنع اللعبة. هديتنا لك عملتان من عملات السلسلة، وكل عملة تفتح جولة إضافية بثلاثة أسئلة جديدة.":"You’ve been with Roughly Qatar through its testing days, and your support is shaping the game. As a thank you, here are 2 streak coins. Each one unlocks an extra game of three fresh questions.",
+    btn:A?"استلم العملتين":"Claim my 2 coins",
+    done:function(){var c=coinsGet();c.n=Math.min(99,c.n+2);coinsSet(c);try{localStorage.setItem("rq-gift","d")}catch(e){}streak();if(!intro&&st.g.length>=3&&!st.r)render()}})}
+function earnedShow(){
+  var off="";try{off=localStorage.getItem("rq-nocp")||""}catch(e){}
+  if(off||document.getElementById("pop"))return;var A=LANG==="ar";
+  popup({title:A?"حصلت على عملة سلسلة":"You earned a streak coin",
+    body:A?"كل ٣ أيام متتالية تمنحك عملة. اصرفها من صفحة النتيجة للعب جولة إضافية بثلاثة أسئلة جديدة، أو احتفظ بها ليوم آخر.":"Every 3-day streak earns a coin. Spend it on your results page to play another game of three fresh questions, or save it for another day.",
+    check:A?"لا تُظهر لي هذا مرة أخرى":"Don’t show me this again",btn:A?"رائع":"Nice",
+    done:function(on){if(on){try{localStorage.setItem("rq-nocp","1")}catch(e){}}}})}
 function done(){
   var tot=st.s.reduce(function(a,b){return a+b},0),avg=Math.round(tot/3),pc=API?0:(CD=demoDist(),pctile(avg)),qrows="",w7,i,q;
   for(i=0;i<3;i++){q=Q[ids[i]];qrows+="<div class='qr'>"+catIcon(q.c)+"<div class='qt'><b dir='auto'>"+qT(q)+"</b>"+(chInfo()?"<span>"+esc(chInfo().n)+(LANG==="ar"?" سجّل ":" scored ")+faD(chInfo().s[i])+PCT()+"</span>":"")+"</div><div><span class='qs'>"+faD(st.s[i])+PCT()+"</span><span class='qv'>"+verdict(st.g[i],q)+"</span></div></div>"}
@@ -2047,7 +2074,8 @@ function done(){
   app.classList.add("plain");
   document.getElementById("sh").onclick=function(){openShare(tot)};
   var ab=document.getElementById("arch");if(ab)ab.onclick=function(){var d=new Date(day*864e5);cm={y:d.getUTCFullYear(),m:d.getUTCMonth()};openMenu()};
-  wireCoin(false);
+  wireCoin();
+  if(!bonus&&st.cg&&!st.cgs){st.cgs=1;saveState();setTimeout(earnedShow,600)}
   if(cdTimer)clearInterval(cdTimer);
   cdTimer=setInterval(function(){var el=document.getElementById("cdn");if(!el){clearInterval(cdTimer);cdTimer=null;return}el.textContent=fmtDur(nextMidnight())},1000);
   animate(avg,pc);chartLater("day",0,avg,viewTok);
@@ -2065,7 +2093,7 @@ document.getElementById("menu").onclick=function(){var d=new Date(day*864e5);cm=
 document.getElementById("lang").onclick=toggleLang;
 document.querySelector(".wordmark").onclick=function(){selectDay(today);intro=true;render();window.scrollTo(0,0)};
 document.addEventListener("visibilitychange",function(){if(!document.hidden&&dayNum()!==day){init();streak();render()}});
-applyLang();init();streak();render();
+applyLang();init();streak();render();setTimeout(giftShow,900);
 if(API&&acct().t)pullSync().then(function(c){if(c){streak();selectDay(day);if(!busy)render()}},function(){});
 /* Auto-update: if a newer build is published, reload once (heals stale browser cache). */
 (function(){var B=window.RQ_BUILD;if(!B)return;var KEY="rq-build-seen",last=0;
