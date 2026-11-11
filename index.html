@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <title>Roughly Qatar – Daily Estimation Game</title>
-<script>window.RQ_BUILD="2026-11-11.1";</script>
+<script>window.RQ_BUILD="2026-11-11.2";</script>
 <meta name="description" content="A fresh set of three how-many questions about Qatar every day. No exact answers — just reason your way close. What would you have guessed?">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Roughly">
@@ -797,7 +797,7 @@ header .hd{direction:ltr}
 <meta name="roughly-api" content="">
 </head>
 <body>
-<header><div class="hd"><button id="homeb" class="mb" aria-label="Home"><svg viewBox='0 0 24 24'><path d='M4 20V10l8-6 8 6v10M4 20h16M10 20v-5h4v5'/></svg></button><div class="hr"><span class="wordmark">roughly.gg</span><button id="menu" class="mb" aria-label="Menu"><svg viewBox='0 0 24 24'><path d='M4 7h16M4 12h16M4 17h16'/></svg></button></div></div></header>
+<header><div class="hd"><div style="display:flex;align-items:center;gap:8px"><button id="homeb" class="mb" aria-label="Home"><svg viewBox='0 0 24 24'><path d='M4 20V10l8-6 8 6v10M4 20h16M10 20v-5h4v5'/></svg></button><button id="lang" class="langbtn" aria-label="Switch language" >عربي</button></div><div class="hr"><span class="wordmark">roughly.gg</span><button id="menu" class="mb" aria-label="Menu"><svg viewBox='0 0 24 24'><path d='M4 7h16M4 12h16M4 17h16'/></svg></button></div></div></header>
 <main>
   <div class="layout"><div id="app" class="card"></div></div>
   <p class="small" id="hwl" style="display:none"><a href="#" id="how">How to play</a></p>
@@ -2320,6 +2320,7 @@ function acctLabel(){var b=document.getElementById("acct");if(!b)return;b.textCo
 function streak(){var e=document.getElementById("streak");if(!e)return;var c=coinsGet().n,t=stats.streak?stats.streak+" day streak":"";if(c)t+=(t?" · ":"")+c+" coin"+(c===1?"":"s");e.textContent=t}
 document.getElementById("how").onclick=function(e){e.preventDefault();openHow()};
 document.getElementById("menu").onclick=function(){var d=new Date(day*864e5);cm={y:d.getUTCFullYear(),m:d.getUTCMonth()};openMenu()};
+document.getElementById("lang").onclick=toggleLang;
 document.getElementById("homeb").onclick=function(){selectDay(today);intro=true;render();window.scrollTo(0,0)};
 document.querySelector(".wordmark").onclick=function(){selectDay(today);intro=true;render();window.scrollTo(0,0)};
 document.addEventListener("visibilitychange",function(){if(!document.hidden&&dayNum()!==day){init();streak();render()}});
