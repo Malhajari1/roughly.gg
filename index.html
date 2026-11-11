@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <title>Roughly Qatar – Daily Estimation Game</title>
-<script>window.RQ_BUILD="2026-11-11.7";</script>
+<script>window.RQ_BUILD="2026-11-11.8";</script>
 <meta name="description" content="A fresh set of three how-many questions about Qatar every day. No exact answers — just reason your way close. What would you have guessed?">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Roughly">
@@ -1662,7 +1662,8 @@ function homeAvg(mine,tries){
     if(r.n>0){el.innerHTML="<span>"+(AR?"متوسط اللاعبين اليوم":"Players’ average today")+"</span><b>"+faD(r.avg)+PCT()+"</b><i>"+faD(r.n)+(AR?(r.n===1?" لاعب":" لاعبين"):(r.n===1?" player":" players"))+"</i>";el.className="hmavg on"}
     else if(tries<2)setTimeout(function(){homeAvg(mine,tries+1)},2500);
     else note(AR?"لا يوجد لاعبون آخرون بعد. ارجع لاحقاً.":"No other players yet. Check back later.")
-  },function(){if(tries<2)setTimeout(function(){homeAvg(mine,tries+1)},2500);else note(AR?"تعذّر تحميل متوسط اللاعبين. جرّب لاحقاً.":"Couldn’t load the players’ average. Try again later.")})}
+  },function(e){var code=String((e&&(e.code||e.message))||"error").replace(/^.*\//,"").slice(0,40);try{console.error("players average:",e)}catch(x){}
+    if(tries<2)setTimeout(function(){homeAvg(mine,tries+1)},2500);else note((AR?"تعذّر تحميل متوسط اللاعبين. جرّب لاحقاً.":"Couldn’t load the players’ average. Try again later.")+" ("+esc(code)+")")})}
 function home(){
   var AR=LANG==="ar",fin=st.g.length>=3&&!st.r,hist=stats.played>0,tot=0,avg=0,hero,i;
   if(fin){tot=st.s.reduce(function(a,b){return a+b},0);avg=Math.round(tot/3)}

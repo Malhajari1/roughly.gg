@@ -159,3 +159,7 @@ No test suite in the repo. Previously verified with jsdom smoke tests and Playwr
 - Results screen: a "Dashboard" button (`#dsh`, Arabic "لوحتي") sits next to "Share result" in a `.shrow`; it opens Home.
 - Players' average on Home: the old code waited only ~3s for the Firebase service and then failed silently, which on a slow load left the score card with no average at all. It now waits up to ~15s (`waitGroups`), shows "Loading players' average…" straight away, and ends in an honest message: the average, "No other players yet", or "Couldn't load the players' average".
 - Tested with a stub service: loads at 5s, rejects, plus the Dashboard button from the results screen. Not tested against real Firestore (rules, quota) or a real phone.
+
+## Players' average shows the real error code (11 Nov 2026, build .8)
+- After build .7 every player saw "Couldn't load the players' average". The app can't tell why from the outside, so the message now ends with the error code in brackets, e.g. "(permission-denied)", and the error is also logged to the console ("players average:"). Likely causes in order: `answers` rules not published in the Firebase console (see `backend/firestore.rules`), anonymous sign-in not enabled, or the Firebase scripts blocked on the player's network.
+- NB: the results/reveal graphs fall back to sample data silently when the real fetch fails (`DEMO_FILL` `bad()`), so they can look healthy while real reads are failing.
