@@ -26,11 +26,11 @@ function authed(req) { const m = /^Bearer ([a-f0-9]{48})$/.exec(req.headers.auth
 // stats for one day: per-question distributions (20 bands of 5 points) and the distribution of 3-question averages
 function band(s) { return Math.min(19, Math.floor(s / 5)); }
 function stats(day) {
-  const d = db.answers[day] || {}, q = {}, avg = { n: 0, dist: Array(20).fill(0) };
+  const d = db.answers[day] || {}, q = {}, avg = { n: 0, sum: 0, dist: Array(20).fill(0) };
   for (const p in d) {
     const a = d[p], ks = Object.keys(a);
     for (const qi of ks) { const o = (q[qi] = q[qi] || { n: 0, over: 0, under: 0, dist: Array(20).fill(0), rs: [] }); o.n++; o.dist[band(a[qi].s)]++; if (o.rs.length < 5000) o.rs.push(Math.round(a[qi].r * 100) / 100); if (a[qi].r > 0.0212) o.over++; else if (a[qi].r < -0.0212) o.under++; }
-    if (ks.length === 3) { avg.n++; avg.dist[band(Math.round(ks.reduce((t, k) => t + a[k].s, 0) / 3))]++; }
+    if (ks.length === 3) { const m = Math.round(ks.reduce((t, k) => t + a[k].s, 0) / 3); avg.n++; avg.sum += m; avg.dist[band(m)]++; }
   }
   return { day, q, avg };
 }

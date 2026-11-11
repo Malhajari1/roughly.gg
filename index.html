@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <title>Roughly Qatar – Daily Estimation Game</title>
-<script>window.RQ_BUILD="2026-11-11.5";</script>
+<script>window.RQ_BUILD="2026-11-11.6";</script>
 <meta name="description" content="A fresh set of three how-many questions about Qatar every day. No exact answers — just reason your way close. What would you have guessed?">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Roughly">
@@ -792,6 +792,7 @@ header .hd{direction:ltr}
 .hmk b{display:flex;align-items:center;justify-content:center;height:38px;border-radius:11px;background:#eef2fb;color:#9aa6c4;font-size:.85rem}
 .hmk .now small{color:var(--c)}.hmk .now b{box-shadow:0 0 0 2px var(--c)}
 .hm .drop0{margin:0 0 6px}
+.hmavg{display:none}.hmavg.on{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;background:rgba(255,255,255,.16);border-radius:14px;padding:9px 12px;margin:-4px 0 12px;font-size:.82rem}.hmavg span{opacity:.85;font-weight:600}.hmavg b{font-size:1.15rem}.hmavg i{font-style:normal;opacity:.7;margin-inline-start:auto}
 #hwl{margin-top:14px}#hwl a{color:var(--c);font-weight:700;text-decoration:none}
 </style>
 <meta name="roughly-api" content="">
@@ -1647,6 +1648,17 @@ function openHow(){
   var AR=LANG==="ar",F=faqAll(),T=THEMES,steps=AR?[["خمّن","استخدم منطقك، اختر رقماً، وثبّته."],["النتيجة","اعرف كم اقتربت، ولماذا."],["قارن","قارن نفسك بالجميع، ثم تحدَّ صديقك."]]:[["Guess","Use logic, pick a number, lock it in."],["Reveal","See how close you landed, and why."],["Compare","Stack up against everyone, then challenge a friend."]];
   sheetShell(AR?"كيف تلعب":"How to play","<div class='lsteps' style='margin:4px 0 8px'>"+steps.map(function(x,i){return "<div class='lstep' style='--c:"+T[i].c+";--c2:"+T[i].c2+";--cs:"+T[i].cs+"'><b>"+faD(i+1)+"</b><h4>"+x[0]+"</h4><span>"+x[1]+"</span></div>"}).join("")+"</div>"+
    [0,3,7,10].map(function(i){return "<details><summary>"+F[i][0]+"</summary><p>"+F[i][1]+"</p></details>"}).join(""))}
+function realDayAvg(){
+  var dd=day,ii=ids.slice(),done=function(r){if(!r||!r.n)return {n:0};var a=typeof r.sum==="number"&&r.n?r.sum/r.n:0;if(!a&&r.dist){var t=0;r.dist.forEach(function(c,b){t+=c*(b*5+2.5)});a=t/r.n}return {n:r.n,avg:Math.round(a)}};
+  if(API)return Promise.resolve(pendingSend).then(function(){return getStats(dd)}).then(function(S){return done(S&&S.avg)});
+  return teleReady().then(function(ok){if(!ok)throw new Error("off");return Promise.resolve(pendingSend).then(function(){return window.RQGroups.dayStats(dd,ii)})}).then(done)}
+function homeAvg(mine,tries){
+  var AR=LANG==="ar",el=document.getElementById("havg");if(!el)return;tries=tries||0;
+  realDayAvg().then(function(r){el=document.getElementById("havg");if(!el)return;
+    if(r.n>0){el.innerHTML="<span>"+(AR?"متوسط اللاعبين اليوم":"Players’ average today")+"</span><b>"+faD(r.avg)+PCT()+"</b><i>"+faD(r.n)+(AR?(r.n===1?" لاعب":" لاعبين"):(r.n===1?" player":" players"))+"</i>";el.className="hmavg on"}
+    else if(tries<2)setTimeout(function(){homeAvg(mine,tries+1)},2500);
+    else{el.innerHTML="<span>"+(AR?"لا يوجد لاعبون آخرون بعد. ارجع لاحقاً.":"No other players yet. Check back later.")+"</span>";el.className="hmavg on"}
+  },function(){el=document.getElementById("havg");if(el&&tries<2)setTimeout(function(){homeAvg(mine,tries+1)},2500)})}
 function home(){
   var AR=LANG==="ar",fin=st.g.length>=3&&!st.r,hist=stats.played>0,tot=0,avg=0,hero,i;
   if(fin){tot=st.s.reduce(function(a,b){return a+b},0);avg=Math.round(tot/3)}
@@ -1656,12 +1668,12 @@ function home(){
   if(bonus){
     hero="<div class='hmh solo'><button class='hmw' id='hpl'>"+(fin?(AR?"اعرض نتيجة الجولة الإضافية":"See bonus results"):(AR?"أكمل الجولة الإضافية":"Continue bonus game"))+"</button><button class='hmg' id='hbk' style='margin-top:8px'>"+(AR?"الرجوع لنتيجة اليوم":"Back to today’s result")+"</button></div>"}
   else if(fin){
-    hero="<div class='hmh'><small>"+(AR?"اليوم":"Today")+"</small><div class='hmsc'><b>"+faD(avg)+"</b><i>"+PCT()+"</i></div><div class='hmb'><button class='hmg' id='hbd'>"+(AR?"عرض التفاصيل":"See breakdown")+"</button><button class='hmw' id='hsh'>"+(AR?"شارك":"Share")+"</button></div></div>"+
+    hero="<div class='hmh'><small>"+(AR?"اليوم":"Today")+"</small><div class='hmsc'><b>"+faD(avg)+"</b><i>"+PCT()+"</i></div><div class='hmavg' id='havg'></div><div class='hmb'><button class='hmg' id='hbd'>"+(AR?"عرض التفاصيل":"See breakdown")+"</button><button class='hmw' id='hsh'>"+(AR?"شارك":"Share")+"</button></div></div>"+
      "<div class='drop0 nb'><div class='dropin'><small>"+tr("Next drop in")+"</small><b id='cdn'>"+fmtDur(nextMidnight())+"</b></div></div>"}
   else hero="<div class='hmh solo'><button class='hmw' id='hpl'>"+(st.g.length?(AR?"أكمل أسئلة اليوم":"Continue today’s drop"):(AR?"العب أسئلة اليوم":"Play today’s drop"))+"</button></div>";
   var tiles=hist?"<div class='hmt'><div><span class='hmi f'>"+ICON_FLAME+"</span><p><b>"+faD(stats.streak||0)+"</b><small>"+(AR?"أيام متتالية":"day streak")+"</small></p></div><div><span class='hmi'>"+ICON_COIN+"</span><p><b>"+faD(cn)+"</b><small>"+(AR?"عملات · التالية بعد "+faD(left)+(left===1?" يوم":" أيام"):(cn===1?"coin":"coins")+" · next in "+left+" day"+(left===1?"":"s"))+"</small></p></div></div>":"";
   var week=hist?"<div class='hmw7'><div class='hmwh'><b>"+(AR?"أسبوعك":"Your week")+"</b><span>"+(cnt?(AR?"المتوسط ":"Average ")+faD(Math.round(sum/cnt))+PCT():"")+"</span></div><div class='hmk'>"+w7.map(function(x,k){var d=new Date(x.d*864e5).getUTCDay();return "<div class='"+(k===6?"now":"")+"'><small>"+WD[d]+"</small><b style='"+(x.avg!==null?"background:"+col(x.avg)+";color:#fff":"")+"'>"+(x.avg!==null?faD(x.avg):"–")+"</b></div>"}).join("")+"</div></div>":"";
-  var grp=groupsOn()?"<div><h3 class='bh' style='margin:6px 0 8px'>"+(AR?"المجموعات":"Groups")+"</h3><div id='hgl'><p class='note'>"+(AR?"جارٍ التحميل…":"Loading…")+"</p></div><div class='shg' style='grid-template-columns:1fr 1fr;margin-top:8px'><button class='shl' id='hgc'>"+(AR?"أنشئ مجموعة":"Create a group")+"</button><button class='shl' id='hgj'>"+(AR?"انضم برمز":"Join with a code")+"</button></div></div>":"";
+  var grp=(groupsOn()||!window.RQGroups)?"<div><h3 class='bh' style='margin:6px 0 8px'>"+(AR?"المجموعات":"Groups")+"</h3><div id='hgl'><p class='note'>"+(AR?"جارٍ التحميل…":"Loading…")+"</p></div><div class='shg' style='grid-template-columns:1fr 1fr;margin-top:8px'><button class='shl' id='hgc'>"+(AR?"أنشئ مجموعة":"Create a group")+"</button><button class='shl' id='hgj'>"+(AR?"انضم برمز":"Join with a code")+"</button></div></div>":"";
   mount("<div class='hm'>"+hero+(fin&&!bonus?tiles+coinCard():tiles)+week+grp+"</div>");
   app.classList.add("plain");
   var go=function(){intro=false;render();window.scrollTo(0,0)},g=function(x){return document.getElementById(x)};
@@ -1671,7 +1683,7 @@ function home(){
   if(fin&&!bonus)wireCoin();
   if(cdTimer)clearInterval(cdTimer);
   cdTimer=setInterval(function(){var el=g("cdn");if(!el){clearInterval(cdTimer);cdTimer=null;return}el.textContent=fmtDur(nextMidnight())},1000);
-  if(groupsOn()){
+  var wireG=function(){
     g("hgc").onclick=function(){openGroupCreate()};g("hgj").onclick=function(){openGroupJoin("")};
     var tok=viewTok;
     window.RQGroups.listGroups().then(function(gs){
@@ -1680,6 +1692,12 @@ function home(){
       box.innerHTML="<div class='mis'>"+gs.map(function(x){return "<button class='mi' data-g='"+esc(x.id)+"'>"+ICON_USERS+"<div><b>"+esc(x.name)+"</b><span>"+faD(x.members)+(AR?" أعضاء · المركز ":" members · #")+faD(x.myRank||"-")+"</span></div>"+ICON_R+"</button>"}).join("")+"</div>";
       Array.prototype.forEach.call(box.querySelectorAll("button[data-g]"),function(b){b.onclick=function(){openGroup(b.getAttribute("data-g"))}})
     },function(){var box=g("hgl");if(box)box.innerHTML=""})}
+  var tries=0,tok0=viewTok,waitG=function(){if(!g("hgl"))return;
+    if(window.RQGroups&&window.RQGroups.enabled){wireG();return}
+    if((window.RQGroups&&!window.RQGroups.enabled)||tries++>40){var hb=g("hgl");if(hb&&hb.parentNode)hb.parentNode.style.display="none";return}
+    setTimeout(waitG,300)};
+  if(grp)waitG();
+  if(fin&&!bonus)homeAvg(avg)
 }
 var MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],MONL=["January","February","March","April","May","June","July","August","September","October","November","December"];
 var ICON_CAL="<svg viewBox='0 0 24 24'><rect x='4' y='5' width='16' height='15' rx='3'/><path d='M8 3v4M16 3v4M4 10h16'/></svg>";
@@ -2553,8 +2571,8 @@ if(!firebaseConfig||!firebaseConfig.apiKey){
         return {n,dist:bins,over,under,rs};},
       async dayStats(day,ids){await ready;const qs=await getDocs(query(collection(db,"answers"),where("day","==",day),limit(15000)));
         const per={};qs.forEach(x=>{const d=x.data();if(ids.indexOf(d.qi)<0||!(d.s>=1&&d.s<=100))return;(per[d.uid]=per[d.uid]||{})[d.qi]=d.s;});
-        const bins=new Array(20).fill(0);let n=0;for(const u in per){const v=Object.keys(per[u]).map(k=>per[u][k]);if(v.length<3)continue;const a=Math.round(v.reduce((p,c)=>p+c,0)/v.length);bins[Math.min(19,Math.floor(a/5))]++;n++;}
-        return {n,dist:bins};},
+        const bins=new Array(20).fill(0);let n=0,sum=0;for(const u in per){const v=Object.keys(per[u]).map(k=>per[u][k]);if(v.length<3)continue;const a=Math.round(v.reduce((p,c)=>p+c,0)/v.length);bins[Math.min(19,Math.floor(a/5))]++;n++;sum+=a;}
+        return {n,dist:bins,sum};},
       async linkGoogle(){await ready;const prov=new GoogleAuthProvider();
         try{await linkWithPopup(auth.currentUser,prov);}
         catch(e){if(e&&e.code==="auth/credential-already-in-use")await signInWithPopup(auth,prov);else throw e;}
