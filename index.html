@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <title>Roughly Qatar – Daily Estimation Game</title>
-<script>window.RQ_BUILD="2026-11-11.6";</script>
+<script>window.RQ_BUILD="2026-11-11.7";</script>
 <meta name="description" content="A fresh set of three how-many questions about Qatar every day. No exact answers — just reason your way close. What would you have guessed?">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Roughly">
@@ -738,7 +738,8 @@ body.fit main{justify-content:center}
 .res .pillrow{margin-top:6px}
 .res .qres{margin:7px 0}
 .res .qr{padding:6px 2px}
-.res .shareb{margin-top:10px}
+.res .shareb{margin-top:0}
+.shrow{display:flex;gap:10px;margin-top:12px}.shrow button.main{margin-top:0;flex:1;width:auto;padding:0 10px;font-size:1.02rem}.shrow button.dashb{flex:.8;background:#fff;color:var(--c);box-shadow:inset 0 0 0 2px var(--c);animation:none}
 .drop0{padding:13px;margin-top:9px}
 .drop0 .dropin small{font-size:.66rem}
 .drop0 .dropin b{font-size:2.1rem;margin:2px 0 9px}
@@ -1648,17 +1649,20 @@ function openHow(){
   var AR=LANG==="ar",F=faqAll(),T=THEMES,steps=AR?[["خمّن","استخدم منطقك، اختر رقماً، وثبّته."],["النتيجة","اعرف كم اقتربت، ولماذا."],["قارن","قارن نفسك بالجميع، ثم تحدَّ صديقك."]]:[["Guess","Use logic, pick a number, lock it in."],["Reveal","See how close you landed, and why."],["Compare","Stack up against everyone, then challenge a friend."]];
   sheetShell(AR?"كيف تلعب":"How to play","<div class='lsteps' style='margin:4px 0 8px'>"+steps.map(function(x,i){return "<div class='lstep' style='--c:"+T[i].c+";--c2:"+T[i].c2+";--cs:"+T[i].cs+"'><b>"+faD(i+1)+"</b><h4>"+x[0]+"</h4><span>"+x[1]+"</span></div>"}).join("")+"</div>"+
    [0,3,7,10].map(function(i){return "<details><summary>"+F[i][0]+"</summary><p>"+F[i][1]+"</p></details>"}).join(""))}
+function waitGroups(){return new Promise(function(res,rej){var t=0;(function w(){var R=window.RQGroups;if(R&&R.enabled&&R.dayStats){res(R);return}if((R&&!R.enabled)||t++>60){rej(new Error("off"));return}setTimeout(w,250)})()})}
 function realDayAvg(){
   var dd=day,ii=ids.slice(),done=function(r){if(!r||!r.n)return {n:0};var a=typeof r.sum==="number"&&r.n?r.sum/r.n:0;if(!a&&r.dist){var t=0;r.dist.forEach(function(c,b){t+=c*(b*5+2.5)});a=t/r.n}return {n:r.n,avg:Math.round(a)}};
   if(API)return Promise.resolve(pendingSend).then(function(){return getStats(dd)}).then(function(S){return done(S&&S.avg)});
-  return teleReady().then(function(ok){if(!ok)throw new Error("off");return Promise.resolve(pendingSend).then(function(){return window.RQGroups.dayStats(dd,ii)})}).then(done)}
+  return waitGroups().then(function(R){return Promise.resolve(pendingSend).then(function(){return R.dayStats(dd,ii)})}).then(done)}
 function homeAvg(mine,tries){
   var AR=LANG==="ar",el=document.getElementById("havg");if(!el)return;tries=tries||0;
+  var note=function(t){el=document.getElementById("havg");if(el){el.innerHTML="<span>"+t+"</span>";el.className="hmavg on"}};
+  if(tries===0)note(AR?"جارٍ تحميل متوسط اللاعبين…":"Loading players’ average…");
   realDayAvg().then(function(r){el=document.getElementById("havg");if(!el)return;
     if(r.n>0){el.innerHTML="<span>"+(AR?"متوسط اللاعبين اليوم":"Players’ average today")+"</span><b>"+faD(r.avg)+PCT()+"</b><i>"+faD(r.n)+(AR?(r.n===1?" لاعب":" لاعبين"):(r.n===1?" player":" players"))+"</i>";el.className="hmavg on"}
     else if(tries<2)setTimeout(function(){homeAvg(mine,tries+1)},2500);
-    else{el.innerHTML="<span>"+(AR?"لا يوجد لاعبون آخرون بعد. ارجع لاحقاً.":"No other players yet. Check back later.")+"</span>";el.className="hmavg on"}
-  },function(){el=document.getElementById("havg");if(el&&tries<2)setTimeout(function(){homeAvg(mine,tries+1)},2500)})}
+    else note(AR?"لا يوجد لاعبون آخرون بعد. ارجع لاحقاً.":"No other players yet. Check back later.")
+  },function(){if(tries<2)setTimeout(function(){homeAvg(mine,tries+1)},2500);else note(AR?"تعذّر تحميل متوسط اللاعبين. جرّب لاحقاً.":"Couldn’t load the players’ average. Try again later.")})}
 function home(){
   var AR=LANG==="ar",fin=st.g.length>=3&&!st.r,hist=stats.played>0,tot=0,avg=0,hero,i;
   if(fin){tot=st.s.reduce(function(a,b){return a+b},0);avg=Math.round(tot/3)}
@@ -2199,7 +2203,7 @@ function applyLang(){document.documentElement.lang=LANG;document.documentElement
 function toggleLang(){LANG=(LANG==="ar"?"en":"ar");try{localStorage.setItem("rq-lang",LANG)}catch(e){}applyLang();render()}
 var AR=LANG==="ar";
 var TR={
-"Confirm":"أكّد","Next":"التالي","See results":"اعرض النتيجة","See the maths":"طريقة الحساب","Share result":"شارك نتيجتك",
+"Confirm":"أكّد","Next":"التالي","See results":"اعرض النتيجة","See the maths":"طريقة الحساب","Share result":"شارك نتيجتك","Dashboard":"لوحتي",
 "Play past drops":"العب الأيام السابقة","Next drop in":"السؤال الجديد بعد","Your score":"نتيجتك","Your guess":"تخمينك","Our estimate":"تقديرنا",
 "Better than":"أفضل من","You":"أنت","Spot on":"إصابة دقيقة","Good to know":"للعلم","How we worked it out":"كيف حسبناها","The logic":"الطريقة",
 "You guessed":"تخمينك","You were":"كنت","Your score ":"نتيجتك","day streak":"يوم متتالي",
@@ -2430,10 +2434,11 @@ function done(){
   "<div class='rtop'><div class='rsc'><small>"+(bonus?(LANG==="ar"?"نتيجة الجولة الإضافية":"Bonus game score"):(LANG==="ar"?"نتيجتك":"Your score"))+"</small><div class='hs'><span id='sn'>"+faD(0)+"</span><i>"+PCT()+"</i></div><div class='pillrow'><span class='hpill' id='pill' style='display:none'>"+(LANG==="ar"?"أفضل "+faD(100-pc)+"٪":"Top "+(100-pc)+"%")+"</span>"+(stats.streak&&!bonus?"<span class='stk'>"+ICON_FLAME+faD(stats.streak)+(LANG==="ar"?" يوم متتالي":" day streak")+"</span>":"")+(coinsGet().n?"<span class='stk'>"+ICON_COIN+faD(coinsGet().n)+(LANG==="ar"?" عملة":(coinsGet().n===1?" coin":" coins"))+"</span>":"")+"</div></div>"+
   "<div class='revg'>"+chartSlot("day")+"</div></div>"+
   h2h(avg)+
-  "<div class='qres'>"+qrows+"</div><button class='main shareb' id='sh'>"+tr("Share result")+"</button></div>"+
+  "<div class='qres'>"+qrows+"</div><div class='shrow'><button class='main dashb' id='dsh'>"+tr("Dashboard")+"</button><button class='main shareb' id='sh'>"+tr("Share result")+"</button></div></div>"+
   "<div class='drop0"+(ARCHIVE_OPEN?"":" nb")+"'><div class='dropin'><small>"+tr("Next drop in")+"</small><b id='cdn'>"+fmtDur(nextMidnight())+"</b></div>"+(ARCHIVE_OPEN?"<button class='pastdrops' id='arch'>"+tr("Play past drops")+"</button>":"")+"</div>"+coinCard()+"<div id='gnudge'></div>");
   app.classList.add("plain");
   document.getElementById("sh").onclick=function(){openShare(tot)};
+  document.getElementById("dsh").onclick=function(){landOn=false;intro=true;render();window.scrollTo(0,0)};
   var ab=document.getElementById("arch");if(ab)ab.onclick=function(){var d=new Date(day*864e5);cm={y:d.getUTCFullYear(),m:d.getUTCMonth()};openMenu()};
   wireCoin();
   if(!bonus&&st.cg&&!st.cgs){st.cgs=1;saveState();setTimeout(earnedShow,600)}
