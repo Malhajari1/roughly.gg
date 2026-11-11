@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <title>Roughly Qatar – Daily Estimation Game</title>
-<script>window.RQ_BUILD="2026-11-11.9";</script>
+<script>window.RQ_BUILD="2026-11-11.10";</script>
 <meta name="description" content="A fresh set of three how-many questions about Qatar every day. No exact answers — just reason your way close. What would you have guessed?">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Roughly">
@@ -793,7 +793,9 @@ header .hd{direction:ltr}
 .hmk b{display:flex;align-items:center;justify-content:center;height:38px;border-radius:11px;background:#eef2fb;color:#9aa6c4;font-size:.85rem}
 .hmk .now small{color:var(--c)}.hmk .now b{box-shadow:0 0 0 2px var(--c)}
 .hm .drop0{margin:0 0 6px}
-.hmavg{display:none}.hmavg.on{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;background:rgba(255,255,255,.16);border-radius:14px;padding:9px 12px;margin:-4px 0 12px;font-size:.82rem}.hmavg span{opacity:.85;font-weight:600}.hmavg b{font-size:1.15rem}.hmavg i{font-style:normal;opacity:.7;margin-inline-start:auto}
+.hmrow{display:flex;align-items:flex-end;justify-content:space-between;gap:10px;margin:4px 0 14px}.hmrow .hmsc{margin:0}
+.hmavg{display:none}.hmavg.on{display:flex;flex-direction:column;align-items:flex-end;text-align:end;gap:1px;background:rgba(255,255,255,.16);border-radius:16px;padding:9px 13px;max-width:52%}
+.hmavg span{opacity:.85;font-weight:600;font-size:.72rem;line-height:1.2}.hmavg b{font-size:1.9rem;line-height:1.05;letter-spacing:-.5px}.hmavg i{font-style:normal;opacity:.7;font-size:.72rem}
 #hwl{margin-top:14px}#hwl a{color:var(--c);font-weight:700;text-decoration:none}
 </style>
 <meta name="roughly-api" content="">
@@ -1673,7 +1675,7 @@ function home(){
   if(bonus){
     hero="<div class='hmh solo'><button class='hmw' id='hpl'>"+(fin?(AR?"اعرض نتيجة الجولة الإضافية":"See bonus results"):(AR?"أكمل الجولة الإضافية":"Continue bonus game"))+"</button><button class='hmg' id='hbk' style='margin-top:8px'>"+(AR?"الرجوع لنتيجة اليوم":"Back to today’s result")+"</button></div>"}
   else if(fin){
-    hero="<div class='hmh'><small>"+(AR?"اليوم":"Today")+"</small><div class='hmsc'><b>"+faD(avg)+"</b><i>"+PCT()+"</i></div><div class='hmavg' id='havg'></div><div class='hmb'><button class='hmg' id='hbd'>"+(AR?"عرض التفاصيل":"See breakdown")+"</button><button class='hmw' id='hsh'>"+(AR?"شارك":"Share")+"</button></div></div>"+
+    hero="<div class='hmh'><small>"+(AR?"اليوم":"Today")+"</small><div class='hmrow'><div class='hmsc'><b>"+faD(avg)+"</b><i>"+PCT()+"</i></div><div class='hmavg' id='havg'></div></div><div class='hmb'><button class='hmg' id='hbd'>"+(AR?"عرض التفاصيل":"See breakdown")+"</button><button class='hmw' id='hsh'>"+(AR?"شارك":"Share")+"</button></div></div>"+
      "<div class='drop0 nb'><div class='dropin'><small>"+tr("Next drop in")+"</small><b id='cdn'>"+fmtDur(nextMidnight())+"</b></div></div>"}
   else hero="<div class='hmh solo'><button class='hmw' id='hpl'>"+(st.g.length?(AR?"أكمل أسئلة اليوم":"Continue today’s drop"):(AR?"العب أسئلة اليوم":"Play today’s drop"))+"</button></div>";
   var tiles=hist?"<div class='hmt'><div><span class='hmi f'>"+ICON_FLAME+"</span><p><b>"+faD(stats.streak||0)+"</b><small>"+(AR?"أيام متتالية":"day streak")+"</small></p></div><div><span class='hmi'>"+ICON_COIN+"</span><p><b>"+faD(cn)+"</b><small>"+(AR?"عملات · التالية بعد "+faD(left)+(left===1?" يوم":" أيام"):(cn===1?"coin":"coins")+" · next in "+left+" day"+(left===1?"":"s"))+"</small></p></div></div>":"";

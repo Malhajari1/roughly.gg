@@ -166,3 +166,6 @@ No test suite in the repo. Previously verified with jsdom smoke tests and Playwr
 
 ## Players' average: invalid-argument fix (11 Nov 2026, build .9)
 - Real Firestore returned `invalid-argument` for the Home average. `dayStats` asked for a whole day of answers with `limit(15000)`; it now runs one query per question of the day (`day==` + `qi==`, `limit(5000)`, same shape as `qStats`) and joins them by uid. This is my best guess at the cause and is NOT confirmed against the live database. The error text now also shows Firestore's own message after the code so the next report says exactly what it objected to.
+
+## Players' average sits opposite the score (11 Nov 2026, build .10)
+- On Home the players' average is a glass block on the right of the big score (`.hmrow`: score left, `#havg` right, mirrored in Arabic/RTL), instead of a bar under it. Checked at 390 and 320 px wide, English and Arabic.
