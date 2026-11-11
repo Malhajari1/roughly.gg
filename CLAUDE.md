@@ -139,3 +139,6 @@ No test suite in the repo. Previously verified with jsdom smoke tests and Playwr
 - Not played / part played: just one big "Play today's drop" (or "Continue today's drop") button, no repeated copy. Finished: average score, See breakdown, Share, next-drop countdown, streak + coin tiles, coin button, week strip, Groups list (`RQGroups.listGroups()`, with Create / Join). Streak, coin and week blocks are hidden for brand-new players.
 - `faqAll()` keeps the old FAQ strings, used by `openHow()`. The language pill was removed from the header: Arabic is auto-detected from `navigator.language` when nothing is saved, and the switch is a row in the menu.
 - Tested (Playwright, stand-in data, groups stubbed): first-timer, returning-unplayed, finished, Arabic/RTL, desktop 1440, 375x667 first-timer fits. Not tested: real Groups list data, a real phone, Home after a bonus game end-to-end.
+
+## Wordmark opens the old landing page (11 Nov 2026, build .3)
+- `landing()` is back, but only reachable by tapping "roughly.gg" (flag `landOn`). Nobody lands on it automatically. The house button and menu Home row go to the Home dashboard. Landing's Play buttons clear `landOn` and start the game.

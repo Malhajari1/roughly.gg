@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <title>Roughly Qatar – Daily Estimation Game</title>
-<script>window.RQ_BUILD="2026-11-11.2";</script>
+<script>window.RQ_BUILD="2026-11-11.3";</script>
 <meta name="description" content="A fresh set of three how-many questions about Qatar every day. No exact answers — just reason your way close. What would you have guessed?">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Roughly">
@@ -1506,6 +1506,56 @@ function wireTools(n,inp){
   document.getElementById("bc").onclick=function(){openSheet(n,inp)};
   lab();
 }
+function landing(){
+  var AR=LANG==="ar";
+  var cats=["Facts","Sport","Food & drink","Roads","Geography","Travel","Money","Resources","Everyday Qatar","Doha life"];
+  var CATAR={"Facts":"حقائق","Sport":"الرياضة","Food & drink":"الأكل والشرب","Roads":"الطرق","Geography":"الجغرافيا","Travel":"السفر","Money":"المال","Resources":"الموارد","Everyday Qatar":"قطر اليومية","Doha life":"حياة الدوحة"};
+  var faq=AR?[
+    ["هل فيه جواب صحيح؟","لا. كل سؤال تقدير. نعرض لك تقديراً منطقياً ومجالاً معقولاً حوله، وتسجّل نقاطك كلما اقتربت أكثر."],
+    ["أقدر أستخدم الآلة الحاسبة؟","أكيد. اضغط «الآلة الحاسبة والملاحظات» في أي سؤال تحسب فيه الأرقام وتدوّن منطقك."],
+    ["هل «للعلم» تكلّفني نقاط؟","لا، مجانية. كل سؤال فيه معلومة «للعلم» وحدة. أحياناً رقم بداية قوي، وأحياناً قاعدة عامة، وأحياناً لمسة محلية قد تنفع وقد لا."],
+    ["كيف تُحسب نتيجتي؟","نقارن تخمينك بتقديرنا ونحسب كم مرة كنت أعلى أو أقل. الإجابة الصحيحة 100، والخطأ بمقدار الضعف نحو 80، وعشرة أضعاف نحو 26. ولا تنزل أبداً إلى الصفر."],
+    ["وش هي الرتب؟","نحسب متوسط نتائجك الثلاث كنسبة دقّة. تعطيك رتبة، من «نازل جديد» إلى «عرّاف الصحراء»."],
+    ["من وين تجيب الأرقام؟","كل تقدير له وسم. «مشتق» يعني مبني على أرقام منشورة مع حساب بسيط. «تقدير تقريبي» يعني مبني على فرضيات مقرّبة. والحساب الكامل يظهر بعد كل سؤال."],
+    ["هل النسبة المئوية حقيقية؟","نعم. تُحسب من إجابات لاعبين حقيقيين بعد أن يجيب 30 شخصاً على الأقل على السؤال. وقبل ذلك نوضّح لك ذلك بدلاً من اختلاق رقم."],
+    ["متى تنزل الأسئلة الجديدة؟","كل يوم عند منتصف الليل بالتوقيت المحلي. والجميع يحصل على الأسئلة الثلاثة نفسها."],
+    ["أقدر ألعب الأيام السابقة؟","نعم. افتح القائمة في الزاوية، اختر أي يوم سابق من التقويم، والعبه. أيام الأرشيف لا تُحتسب في سلسلتك."],
+    ["أقدر أتحدى صديق؟","نعم. بعد ما تخلّص، اضغط «شارك نتيجتك» وترسل رابط تحدي. يفتح مباشرة على نفس الأسئلة الثلاثة، ولا يرى صديقك نتيجتك إلا بعد أن يجيب."],
+    ["أحتاج حساب؟","لا. تسجيل الدخول اختياري. افتح القائمة إذا أردت أن تتبعك سلسلتك وإحصاءاتك بين الأجهزة."]
+  ]:[
+    ["Is there a right answer?","No. Every question is an estimate. We show a logical estimate and a plausible range around it, and you score by landing close."],
+    ["Can I use a calculator?","Yes. Tap Calculator &amp; Notes on any question to crunch numbers and jot down your logic."],
+    ["Does Good to know cost points?","No, it’s free. Each question has one Good to know note. Sometimes it’s a solid starting number, sometimes a rule of thumb, sometimes local colour that may or may not help."],
+    ["How is my score worked out?","We compare your guess to our estimate and work out how many times too high or low you were. Spot on scores 100, being 2× off scores about 80, and 10× off about 26. It never drops to zero."],
+    ["What are the ranks?","Your three scores are averaged into an accuracy percentage. It earns a rank, from Fresh Off the Plane up to Desert Oracle."],
+    ["Where do the numbers come from?","Every estimate is tagged. Derived means it’s built from published figures plus simple maths. Rough estimate means it rests on rounded assumptions. The full logic is shown after every question."],
+    ["Is the percentile real?","Yes. It’s worked out from real players’ answers once at least 30 people have answered that question. Until then we say so instead of making a number up."],
+    ["When do new questions arrive?","Every day at midnight, local time. Everyone gets the same three."],
+    ["Can I play past days?","Past days are locked. Keep your streak going and you earn a streak coin every 3 days. After you finish today’s game, spend a coin to play another round of three fresh questions, or save it for another day."],
+    ["Can I challenge a friend?","Yes. After you finish, tap Share result to send a challenge link. It opens straight into the same three questions, and your friend only sees your score after they’ve answered."],
+    ["Do I need an account?","No. Signing in is optional. Open the menu if you want your streak and stats to follow you between devices."]
+  ];
+  var cta=bonus?(st.g.length>=3&&!st.r?(AR?"اعرض نتيجة الجولة الإضافية":"See bonus results"):(AR?"أكمل الجولة الإضافية":"Continue bonus game")):(st.g.length>=3&&!st.r?(AR?"اعرض نتيجة اليوم":"See today’s results"):st.g.length?(AR?"أكمل لعبة اليوم":"Continue today’s game"):(AR?"العب لعبة اليوم":"Play today’s game"));
+  mount(
+  "<div class='lhero'><div class='ldrops'>"+[0,1,2].map(function(i){var t=THEMES[i],ic=["Food & drink","Roads","Doha life"][i];return "<span class='ldrop' style='--c:"+t.c+";--c2:"+t.c2+";--cs:"+t.cs+"'>"+(ICONS[ic]||"")+"</span>"}).join("")+"</div>"+
+  "<h1>"+(AR?"ثلاث تخمينات.<br><em>منطق خالص.</em>":"Three guesses.<br><em>Pure logic.</em>")+"</h1><p class='lead'>"+(AR?"ثلاثة أسئلة «كم؟» جديدة عن قطر، كل يوم. لا جواب مضبوط — فكّر بمنطقك، واقترب قدر الإمكان، واسعَ إلى أعلى نتيجة.":"A fresh set of three how-many questions about Qatar, every day. No exact answers, just reason your way close and chase the score.")+"</p>"+
+  "<button class='main' id='pl'>"+cta+"</button><p class='lsub'>"+(AR?"سؤال جديد كل يوم &middot; دقيقتان &middot; بدون تسجيل":"New drop daily &middot; 2 minutes &middot; no sign-up")+"</p></div>"+
+  "<div class='lsteps'>"+
+  "<div class='lstep' style='--c:"+THEMES[0].c+";--c2:"+THEMES[0].c2+";--cs:"+THEMES[0].cs+"'><b>1</b><h4>"+(AR?"خمّن":"Guess")+"</h4><span>"+(AR?"استخدم منطقك، اختر رقماً، وثبّته.":"Use logic, pick a number, lock it in.")+"</span></div>"+
+  "<div class='lstep' style='--c:"+THEMES[1].c+";--c2:"+THEMES[1].c2+";--cs:"+THEMES[1].cs+"'><b>2</b><h4>"+(AR?"النتيجة":"Reveal")+"</h4><span>"+(AR?"اعرف كم اقتربت، ولماذا.":"See how close you landed, and why.")+"</span></div>"+
+  "<div class='lstep' style='--c:"+THEMES[2].c+";--c2:"+THEMES[2].c2+";--cs:"+THEMES[2].cs+"'><b>3</b><h4>"+(AR?"قارن":"Compare")+"</h4><span>"+(AR?"قارن نفسك بالجميع، ثم تحدَّ صديقك.":"Stack up against everyone, then challenge a friend.")+"</span></div></div>"+
+  "<div class='sec'><h3>"+(AR?"أدواتك":"Your toolkit")+"</h3><p class='sub'>"+(AR?"كل ما تحتاجه للتفكير فيه.":"Everything you need to think it through.")+"</p><div class='feat'>"+
+  "<div class='fc'><div class='fi'>"+ICON_CALC+"</div><div><b>"+(AR?"الآلة الحاسبة والملاحظات":"Calculator &amp; Notes")+"</b><span>"+(AR?"احسب الأرقام ودوّن منطقك.":"Crunch numbers and jot down your logic.")+"</span></div></div>"+
+  "<div class='fc'><div class='fi'>"+ICON_BULB+"</div><div><b>"+(AR?"معلومة «للعلم» واحدة لكل سؤال":"One Good to know per question")+"</b><span>"+(AR?"معلومة مفيدة أو لمسة من أجواء الدوحة. مجاناً.":"A useful fact or a bit of Doha colour. Free.")+"</span></div></div>"+
+  "<div class='fc'><div class='fi'>"+ICON_CHART+"</div><div><b>"+(AR?"تحليل فوري":"Instant breakdown")+"</b><span>"+(AR?"اعرض الحساب كاملاً وترتيبك.":"See the full logic and where you rank.")+"</span></div></div><div class='fc'><div class='fi'>"+ICON_COIN+"</div><div><b>"+(AR?"عملات السلسلة":"Streak coins")+"</b><span>"+(AR?"كل ٣ أيام متتالية تمنحك لعبة إضافية.":"Every 3-day streak earns an extra game.")+"</span></div></div></div></div>"+
+  "<div class='sec'><h3>"+(AR?"ماذا ستخمّن":"What you’ll be guessing")+"</h3><p class='sub'>"+(AR?"من رسائل واتساب الصوتية إلى البنزين. السؤال الثالث دائماً عن حياة الدوحة.":"From WhatsApp voice notes to petrol. The third question is always a Doha life one.")+"</p><div class='chips'>"+cats.map(function(c){return "<span>"+catIcon(c)+(AR?CATAR[c]:c)+"</span>"}).join("")+"</div></div>"+
+  "<div class='sec'><h3>"+(AR?"أسئلة وأجوبة":"Questions, answered")+"</h3>"+faq.map(function(f){return "<details><summary>"+f[0]+"</summary><p>"+f[1]+"</p></details>"}).join("")+"</div>"+
+  "<div class='cta'><h3>"+(AR?"جاهز؟ أسئلة اليوم الثلاثة تنتظرك.":"Ready? Today’s three are waiting.")+"</h3><p>"+(AR?"ثق بمنطقك. اختر رقماً بثقة.":"Trust your logic. Commit to a number.")+"</p><button class='main light' id='pl2'>"+cta+"</button></div>");
+  app.classList.add("land");
+  var go=function(){landOn=false;intro=false;render();window.scrollTo(0,0)};
+  document.getElementById("pl").onclick=go;document.getElementById("pl2").onclick=go;
+}
+var landOn=false;
 function faqAll(){var AR=LANG==="ar";return AR?[
     ["هل فيه جواب صحيح؟","لا. كل سؤال تقدير. نعرض لك تقديراً منطقياً ومجالاً معقولاً حوله، وتسجّل نقاطك كلما اقتربت أكثر."],
     ["أقدر أستخدم الآلة الحاسبة؟","أكيد. اضغط «الآلة الحاسبة والملاحظات» في أي سؤال تحسب فيه الأرقام وتدوّن منطقك."],
@@ -1614,7 +1664,7 @@ function openMenu(){
     var b=e.target.closest?e.target.closest("button"):null;if(!b||b.disabled)return;
     if(b.hasAttribute("data-d")){selectDay(parseInt(b.getAttribute("data-d"),10));intro=false;closeSheet();render();window.scrollTo(0,0)}
     else if(b.hasAttribute("data-nav")){var v=cm.y*12+cm.m+parseInt(b.getAttribute("data-nav"),10);cm={y:Math.floor(v/12),m:v%12};openMenu()}
-    else if(b.hasAttribute("data-home")){closeSheet();selectDay(today);intro=true;render();window.scrollTo(0,0)}
+    else if(b.hasAttribute("data-home")){closeSheet();selectDay(today);landOn=false;intro=true;render();window.scrollTo(0,0)}
     else if(b.hasAttribute("data-act")){var a=b.getAttribute("data-act");if(a==="signin")openSignIn(1,"");else if(a==="groups")openGroups();else if(a==="dev")openDev();else if(a==="lang"){toggleLang();openMenu()}else if(a==="signout"){setAcct(null);openMenu()}}
     else if(b.id==="mspend"){closeSheet();spendCoin()}
     else if(b.id==="sx")closeSheet()};
@@ -2088,9 +2138,9 @@ function hintPair(i){var h=HINTS[i];if(!h)return [LANG==="ar"?"للعلم":"Good
 function render(){
   cancelAnimationFrame(raf);viewTok++;
   var n=st.g.length;
-  document.body.setAttribute("data-view",intro?"home":"play");document.body.classList.toggle("fit",!intro&&!(n>=3&&!st.r));side();
+  document.body.setAttribute("data-view",intro?(landOn?"land":"home"):"play");document.body.classList.toggle("fit",!intro&&!(n>=3&&!st.r));side();
   var hl=document.getElementById("hwl");if(hl)hl.style.display=(!intro&&!bonus&&!(stats.played>0)&&n<3&&!st.r)?"block":"none";
-  if(intro){setTheme(THEMES[0]);return home();}
+  if(intro){setTheme(THEMES[0]);return landOn?landing():home();}
   if(n>=3&&!st.r){setTheme(WIN);return done();}
   if(st.r&&n>=1){setTheme(THEMES[(n-1)%3]);return reveal(n-1);}
   setTheme(THEMES[n%3]);ask(n);
@@ -2321,8 +2371,8 @@ function streak(){var e=document.getElementById("streak");if(!e)return;var c=coi
 document.getElementById("how").onclick=function(e){e.preventDefault();openHow()};
 document.getElementById("menu").onclick=function(){var d=new Date(day*864e5);cm={y:d.getUTCFullYear(),m:d.getUTCMonth()};openMenu()};
 document.getElementById("lang").onclick=toggleLang;
-document.getElementById("homeb").onclick=function(){selectDay(today);intro=true;render();window.scrollTo(0,0)};
-document.querySelector(".wordmark").onclick=function(){selectDay(today);intro=true;render();window.scrollTo(0,0)};
+document.getElementById("homeb").onclick=function(){selectDay(today);landOn=false;intro=true;render();window.scrollTo(0,0)};
+document.querySelector(".wordmark").onclick=function(){selectDay(today);landOn=true;intro=true;render();window.scrollTo(0,0)};
 document.addEventListener("visibilitychange",function(){if(!document.hidden&&dayNum()!==day){init();streak();render()}});
 applyLang();init();streak();render();setTimeout(function(){devGiftShow();giftShow()},900);
 if(API&&acct().t)pullSync().then(function(c){if(c){streak();selectDay(day);if(!busy)render()}},function(){});
