@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <title>Roughly Qatar – Daily Estimation Game</title>
-<script>window.RQ_BUILD="2026-11-10.17";</script>
+<script>window.RQ_BUILD="2026-11-11.1";</script>
 <meta name="description" content="A fresh set of three how-many questions about Qatar every day. No exact answers — just reason your way close. What would you have guessed?">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Roughly">
@@ -696,7 +696,6 @@ button,.k,.chip{touch-action:manipulation}
 /* kill rubber-band / phantom scroll */
 html{overscroll-behavior:none;height:100%}
 body{overscroll-behavior:none}
-body:not([data-view=land]) main>.small{display:none}
 /* v7: results stacked boards; combined bright shiny drop board off the blue */
 #app.plain{background:none;box-shadow:none;padding:0;border-radius:0}
 .plain>.res.card{margin:0}
@@ -772,14 +771,36 @@ header .hd{direction:ltr}
 [dir=rtl] select.chip.uc{padding-right:14px;padding-left:30px;background-position:left 10px center}
 [dir=rtl] .st i{margin-left:0}
 [dir=rtl] .lead,[dir=rtl] .sub,[dir=rtl] .note,[dir=rtl] .hint,[dir=rtl] details p,[dir=rtl] details summary{text-align:right}
+
+/* Home dashboard */
+.hm{display:grid;gap:12px;padding-bottom:30px}
+.hmh{background:linear-gradient(160deg,var(--c),var(--c2));color:#fff;border-radius:26px;padding:18px 18px 16px;box-shadow:0 18px 38px -16px rgba(var(--cs),.6);text-align:start}
+.hmh.solo{padding:14px}
+.hmh small{font-size:.7rem;letter-spacing:1.4px;font-weight:800;text-transform:uppercase;color:rgba(255,255,255,.75)}
+.hmsc{display:flex;align-items:baseline;gap:4px;margin:4px 0 14px}.hmsc b{font-size:4rem;line-height:1;font-weight:800;letter-spacing:-2px}.hmsc i{font-style:normal;font-size:1.6rem;font-weight:700}
+.hmb{display:flex;gap:8px}.hmb button,.hmh.solo button{flex:1;border:0;border-radius:16px;padding:14px;font-family:inherit;font-weight:700;font-size:1rem;cursor:pointer}
+.hmh.solo button{width:100%;padding:20px;font-size:1.2rem}
+.hmg{background:rgba(255,255,255,.18);color:#fff}.hmw{background:#fff;color:var(--c)}
+.hmt{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.hmt>div{background:#fff;border-radius:20px;padding:14px;box-shadow:0 10px 26px -14px rgba(var(--cs),.4);display:flex;gap:12px;align-items:center}
+.hmt p{margin:0}.hmt b{display:block;font-size:1.7rem;line-height:1;color:#16213e}.hmt small{font-size:.74rem;color:#5b6b94;line-height:1.2;display:block;margin-top:3px}
+.hmi{flex:none;width:42px;height:42px;border-radius:14px;background:#eef3ff;display:flex;align-items:center;justify-content:center}.hmi svg{width:26px;height:26px}
+.hmi.f svg{fill:#ffb020;stroke:#f08a00;stroke-width:1.5}
+.hmw7{background:#fff;border-radius:22px;padding:14px;box-shadow:0 10px 26px -14px rgba(var(--cs),.4)}
+.hmwh{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px}.hmwh b{font-size:1rem;color:#16213e}.hmwh span{font-size:.8rem;color:#5b6b94;font-weight:600}
+.hmk{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;direction:ltr}.hmk div{text-align:center}.hmk small{display:block;font-size:.66rem;font-weight:700;color:#5b6b94;margin-bottom:4px}
+.hmk b{display:flex;align-items:center;justify-content:center;height:38px;border-radius:11px;background:#eef2fb;color:#9aa6c4;font-size:.85rem}
+.hmk .now small{color:var(--c)}.hmk .now b{box-shadow:0 0 0 2px var(--c)}
+.hm .drop0{margin:0 0 6px}
+#hwl{margin-top:14px}#hwl a{color:var(--c);font-weight:700;text-decoration:none}
 </style>
 <meta name="roughly-api" content="">
 </head>
 <body>
-<header><div class="hd"><button id="lang" class="langbtn" aria-label="Switch language">عربي</button><div class="hr"><span class="wordmark">roughly.gg</span><button id="menu" class="mb" aria-label="Menu"><svg viewBox='0 0 24 24'><path d='M4 7h16M4 12h16M4 17h16'/></svg></button></div></div></header>
+<header><div class="hd"><button id="homeb" class="mb" aria-label="Home"><svg viewBox='0 0 24 24'><path d='M4 20V10l8-6 8 6v10M4 20h16M10 20v-5h4v5'/></svg></button><div class="hr"><span class="wordmark">roughly.gg</span><button id="menu" class="mb" aria-label="Menu"><svg viewBox='0 0 24 24'><path d='M4 7h16M4 12h16M4 17h16'/></svg></button></div></div></header>
 <main>
   <div class="layout"><div id="app" class="card"></div></div>
-  <p class="small"><a href="#" id="how">How to play</a> &middot; A new set of three every day</p>
+  <p class="small" id="hwl" style="display:none"><a href="#" id="how">How to play</a></p>
 </main>
 <div id="scrim"></div><div id="sheet" role="dialog" aria-modal="true" aria-label="Calculator and notes"></div>
 <script>
@@ -1372,7 +1393,7 @@ function init(){
   if(!stats||typeof stats.streak!=="number")stats={streak:0,last:0,played:0,total:0};
   if(stats.last<today-1&&stats.last!==today)stats.streak=0;
   var d=new Date(today*864e5);cm={y:d.getUTCFullYear(),m:d.getUTCMonth()};
-  intro=true;
+  intro=!!(st&&st.g&&st.g.length>=3&&!st.r&&!bonus);
   if(parseChallenge())intro=false;
   var gf=/[?&]gift=(\d{1,2})\.([a-z0-9]{6})\.([a-z0-9]{6,14})/.exec(location.search||"");
   if(gf){window.__rqGift=[parseInt(gf[1],10),gf[2],gf[3]];intro=false;try{window.history.replaceState(null,"",location.pathname)}catch(e){}}
@@ -1485,11 +1506,7 @@ function wireTools(n,inp){
   document.getElementById("bc").onclick=function(){openSheet(n,inp)};
   lab();
 }
-function landing(){
-  var AR=LANG==="ar";
-  var cats=["Facts","Sport","Food & drink","Roads","Geography","Travel","Money","Resources","Everyday Qatar","Doha life"];
-  var CATAR={"Facts":"حقائق","Sport":"الرياضة","Food & drink":"الأكل والشرب","Roads":"الطرق","Geography":"الجغرافيا","Travel":"السفر","Money":"المال","Resources":"الموارد","Everyday Qatar":"قطر اليومية","Doha life":"حياة الدوحة"};
-  var faq=AR?[
+function faqAll(){var AR=LANG==="ar";return AR?[
     ["هل فيه جواب صحيح؟","لا. كل سؤال تقدير. نعرض لك تقديراً منطقياً ومجالاً معقولاً حوله، وتسجّل نقاطك كلما اقتربت أكثر."],
     ["أقدر أستخدم الآلة الحاسبة؟","أكيد. اضغط «الآلة الحاسبة والملاحظات» في أي سؤال تحسب فيه الأرقام وتدوّن منطقك."],
     ["هل «للعلم» تكلّفني نقاط؟","لا، مجانية. كل سؤال فيه معلومة «للعلم» وحدة. أحياناً رقم بداية قوي، وأحياناً قاعدة عامة، وأحياناً لمسة محلية قد تنفع وقد لا."],
@@ -1513,26 +1530,44 @@ function landing(){
     ["Can I play past days?","Past days are locked. Keep your streak going and you earn a streak coin every 3 days. After you finish today’s game, spend a coin to play another round of three fresh questions, or save it for another day."],
     ["Can I challenge a friend?","Yes. After you finish, tap Share result to send a challenge link. It opens straight into the same three questions, and your friend only sees your score after they’ve answered."],
     ["Do I need an account?","No. Signing in is optional. Open the menu if you want your streak and stats to follow you between devices."]
-  ];
-  var cta=bonus?(st.g.length>=3&&!st.r?(AR?"اعرض نتيجة الجولة الإضافية":"See bonus results"):(AR?"أكمل الجولة الإضافية":"Continue bonus game")):(st.g.length>=3&&!st.r?(AR?"اعرض نتيجة اليوم":"See today’s results"):st.g.length?(AR?"أكمل لعبة اليوم":"Continue today’s game"):(AR?"العب لعبة اليوم":"Play today’s game"));
-  mount(
-  "<div class='lhero'><div class='ldrops'>"+[0,1,2].map(function(i){var t=THEMES[i],ic=["Food & drink","Roads","Doha life"][i];return "<span class='ldrop' style='--c:"+t.c+";--c2:"+t.c2+";--cs:"+t.cs+"'>"+(ICONS[ic]||"")+"</span>"}).join("")+"</div>"+
-  "<h1>"+(AR?"ثلاث تخمينات.<br><em>منطق خالص.</em>":"Three guesses.<br><em>Pure logic.</em>")+"</h1><p class='lead'>"+(AR?"ثلاثة أسئلة «كم؟» جديدة عن قطر، كل يوم. لا جواب مضبوط — فكّر بمنطقك، واقترب قدر الإمكان، واسعَ إلى أعلى نتيجة.":"A fresh set of three how-many questions about Qatar, every day. No exact answers, just reason your way close and chase the score.")+"</p>"+
-  "<button class='main' id='pl'>"+cta+"</button><p class='lsub'>"+(AR?"سؤال جديد كل يوم &middot; دقيقتان &middot; بدون تسجيل":"New drop daily &middot; 2 minutes &middot; no sign-up")+"</p></div>"+
-  "<div class='lsteps'>"+
-  "<div class='lstep' style='--c:"+THEMES[0].c+";--c2:"+THEMES[0].c2+";--cs:"+THEMES[0].cs+"'><b>1</b><h4>"+(AR?"خمّن":"Guess")+"</h4><span>"+(AR?"استخدم منطقك، اختر رقماً، وثبّته.":"Use logic, pick a number, lock it in.")+"</span></div>"+
-  "<div class='lstep' style='--c:"+THEMES[1].c+";--c2:"+THEMES[1].c2+";--cs:"+THEMES[1].cs+"'><b>2</b><h4>"+(AR?"النتيجة":"Reveal")+"</h4><span>"+(AR?"اعرف كم اقتربت، ولماذا.":"See how close you landed, and why.")+"</span></div>"+
-  "<div class='lstep' style='--c:"+THEMES[2].c+";--c2:"+THEMES[2].c2+";--cs:"+THEMES[2].cs+"'><b>3</b><h4>"+(AR?"قارن":"Compare")+"</h4><span>"+(AR?"قارن نفسك بالجميع، ثم تحدَّ صديقك.":"Stack up against everyone, then challenge a friend.")+"</span></div></div>"+
-  "<div class='sec'><h3>"+(AR?"أدواتك":"Your toolkit")+"</h3><p class='sub'>"+(AR?"كل ما تحتاجه للتفكير فيه.":"Everything you need to think it through.")+"</p><div class='feat'>"+
-  "<div class='fc'><div class='fi'>"+ICON_CALC+"</div><div><b>"+(AR?"الآلة الحاسبة والملاحظات":"Calculator &amp; Notes")+"</b><span>"+(AR?"احسب الأرقام ودوّن منطقك.":"Crunch numbers and jot down your logic.")+"</span></div></div>"+
-  "<div class='fc'><div class='fi'>"+ICON_BULB+"</div><div><b>"+(AR?"معلومة «للعلم» واحدة لكل سؤال":"One Good to know per question")+"</b><span>"+(AR?"معلومة مفيدة أو لمسة من أجواء الدوحة. مجاناً.":"A useful fact or a bit of Doha colour. Free.")+"</span></div></div>"+
-  "<div class='fc'><div class='fi'>"+ICON_CHART+"</div><div><b>"+(AR?"تحليل فوري":"Instant breakdown")+"</b><span>"+(AR?"اعرض الحساب كاملاً وترتيبك.":"See the full logic and where you rank.")+"</span></div></div><div class='fc'><div class='fi'>"+ICON_COIN+"</div><div><b>"+(AR?"عملات السلسلة":"Streak coins")+"</b><span>"+(AR?"كل ٣ أيام متتالية تمنحك لعبة إضافية.":"Every 3-day streak earns an extra game.")+"</span></div></div></div></div>"+
-  "<div class='sec'><h3>"+(AR?"ماذا ستخمّن":"What you’ll be guessing")+"</h3><p class='sub'>"+(AR?"من رسائل واتساب الصوتية إلى البنزين. السؤال الثالث دائماً عن حياة الدوحة.":"From WhatsApp voice notes to petrol. The third question is always a Doha life one.")+"</p><div class='chips'>"+cats.map(function(c){return "<span>"+catIcon(c)+(AR?CATAR[c]:c)+"</span>"}).join("")+"</div></div>"+
-  "<div class='sec'><h3>"+(AR?"أسئلة وأجوبة":"Questions, answered")+"</h3>"+faq.map(function(f){return "<details><summary>"+f[0]+"</summary><p>"+f[1]+"</p></details>"}).join("")+"</div>"+
-  "<div class='cta'><h3>"+(AR?"جاهز؟ أسئلة اليوم الثلاثة تنتظرك.":"Ready? Today’s three are waiting.")+"</h3><p>"+(AR?"ثق بمنطقك. اختر رقماً بثقة.":"Trust your logic. Commit to a number.")+"</p><button class='main light' id='pl2'>"+cta+"</button></div>");
-  app.classList.add("land");
-  var go=function(){intro=false;render();window.scrollTo(0,0)};
-  document.getElementById("pl").onclick=go;document.getElementById("pl2").onclick=go;
+  ]}
+function openHow(){
+  var AR=LANG==="ar",F=faqAll(),T=THEMES,steps=AR?[["خمّن","استخدم منطقك، اختر رقماً، وثبّته."],["النتيجة","اعرف كم اقتربت، ولماذا."],["قارن","قارن نفسك بالجميع، ثم تحدَّ صديقك."]]:[["Guess","Use logic, pick a number, lock it in."],["Reveal","See how close you landed, and why."],["Compare","Stack up against everyone, then challenge a friend."]];
+  sheetShell(AR?"كيف تلعب":"How to play","<div class='lsteps' style='margin:4px 0 8px'>"+steps.map(function(x,i){return "<div class='lstep' style='--c:"+T[i].c+";--c2:"+T[i].c2+";--cs:"+T[i].cs+"'><b>"+faD(i+1)+"</b><h4>"+x[0]+"</h4><span>"+x[1]+"</span></div>"}).join("")+"</div>"+
+   [0,3,7,10].map(function(i){return "<details><summary>"+F[i][0]+"</summary><p>"+F[i][1]+"</p></details>"}).join(""))}
+function home(){
+  var AR=LANG==="ar",fin=st.g.length>=3&&!st.r,hist=stats.played>0,tot=0,avg=0,hero,i;
+  if(fin){tot=st.s.reduce(function(a,b){return a+b},0);avg=Math.round(tot/3)}
+  var cn=coinsGet().n,left=STREAK_COIN_EVERY-(stats.streak%STREAK_COIN_EVERY),w7=last7(),sum=0,cnt=0,WD=AR?["ح","ن","ث","ر","خ","ج","س"]:"SMTWTFS".split("");
+  var col=function(v){return v>=80?"#22c55e":v>=50?"#f59e0b":"#ef4444"};
+  w7.forEach(function(x){if(x.avg!==null){sum+=x.avg;cnt++}});
+  if(bonus){
+    hero="<div class='hmh solo'><button class='hmw' id='hpl'>"+(fin?(AR?"اعرض نتيجة الجولة الإضافية":"See bonus results"):(AR?"أكمل الجولة الإضافية":"Continue bonus game"))+"</button><button class='hmg' id='hbk' style='margin-top:8px'>"+(AR?"الرجوع لنتيجة اليوم":"Back to today’s result")+"</button></div>"}
+  else if(fin){
+    hero="<div class='hmh'><small>"+(AR?"اليوم":"Today")+"</small><div class='hmsc'><b>"+faD(avg)+"</b><i>"+PCT()+"</i></div><div class='hmb'><button class='hmg' id='hbd'>"+(AR?"عرض التفاصيل":"See breakdown")+"</button><button class='hmw' id='hsh'>"+(AR?"شارك":"Share")+"</button></div></div>"+
+     "<div class='drop0 nb'><div class='dropin'><small>"+tr("Next drop in")+"</small><b id='cdn'>"+fmtDur(nextMidnight())+"</b></div></div>"}
+  else hero="<div class='hmh solo'><button class='hmw' id='hpl'>"+(st.g.length?(AR?"أكمل أسئلة اليوم":"Continue today’s drop"):(AR?"العب أسئلة اليوم":"Play today’s drop"))+"</button></div>";
+  var tiles=hist?"<div class='hmt'><div><span class='hmi f'>"+ICON_FLAME+"</span><p><b>"+faD(stats.streak||0)+"</b><small>"+(AR?"أيام متتالية":"day streak")+"</small></p></div><div><span class='hmi'>"+ICON_COIN+"</span><p><b>"+faD(cn)+"</b><small>"+(AR?"عملات · التالية بعد "+faD(left)+(left===1?" يوم":" أيام"):(cn===1?"coin":"coins")+" · next in "+left+" day"+(left===1?"":"s"))+"</small></p></div></div>":"";
+  var week=hist?"<div class='hmw7'><div class='hmwh'><b>"+(AR?"أسبوعك":"Your week")+"</b><span>"+(cnt?(AR?"المتوسط ":"Average ")+faD(Math.round(sum/cnt))+PCT():"")+"</span></div><div class='hmk'>"+w7.map(function(x,k){var d=new Date(x.d*864e5).getUTCDay();return "<div class='"+(k===6?"now":"")+"'><small>"+WD[d]+"</small><b style='"+(x.avg!==null?"background:"+col(x.avg)+";color:#fff":"")+"'>"+(x.avg!==null?faD(x.avg):"–")+"</b></div>"}).join("")+"</div></div>":"";
+  var grp=groupsOn()?"<div><h3 class='bh' style='margin:6px 0 8px'>"+(AR?"المجموعات":"Groups")+"</h3><div id='hgl'><p class='note'>"+(AR?"جارٍ التحميل…":"Loading…")+"</p></div><div class='shg' style='grid-template-columns:1fr 1fr;margin-top:8px'><button class='shl' id='hgc'>"+(AR?"أنشئ مجموعة":"Create a group")+"</button><button class='shl' id='hgj'>"+(AR?"انضم برمز":"Join with a code")+"</button></div></div>":"";
+  mount("<div class='hm'>"+hero+(fin&&!bonus?tiles+coinCard():tiles)+week+grp+"</div>");
+  app.classList.add("plain");
+  var go=function(){intro=false;render();window.scrollTo(0,0)},g=function(x){return document.getElementById(x)};
+  if(g("hpl"))g("hpl").onclick=go;if(g("hbd"))g("hbd").onclick=go;
+  if(g("hbk"))g("hbk").onclick=exitBonus;
+  if(g("hsh"))g("hsh").onclick=function(){openShare(tot)};
+  if(fin&&!bonus)wireCoin();
+  if(cdTimer)clearInterval(cdTimer);
+  cdTimer=setInterval(function(){var el=g("cdn");if(!el){clearInterval(cdTimer);cdTimer=null;return}el.textContent=fmtDur(nextMidnight())},1000);
+  if(groupsOn()){
+    g("hgc").onclick=function(){openGroupCreate()};g("hgj").onclick=function(){openGroupJoin("")};
+    var tok=viewTok;
+    window.RQGroups.listGroups().then(function(gs){
+      var box=g("hgl");if(!box||tok!==viewTok)return;
+      if(!gs.length){box.innerHTML="<p class='note'>"+(AR?"لست في أي مجموعة بعد. أنشئ واحدة وادعُ أصدقاءك.":"You’re not in a group yet. Create one and invite your friends.")+"</p>";return}
+      box.innerHTML="<div class='mis'>"+gs.map(function(x){return "<button class='mi' data-g='"+esc(x.id)+"'>"+ICON_USERS+"<div><b>"+esc(x.name)+"</b><span>"+faD(x.members)+(AR?" أعضاء · المركز ":" members · #")+faD(x.myRank||"-")+"</span></div>"+ICON_R+"</button>"}).join("")+"</div>";
+      Array.prototype.forEach.call(box.querySelectorAll("button[data-g]"),function(b){b.onclick=function(){openGroup(b.getAttribute("data-g"))}})
+    },function(){var box=g("hgl");if(box)box.innerHTML=""})}
 }
 var MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],MONL=["January","February","March","April","May","June","July","August","September","October","November","December"];
 var ICON_CAL="<svg viewBox='0 0 24 24'><rect x='4' y='5' width='16' height='15' rx='3'/><path d='M8 3v4M16 3v4M4 10h16'/></svg>";
@@ -1574,13 +1609,13 @@ function openMenu(){
   "<div class='mrow'><button class='x' data-nav='-1' aria-label='Previous month'"+(canPrev?"":" disabled")+">"+(AR?ICON_R:ICON_L)+"</button><b>"+MONL[cm.m]+" "+cm.y+"</b><button class='x' data-nav='1' aria-label='Next month'"+(canNext?"":" disabled")+">"+(AR?ICON_L:ICON_R)+"</button></div>"+
   "<div class='cal' style='margin-bottom:6px'>"+WD.map(function(c){return "<span class='wd'>"+c+"</span>"}).join("")+"</div><div class='cal'>"+cells+"</div>"+
   "<p class='note' style='margin-top:14px'>"+(AR?"اضغط أي يوم حتى اليوم لتلعبه. أيام الأرشيف لا تُحتسب في سلسلتك.":"Tap any day up to today to play it. Archive days don’t count toward your streak.")+"</p>"):coinMenu())+
-  "<div class='mis' style='margin-top:14px'><button class='mi' data-home='1'>"+ICON_HOME+"<div><b>"+(AR?"الرجوع للرئيسية":"Back to home")+"</b><span>"+(AR?"كيف تلعب والأسئلة الشائعة":"How to play and the FAQ")+"</span></div>"+ICON_R+"</button></div>";
+  "<div class='mis' style='margin-top:14px'><button class='mi' data-home='1'>"+ICON_HOME+"<div><b>"+(AR?"الرئيسية":"Home")+"</b><span>"+(AR?"سلسلتك وأسبوعك ومجموعاتك":"Your streak, week and groups")+"</span></div>"+ICON_R+"</button></div>";
   sh.onclick=function(e){
     var b=e.target.closest?e.target.closest("button"):null;if(!b||b.disabled)return;
     if(b.hasAttribute("data-d")){selectDay(parseInt(b.getAttribute("data-d"),10));intro=false;closeSheet();render();window.scrollTo(0,0)}
     else if(b.hasAttribute("data-nav")){var v=cm.y*12+cm.m+parseInt(b.getAttribute("data-nav"),10);cm={y:Math.floor(v/12),m:v%12};openMenu()}
     else if(b.hasAttribute("data-home")){closeSheet();selectDay(today);intro=true;render();window.scrollTo(0,0)}
-    else if(b.hasAttribute("data-act")){var a=b.getAttribute("data-act");if(a==="signin")openSignIn(1,"");else if(a==="groups")openGroups();else if(a==="dev")openDev();else if(a==="signout"){setAcct(null);openMenu()}}
+    else if(b.hasAttribute("data-act")){var a=b.getAttribute("data-act");if(a==="signin")openSignIn(1,"");else if(a==="groups")openGroups();else if(a==="dev")openDev();else if(a==="lang"){toggleLang();openMenu()}else if(a==="signout"){setAcct(null);openMenu()}}
     else if(b.id==="mspend"){closeSheet();spendCoin()}
     else if(b.id==="sx")closeSheet()};
   sc.onclick=closeSheet;sh.classList.add("open");sc.classList.add("open");document.body.style.overflow="hidden";
@@ -1761,6 +1796,7 @@ var ICON_USER="<svg viewBox='0 0 24 24'><circle cx='12' cy='8' r='4'/><path d='M
 ICON_BAL="<svg viewBox='0 0 24 24'><path d='M12 4v16M6 20h12M5 8h14M7 8l-3 7a3 3 0 0 0 6 0L7 8zM17 8l-3 7a3 3 0 0 0 6 0l-3-7z'/></svg>",
 ICON_HOME="<svg viewBox='0 0 24 24'><path d='M4 20V10l8-6 8 6v10M4 20h16M10 20v-5h4v5'/></svg>",
 ICON_COIN="<svg viewBox='0 0 64 64' stroke-linejoin='round'><g stroke='#c97a00' stroke-width='2.5'><path d='M10 44v6c0 4.4 9.8 8 22 8s22-3.6 22-8v-6z' fill='#f2a200'/><ellipse cx='32' cy='44' rx='22' ry='8' fill='#ffc933'/><path d='M10 31v6c0 4.4 9.8 8 22 8s22-3.6 22-8v-6z' fill='#f2a200'/><ellipse cx='32' cy='31' rx='22' ry='8' fill='#ffc933'/><path d='M10 18v6c0 4.4 9.8 8 22 8s22-3.6 22-8v-6z' fill='#f2a200'/><ellipse cx='32' cy='18' rx='22' ry='8' fill='#ffd24a'/></g><ellipse cx='32' cy='18' rx='13' ry='4.2' fill='none' stroke='#fff' stroke-opacity='.7' stroke-width='2'/></svg>",
+ICON_LANG="<svg viewBox='0 0 24 24'><circle cx='12' cy='12' r='9'/><path d='M3 12h18M12 3c2.5 2.7 3.8 5.7 3.8 9s-1.3 6.3-3.8 9c-2.5-2.7-3.8-5.7-3.8-9S9.5 5.7 12 3z'/></svg>",
 ICON_DEV="<svg viewBox='0 0 24 24'><path d='M14.7 6.3a4 4 0 0 0-5.4 5.4L3.5 17.5a1.8 1.8 0 0 0 2.5 2.5l5.8-5.8a4 4 0 0 0 5.4-5.4l-2.6 2.6-2.2-.4-.4-2.2z'/></svg>",
 ICON_USERS="<svg viewBox='0 0 24 24'><circle cx='9' cy='8' r='3.2'/><circle cx='17' cy='9' r='2.4'/><path d='M3.5 20c0-3 2.8-5 5.5-5s5.5 2 5.5 5M15.5 20c0-2.2 1-3.8 3.4-3.8'/></svg>";
 function menuRows(){
@@ -1769,6 +1805,7 @@ function menuRows(){
   (a.t?"<div class='mi static'>"+ICON_USER+"<div><b>"+(AR?"مسجّل الدخول":"Signed in")+"</b><span>"+esc(a.e)+"</span></div><button class='lnk' data-act='signout'>"+(AR?"خروج":"Sign out")+"</button></div>"
       :"<button class='mi' data-act='signin'>"+ICON_USER+"<div><b>"+(AR?"تسجيل الدخول":"Sign in")+"</b><span>"+(AR?"اختياري. احتفظ بسلسلتك بين أجهزتك.":"Optional. Keep your streak across devices.")+"</span></div>"+ICON_R+"</button>")+
   "<button class='mi' data-act='groups'>"+ICON_USERS+"<div><b>"+(AR?"المجموعات":"Groups")+"</b><span>"+(AR?"نافس أصدقاءك على لوحة أسبوعية":"Race friends on a weekly leaderboard")+"</span></div>"+ICON_R+"</button>"+
+  "<button class='mi' data-act='lang'>"+ICON_LANG+"<div><b>"+(AR?"English":"العربية")+"</b><span>"+(AR?"Switch to English":"Switch to Arabic")+"</span></div>"+ICON_R+"</button>"+
   "<button class='mi' data-act='dev'>"+ICON_DEV+"<div><b>Dev</b><span>Locked. Owner tools.</span></div>"+ICON_R+"</button></div>"}
 var __sf=0;
 function fitSheet(){return;var sh=document.getElementById("sheet");if(!sh||!sh.classList.contains("open"))return;
@@ -2027,7 +2064,7 @@ var THEMES=[
 var WIN=THEMES[0];
 function setTheme(t){var s=document.body.style;s.setProperty("--c",t.c);s.setProperty("--c2",t.c2);s.setProperty("--ct",t.ct);s.setProperty("--cs",t.cs)}
 /* NB: the status bar / top strip (html bg, body-top tint, theme-color meta) is a constant #eaf1ff set in <head>/CSS and is deliberately NOT changed per theme, so iOS never shows a white seam regardless of whether Safari honours dynamic theme-color. */
-var LANG="en";try{LANG=localStorage.getItem("rq-lang")==="ar"?"ar":"en"}catch(e){}
+var LANG="en";try{var sl=localStorage.getItem("rq-lang");LANG=(sl==="ar"||(sl===null&&/^ar/i.test(navigator.language||"")))?"ar":"en"}catch(e){}
 function applyLang(){document.documentElement.lang=LANG;document.documentElement.dir=(LANG==="ar"?"rtl":"ltr");var b=document.getElementById("lang");if(b)b.textContent=(LANG==="ar"?"EN":"عربي")}
 function toggleLang(){LANG=(LANG==="ar"?"en":"ar");try{localStorage.setItem("rq-lang",LANG)}catch(e){}applyLang();render()}
 var AR=LANG==="ar";
@@ -2051,8 +2088,9 @@ function hintPair(i){var h=HINTS[i];if(!h)return [LANG==="ar"?"للعلم":"Good
 function render(){
   cancelAnimationFrame(raf);viewTok++;
   var n=st.g.length;
-  document.body.setAttribute("data-view",intro?"land":"play");document.body.classList.toggle("fit",!intro&&!(n>=3&&!st.r));side();
-  if(intro){setTheme(THEMES[0]);return landing();}
+  document.body.setAttribute("data-view",intro?"home":"play");document.body.classList.toggle("fit",!intro&&!(n>=3&&!st.r));side();
+  var hl=document.getElementById("hwl");if(hl)hl.style.display=(!intro&&!bonus&&!(stats.played>0)&&n<3&&!st.r)?"block":"none";
+  if(intro){setTheme(THEMES[0]);return home();}
   if(n>=3&&!st.r){setTheme(WIN);return done();}
   if(st.r&&n>=1){setTheme(THEMES[(n-1)%3]);return reveal(n-1);}
   setTheme(THEMES[n%3]);ask(n);
@@ -2280,9 +2318,9 @@ function groupNudge(){
 }
 function acctLabel(){var b=document.getElementById("acct");if(!b)return;b.textContent=acct().t?"Account":"Sign in"}
 function streak(){var e=document.getElementById("streak");if(!e)return;var c=coinsGet().n,t=stats.streak?stats.streak+" day streak":"";if(c)t+=(t?" · ":"")+c+" coin"+(c===1?"":"s");e.textContent=t}
-document.getElementById("how").onclick=function(e){e.preventDefault();selectDay(today);intro=true;render();window.scrollTo(0,0)};
+document.getElementById("how").onclick=function(e){e.preventDefault();openHow()};
 document.getElementById("menu").onclick=function(){var d=new Date(day*864e5);cm={y:d.getUTCFullYear(),m:d.getUTCMonth()};openMenu()};
-document.getElementById("lang").onclick=toggleLang;
+document.getElementById("homeb").onclick=function(){selectDay(today);intro=true;render();window.scrollTo(0,0)};
 document.querySelector(".wordmark").onclick=function(){selectDay(today);intro=true;render();window.scrollTo(0,0)};
 document.addEventListener("visibilitychange",function(){if(!document.hidden&&dayNum()!==day){init();streak();render()}});
 applyLang();init();streak();render();setTimeout(function(){devGiftShow();giftShow()},900);

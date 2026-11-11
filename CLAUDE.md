@@ -28,7 +28,7 @@ Owner: SWISS, solo founder based in Doha. Tone in copy: human, warm, a bit funny
 - Question and reveal screens are vertically centred and sized to fit one phone screen (no scroll). The primary action button sits in normal flow — no floating bar, no arrow icon.
 - Category shown as its icon only (a badge in the stepper row), never spelled out. No "Question 1 of 3".
 - Reveal is a quick, bright "hit": a coloured score block (green/amber/red by closeness) with a fast count-up and a thump. Results show a big count-up score, Top X%, the three questions (icon + text + score), last-7-days, and a large "Next drop in" countdown bubble with a "Play past drops" button.
-- Landing page first for normal visits: game-like hero (three colour "drops", bold headline, Play button) + numbered step cards + categories + short FAQ. Challenge links skip it.
+- No landing page (removed 11 Nov 2026, build 2026-11-11.1). Everyone lands straight on the question, except players who already finished today, who land on Home. First-timers (`stats.played===0`) see a small "How to play" link under the question card (`#hwl`, opens `openHow()` sheet). Challenge and gift links skip Home.
 
 ## Repo layout
 - `index.html` the entire game: HTML + CSS + vanilla JS in one file. No build step, no dependencies.
@@ -133,3 +133,9 @@ No test suite in the repo. Previously verified with jsdom smoke tests and Playwr
 - Reveal graph: sample bars are yellow (`#ffd84d`) stacked under the pale real bars, legend entry "Sample data" (`o.fs` = sample r values, `o.rs` = real). Results chart: yellow sample part of each bar (`CD.fb`), and the note says "Includes N sample answers, shown in yellow."
 - "Better than X%" and "Top X%" are computed from real + sample, so they are not true while samples are on. Turn `DEMO_FILL` off before telling players those numbers are real.
 - Tested in Playwright: sample-only and real+sample, all three questions plus results, no console errors. Not tested with real Firestore data.
+
+## Home dashboard replaces the landing page (11 Nov 2026, build .1)
+- `home()` replaces `landing()`. `intro` is now the "show Home" flag: true on load only when today is finished (and not in a bonus game). The Home button (top-left, `#homeb`) and the wordmark open it any time.
+- Not played / part played: just one big "Play today's drop" (or "Continue today's drop") button, no repeated copy. Finished: average score, See breakdown, Share, next-drop countdown, streak + coin tiles, coin button, week strip, Groups list (`RQGroups.listGroups()`, with Create / Join). Streak, coin and week blocks are hidden for brand-new players.
+- `faqAll()` keeps the old FAQ strings, used by `openHow()`. The language pill was removed from the header: Arabic is auto-detected from `navigator.language` when nothing is saved, and the switch is a row in the menu.
+- Tested (Playwright, stand-in data, groups stubbed): first-timer, returning-unplayed, finished, Arabic/RTL, desktop 1440, 375x667 first-timer fits. Not tested: real Groups list data, a real phone, Home after a bonus game end-to-end.
