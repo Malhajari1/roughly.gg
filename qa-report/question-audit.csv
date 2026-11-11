@@ -1,0 +1,199 @@
+index,status,category,kind,question,unit,estimate,lo,hi,range_x,severity,issue,note
+0,active,Everyday Qatar,R,How many mobile phones are in use in Qatar?,phones,4200000,3000000,7000000,2.3,,,
+1,active,Everyday Qatar,R,How many light bulbs are switched on across Qatar at 9 pm?,bulbs,20000000,8000000,50000000,6.2,,,
+2,active,Everyday Qatar,R,How many WhatsApp voice notes are sent in Qatar every day?,voice notes,37000000,10000000,150000000,15.0,,,
+3,active,Food & drink,R,How many loaves and flatbreads does Qatar eat every day?,pieces of bread,4000000,1500000,8000000,5.3,,,
+4,active,Food & drink,R,How many bottles of water does Qatar drink every day?,bottles,6000000,2500000,12000000,4.8,,,
+5,active,Food & drink,R,How many pizzas does Qatar order on a typical Friday?,pizzas,200000,60000,600000,10.0,,,
+6,active,Food & drink,R,How many kilograms of rice does Qatar eat every day?,kg,500000,250000,1000000,4.0,,,
+7,active,Money,R,How many riyals does Qatar spend on coffee every day?,QAR,18000000,6000000,50000000,8.3,,,
+8,active,Money,R,How many riyals of cash are sitting in people’s wallets across Qatar right now?,QAR,500000000,150000000,1500000000,10.0,,,
+9,active,Roads,R,How many litres of petrol and diesel do Qatar’s cars burn every day?,litres,8000000,3000000,20000000,6.7,,,
+10,active,Roads,R,How many people ride the Doha Metro on a typical weekday?,riders,200000,80000,500000,6.2,,,
+11,active,Roads,R,How many cars are washed in Qatar every day?,cars,250000,80000,600000,7.5,,,
+12,active,Travel,D,How many flights take off or land at Hamad Airport every day?,flights,880,450,1700,3.8,,,
+13,active,Geography,D,How many hours would it take to drive the whole Qatar coastline at 80 km/h?,hours,7,4,14,3.5,,,
+14,active,Geography,D,"If everyone in the world stood in Qatar with one square metre each, how many people would fit?",people,11600000000,5000000000,20000000000,4.0,,,
+15,active,Resources,R,How many Olympic swimming pools would Qatar’s daily water use fill?,pools,540,280,1100,3.9,,,
+16,retired,Resources,R,How many kilowatt-hours of electricity does Qatar use every day?,kWh,150000000,80000000,300000000,3.8,,,
+17,active,Resources,R,How many plastic bags does Qatar go through in a day?,bags,3000000,1000000,8000000,8.0,,,
+18,active,Resources,R,How many tonnes of rubbish does Qatar produce every day?,tonnes,5000,2500,12000,4.8,,,
+19,active,Sport,R,"How many kilometres do people run and walk along the Corniche on a cool Friday morning, combined?",km,7500,2000,30000,15.0,,,
+20,active,Sport,R,How many gym memberships are active in Qatar?,memberships,375000,150000,800000,5.3,,,
+21,active,Doha life,R,How many times a week does a driver in Doha get cut off at a roundabout?,times,8,3,25,8.3,,,
+22,active,Doha life,R,How many times does the average person say “habibi” or “habibti” in a day?,times,12,4,40,10.0,,,
+23,active,Doha life,R,A friend says they’re “two minutes away.” How many minutes does it actually take?,minutes,20,8,60,7.5,,,
+24,active,Doha life,R,How many people head out to the desert on a winter Thursday night?,people,150000,50000,400000,8.0,,,
+25,active,Doha life,R,How many stray cats live in Doha?,cats,60000,20000,200000,10.0,,,
+26,active,Doha life,R,How many people are on the Corniche on the first properly cool evening of the year?,people,42000,15000,120000,8.0,,,
+27,active,Doha life,R,How many “where are you?” messages are sent in Qatar every day?,messages,1000000,300000,4000000,13.3,,,
+28,active,Doha life,R,How many horn honks are there on Doha’s roads on a normal weekday?,honks,2400000,600000,8000000,13.3,,,
+29,active,Doha life,R,How many Instagram stories of the West Bay skyline are posted every sunset?,stories,20000,6000,80000,13.3,,,
+30,active,Doha life,R,How many delivery riders are on Doha’s roads at 9 pm on a Friday?,riders,10000,4000,30000,7.5,,,
+31,active,Doha life,R,How many kilometres do people walk inside air-conditioned malls on a 45°C summer day?,km,450000,150000,1500000,10.0,,,
+32,active,Doha life,R,How many times a day does a delivery driver call to ask “where exactly is your house?”,calls,200000,80000,500000,6.2,High,Ambiguous wording,"'How many times a day does a delivery driver call' reads as per driver, but the answer is a national total (200,000)."
+33,active,Food & drink,R,How many cups of karak are sold across Qatar every day?,cups,3000000,1200000,7000000,5.8,,,
+34,active,Food & drink,R,How many shawarmas does Qatar wrap on a typical weekend day?,shawarmas,400000,150000,1000000,6.7,,,
+35,active,Food & drink,R,How many dates does Qatar eat on a single day of Ramadan?,dates,9000000,3000000,20000000,6.7,,,
+36,active,Everyday Qatar,R,How many air-conditioning units are running in Qatar on a summer afternoon?,AC units,3000000,1500000,7000000,4.7,,,
+37,active,Everyday Qatar,R,How many SIM cards are active in Qatar?,SIM cards,5000000,3000000,8000000,2.7,,,
+38,active,Everyday Qatar,R,How many screens are switched on across Qatar during a big Qatar football match?,screens,800000,300000,2000000,6.7,,,
+39,active,Money,R,How many riyals does Qatar spend on fuel at the pump every day?,QAR,12000000,5000000,30000000,6.0,Medium,Incorrect input,"Uses QAR 1.5 per litre. Qatar pump prices are about QAR 1.95-2.10 (2025-26), so the estimate should be ~QAR 16 million, not 12."
+40,active,Money,R,How many riyals of gold are bought in Qatar in a day?,QAR,6000000,2000000,20000000,10.0,,,
+41,active,Roads,R,How many Toyota Land Cruisers are on Qatar's roads?,Land Cruisers,250000,100000,600000,6.0,,,
+42,active,Roads,R,How many traffic lights are there in Doha?,traffic lights,900,400,2000,5.0,Medium,Ambiguous,"'Traffic lights': junctions, poles or light heads? Steps assume 3 heads per junction, which matches none of them (a 4-way junction has 8+ heads)."
+43,active,Roads,R,How many parking spaces does a big Doha mall have?,spaces,6000,2500,12000,4.8,,,
+44,active,Travel,R,How many suitcases pass through Hamad International Airport every day?,suitcases,150000,60000,400000,6.7,Medium,Near-duplicate,"Answer is Hamad's daily passenger count (~150,000), same as #145 and close to #93."
+45,active,Travel,R,How many taxis and ride-hail cars are working in Doha right now?,cars,30000,10000,80000,8.0,,,
+46,active,Geography,R,How many kilometres of track would you cover riding all three Doha Metro lines end to end?,km,76,40,130,3.2,Medium,Factual error,Fun fact says 76 km is 'further than the drive from Doha to the Saudi border'. Doha to Abu Samra is ~90+ km (straight line ~92 km). Also an exact public figure tagged Rough estimate.
+47,active,Geography,R,How many football pitches would fit inside Hamad International Airport?,pitches,4000,1500,9000,6.0,,,
+48,active,Resources,R,How many litres of water does a single Doha household use in a day?,litres,1800,700,4000,5.7,,,
+49,active,Sport,R,How many steps does the average Doha office worker take in a day?,steps,5000,2000,12000,6.0,,,
+50,active,Sport,R,How many padel courts are there in Qatar?,courts,500,200,1200,6.0,,,
+51,active,Everyday Qatar,R,How many small cups of Arabic coffee are poured at majlis gatherings on a Friday?,cups,1500000,500000,4000000,8.0,,,
+52,active,Food & drink,R,How many kilograms of chicken does Qatar cook every day?,kg,600000,250000,1500000,6.0,,,
+53,active,Doha life,R,How many times a week does someone in Doha say 'inshallah' when they really mean 'probably not'?,times,9,3,30,10.0,,,
+54,active,Doha life,R,How many selfies are taken at The Pearl on a pleasant weekend?,selfies,80000,30000,200000,6.7,,,
+55,active,Doha life,R,How many times a week does a Doha driver get flashed from behind to move over?,times,12,4,40,10.0,,,
+56,active,Doha life,R,How many photos do tourists take of the camels at Souq Waqif in a day?,photos,15000,5000,40000,8.0,,,
+57,active,Doha life,R,How many laps does a driver do around a packed mall car park before finding a space?,laps,3,1,8,8.0,,,
+58,active,Food & drink,R,How many cans and bottles of soft drink does Qatar get through in a day?,drinks,3000000,1000000,8000000,8.0,,,
+59,active,Food & drink,R,How many kilograms of lamb and mutton does Qatar eat every day?,kg,180000,60000,500000,8.3,,,
+60,active,Food & drink,R,How many plates of biryani and machboos does Qatar serve in a day?,plates,1000000,300000,2000000,6.7,,,
+61,active,Food & drink,R,How many cups of fresh juice does Qatar drink every day?,cups,750000,200000,2000000,10.0,,,
+62,active,Food & drink,R,How many burgers does Qatar eat on a typical weekend day?,burgers,350000,100000,1000000,10.0,,,
+63,active,Food & drink,R,How many pieces of sushi does Qatar eat every day?,pieces,50000,15000,150000,10.0,,,
+64,active,Food & drink,R,How many kilograms of hummus does Qatar eat every day?,kg,120000,40000,400000,10.0,,,
+65,active,Food & drink,R,How many samosas does Qatar eat on a single day of Ramadan?,samosas,6000000,2000000,15000000,7.5,,,
+66,active,Food & drink,R,How many scoops of ice cream does Qatar sell on a hot summer day?,scoops,375000,100000,1000000,10.0,,,
+67,active,Food & drink,R,How many bottles of laban and yogurt drink does Qatar drink every day?,bottles,1200000,400000,3000000,7.5,,,
+68,active,Food & drink,R,How many kilograms of mangoes does Qatar eat in a day during the season?,kg,500000,150000,1500000,10.0,,,
+69,active,Everyday Qatar,R,How many mosques are there in Qatar?,mosques,2000,1000,4000,4.0,Low,"Verifiable, mis-tagged","Ministry of Awqaf publishes mosque counts (~2,300). Wording '1 per 1,500 x 3 million' should be '/'."
+70,active,Everyday Qatar,R,How many calls to prayer are sounded across Qatar in a day?,calls,10000,4000,25000,6.2,Low,Derived duplicate,"Just #69 (mosques) x 5. If #69 has been seen, this is pure arithmetic."
+71,active,Everyday Qatar,R,How many elevators are there in Qatar?,elevators,40000,15000,100000,6.7,,,
+72,active,Everyday Qatar,R,How many CCTV cameras are there in Doha?,cameras,300000,100000,800000,8.0,,,
+73,active,Everyday Qatar,R,How many ATMs are there in Qatar?,ATMs,1800,800,4000,5.0,,,
+74,active,Everyday Qatar,R,How many date palm trees are there in Qatar?,palm trees,3000000,1000000,8000000,8.0,,,
+75,active,Everyday Qatar,R,How many washing machines are running across Qatar on a Friday morning?,machines,375000,150000,1000000,6.7,,,
+76,active,Everyday Qatar,R,How many pharmacies are there in Qatar?,pharmacies,1000,400,2000,5.0,,,
+77,active,Everyday Qatar,R,How many barbershops and salons are there in Qatar?,salons,3000,1200,7000,5.8,,,
+78,active,Money,R,How many riyals does Qatar send abroad in remittances every day?,QAR,120000000,50000000,300000000,6.0,,,
+79,active,Money,R,How many riyals does Qatar spend on oud and perfume every day?,QAR,8000000,3000000,20000000,6.7,,,
+80,active,Money,R,How many riyals does Souq Waqif take in over a weekend?,QAR,15000000,5000000,50000000,10.0,,,
+81,active,Money,R,How many riyals of parking fines does Qatar issue in a day?,QAR,300000,100000,1000000,10.0,,,
+82,active,Money,R,How many riyals does a big Qatari wedding cost?,QAR,1000000,300000,4000000,13.3,,,
+83,active,Money,R,How many riyals does Qatar spend on private school fees in a year?,QAR,9000000000,4000000000,25000000000,6.2,Medium,Internal contradiction,"Steps use 230,000 private-school pupils but the hint says 300,000 (and #154 uses 300,000). 300,000 x 40,000 = QAR 12bn, not 9bn."
+84,active,Money,R,How many riyals of loose change are sitting in Qatar's cars right now?,QAR,9000000,3000000,30000000,10.0,,,
+85,active,Roads,R,How many roundabouts are there in Qatar?,roundabouts,350,150,800,5.3,,,
+86,active,Roads,R,How many speed bumps are there in Doha?,speed bumps,20000,8000,50000,6.2,,,
+87,active,Roads,R,How many petrol stations are there in Qatar?,stations,120,50,300,6.0,Low,"Verifiable, mis-tagged",Woqod publishes its station count (~120-130). Could be Official with a source.
+88,active,Roads,R,How many kilometres of road are there in Qatar?,km,10000,4000,25000,6.2,,,
+89,active,Roads,R,How many public buses are running in Qatar?,buses,3000,1000,7000,7.0,,,
+90,active,Roads,R,How many cars pass through a major Doha interchange in an hour at rush?,cars,8000,3000,20000,6.7,,,
+91,active,Roads,R,How many car number plates are issued in Qatar on a typical day?,plates,400,150,1200,8.0,,,
+92,active,Roads,R,How many e-scooters are out on Doha's paths on a cool evening?,scooters,5000,1500,15000,10.0,,,
+93,active,Travel,R,How many passengers does Qatar Airways carry on a typical day?,passengers,140000,60000,400000,6.7,Medium,Near-duplicate / verify,"~140,000 passengers/day, near-identical answer to #44/#145. Qatar Airways reports ~40-43M passengers/year, so 50M may be high."
+94,active,Travel,R,How many hotel rooms are there in Qatar?,rooms,40000,15000,100000,6.7,,,
+95,active,Travel,R,How many people visit Katara Cultural Village on a weekend?,visitors,80000,30000,200000,6.7,,,
+96,active,Travel,R,How many dhow boats are moored along the Doha Corniche?,dhows,60,25,150,6.0,,,
+97,active,Travel,R,How many tourists visit Souq Waqif on a cool-season day?,tourists,20000,7000,60000,8.6,,,
+98,active,Travel,R,How many kilometres does Qatar Airways' fleet fly in a single day?,km,3000000,1000000,8000000,8.0,,,
+99,active,Geography,R,How many islands lie off Qatar's coast?,islands,80,30,200,6.7,Medium,Ambiguous / unverifiable,Island count depends on whether The Pearl's artificial islands and tidal sandbanks count.
+100,active,Geography,R,How many people stacked head to toe would match the height of Qatar's tallest tower?,people,190,120,320,2.7,Low,Arithmetic,"300 m / 1.7 m = 176, not 190. 'Qatar's tallest tower' also needs naming (Aspire Tower, 300 m)."
+101,active,Geography,R,How many litres of seawater does Qatar desalinate in a day?,litres,1600000000,800000000,3000000000,3.8,Medium,Ambiguous,'Litres of seawater desalinated' could mean intake (seawater) or output (fresh water); intake is ~2-3x output. Figure needs a source.
+102,active,Geography,R,How many football pitches would fit inside Education City?,pitches,2000,800,5000,6.2,,,
+103,active,Geography,R,"How many kilometres is Doha from the nearest other capital, Manama?",km,150,90,260,2.9,,,
+104,active,Resources,R,How many gigabytes of mobile data does Qatar use in a day?,GB,10000000,3000000,40000000,13.3,Medium,Likely too high,"3.3 GB per person per day = ~100 GB/month. Gulf mobile averages are ~20-40 GB/month, suggesting ~2-4 million GB/day."
+105,active,Resources,R,How many tonnes of sand blow onto Qatar's roads on a dusty day?,tonnes,5000,1500,20000,13.3,Medium,Unverifiable,Tonnes of sand on roads on a dusty day: no source exists and steps are just the number restated.
+106,retired,Resources,R,How many kilowatt-hours of electricity does air conditioning use in Qatar in a day?,kWh,70000000,30000000,200000000,6.7,,,
+107,active,Resources,R,How many litres of water keep Qatar's grass and golf greens alive in a day?,litres,200000000,80000000,600000000,7.5,,,
+108,active,Resources,R,How many tonnes of food does Qatar waste in a day?,tonnes,1500,600,4000,6.7,,,
+109,active,Resources,R,How many solar panels would it take to power one Qatari home for a day?,panels,40,15,100,6.7,,,
+110,active,Sport,R,How many swimming pools are there in Qatar?,pools,20000,7000,60000,8.6,,,
+111,active,Sport,R,How many people fill the stands at a big stadium match in Qatar?,people,40000,15000,80000,5.3,Medium,Ambiguous / trivial,'A big stadium match' ranges from 40k (Al Thumama) to 88k (Lusail). Answer depends on which stadium the player pictures.
+112,active,Sport,R,How many kilometres are run on treadmills in Qatar's gyms in a day?,km,150000,50000,400000,8.0,,,
+113,active,Sport,R,How many horses are stabled in Qatar?,horses,30000,10000,80000,8.0,,,
+114,active,Sport,R,How many footballs do Qatar's academies and schools wear out in a year?,footballs,100000,30000,300000,10.0,,,
+115,active,Doha life,R,How many times a day does someone in Doha say 'yalla'?,times,40,15,120,8.0,Low,Phrasing pair,Per-person answer (40) with the same 'someone' phrasing as the national-total questions.
+116,active,Doha life,R,How many sprays of oud or perfume does someone use before a big event?,sprays,8,3,20,6.7,,,
+117,active,Doha life,R,How many times a day does someone double-park 'for one minute' outside a shop in Doha?,times,300000,100000,800000,8.0,High,Ambiguous wording,"'...does someone double-park' reads as one person; answer is a national total (300,000). #115 uses the same phrasing for a per-person answer (40)."
+118,active,Doha life,R,How many times a day is 'mashallah' said over a baby photo in Qatar?,times,800000,300000,2000000,6.7,,,
+119,active,Doha life,R,How many cars are left idling with the AC on while the owner runs inside?,cars,200000,70000,500000,7.1,Medium,Missing time frame,'How many cars are left idling...' has no time frame; the answer assumes 'on a hot day'.
+120,active,Doha life,R,How many times does a majlis conversation solve all the world's problems in one night?,times,5,2,15,7.5,Medium,Unanswerable joke,"No way to reason towards an answer; score is arbitrary. Keep as a 'just for fun' with no score, or rewrite."
+121,active,Doha life,R,How many cats are fed outside Doha's restaurants in a day?,cats,40000,15000,100000,6.7,Low,Near-duplicate,Cats fed outside restaurants vs #25 stray cats in Doha; scheduled 5 days apart.
+122,active,Doha life,R,How many times a day does someone say 'five minutes' while waiting for food that takes thirty?,times,900000,300000,2500000,8.3,High,Ambiguous wording,"'...does someone say five minutes' reads as one person; answer is national (900,000)."
+123,active,Doha life,R,How many majlis and dewaniya gatherings are held across Qatar on a Friday night?,gatherings,50000,20000,150000,7.5,,,
+124,active,Doha life,R,How many tissue boxes are riding around in Qatar's cars right now?,boxes,2000000,800000,5000000,6.2,,,
+125,active,Doha life,R,How many times a week does the AC remote go missing in a Doha home?,times,5,2,15,7.5,Low,Unanswerable joke,'AC remote goes missing per week' has no reasoning path.
+126,active,Doha life,R,How many selfies are taken at Katara amphitheatre on a weekend?,selfies,30000,10000,90000,9.0,Low,Near-duplicate,"Selfies at Katara; same template as #54 (selfies at The Pearl), scheduled 6 days apart."
+127,active,Doha life,R,How many times a day does someone get lost inside a big Doha mall?,times,15000,5000,50000,10.0,High,Ambiguous wording,"'...does someone get lost inside a big Doha mall' reads as one person; answer is national (15,000)."
+128,active,Doha life,R,How many bottles of oud and perfume are gifted across Qatar during Eid?,bottles,500000,150000,1500000,10.0,,,
+129,active,Doha life,R,How many times a day does a Doha driver reverse neatly into a space in one smooth move?,times,300000,100000,800000,8.0,High,Ambiguous wording,"'...does a Doha driver reverse neatly' reads as one driver; answer is national (300,000)."
+130,active,Doha life,R,How many gold-wrapped chocolates are handed out at one big Qatari wedding?,chocolates,3000,1000,8000,8.0,,,
+131,active,Doha life,R,How many times a day does a Doha driver check the traffic map before a short trip?,times,1000000,400000,3000000,7.5,High,Ambiguous wording,"'...does a Doha driver check the traffic map' reads as one driver; answer is national (1,000,000)."
+132,active,Doha life,R,How many abayas are there in the average wardrobe?,abayas,12,5,30,6.0,,,
+133,active,Facts,O,How many times has Qatar hosted the Asian Games?,times,1,1,3,3.0,Low,Scoring flaw (facts),"Answer 1: a guess of 2 scores 80%, and 0 cannot be entered at all."
+134,retired,Facts,O,How many FIFA World Cups has Qatar hosted?,times,1,1,3,3.0,,,
+135,active,Facts,O,How many stations does the Doha Metro have?,stations,37,20,70,3.5,,,
+136,active,Facts,O,How many times has Qatar won the AFC Asian Cup in football?,times,2,1,5,5.0,,,
+137,active,Facts,O,How many municipalities does Qatar have?,municipalities,8,4,16,4.0,Low,Scoring flaw (facts),"Answer 8: guesses of 6 or 10 score 96-97%, so a wrong fact gets near-full marks."
+138,active,Facts,O,How many stadiums were used in the Qatar 2022 World Cup?,stadiums,8,4,16,4.0,,,
+139,retired,Facts,O,How many countries are in the GCC (Gulf Cooperation Council)?,countries,6,3,12,4.0,,,
+140,retired,Facts,O,How many UNESCO World Heritage Sites does Qatar have?,sites,1,1,4,4.0,,,
+141,active,Food & drink,R,How many falafel balls does Qatar fry in a day?,balls,3000000,1000000,8000000,8.0,,,
+142,active,Roads,R,How many car tyres does Qatar get through in a year?,tyres,2000000,800000,5000000,6.2,,,
+143,active,Roads,D,How many electric vehicles are on Qatar's roads?,EVs,8000,3000,30000,10.0,,,
+144,active,Roads,D,How many road accidents are reported in Qatar in a day?,accidents,800,300,2000,6.7,,,
+145,active,Travel,D,How many boarding passes are scanned at Hamad Airport in a day?,boarding passes,150000,60000,400000,6.7,Medium,Logic error,"54 million passengers a year counts arrivals and departures. Boarding passes are scanned only on departure, so ~74,000 a day, not 149,000. Also near-duplicate of #44 and #93."
+146,active,Travel,R,How many taxis are waiting at the Hamad Airport rank at a busy moment?,taxis,600,200,2000,10.0,,,
+147,active,Resources,D,How many tonnes of dates does Qatar harvest in a year?,tonnes,25000,10000,50000,5.0,,,
+148,active,Resources,O,How many solar panels are there in Qatar?,panels,1800000,800000,4000000,5.0,Medium,Logic / possibly stale,"'How many solar panels are there in Qatar' answered with one plant (Al Kharsaah, 1.8M). Tagged Official, but the Mesaieed and Ras Laffan solar plants (2025) and rooftops are ignored. Verify before showing."
+149,active,Resources,D,How many trees does Qatar plant in a year?,trees,1000000,300000,3000000,10.0,,,
+150,active,Geography,D,How many times would Qatar fit inside Saudi Arabia?,times,185,80,400,5.0,,,
+151,active,Geography,D,How many hours would it take to walk across Qatar at its widest?,hours,17,9,30,3.3,,,
+152,active,Geography,O,How many millimetres of rain does Qatar get in a year?,mm,75,30,160,5.3,,,
+153,active,Geography,D,How many hawksbill turtle hatchlings reach the sea in Qatar each season?,hatchlings,8000,3000,20000,6.7,Low,Obscure,"Hawksbill hatchlings per season: obscure, single-source figure, hard to reason about."
+154,active,Money,R,How many riyals does Qatar spend on school uniforms each August?,QAR,90000000,30000000,200000000,6.7,Low,Internal contradiction,"Uses 300,000 private pupils; #83 uses 230,000."
+155,active,Money,R,How many riyals of Eidiya (cash gifts) are handed out across Qatar over Eid?,QAR,500000000,150000000,1500000000,10.0,,,
+156,active,Money,R,How many riyals of wedding gold does Qatar buy in a year?,QAR,2000000000,500000000,6000000000,12.0,Medium,Verify,"Assumes 12,000-15,000 weddings a year. Qatar registers roughly 4,000-5,000 marriages a year (PSA), so this may be ~3x high."
+157,active,Doha life,R,How many times a day is 'khalas' said across Qatar?,times,15000000,5000000,50000000,10.0,,,
+158,active,Doha life,R,How many 'good morning' images are forwarded in Qatar's family WhatsApp groups each day?,images,2000000,600000,6000000,10.0,,,
+159,active,Doha life,R,How many voice notes longer than five minutes are sent in Qatar each day?,voice notes,2000000,600000,6000000,10.0,Low,Near-duplicate,Builds on #2 (voice notes per day). Scheduled 3 days apart from #2.
+160,active,Doha life,R,How many plastic bags are reused as bin liners in Qatar in a day?,bags,750000,250000,2000000,8.0,,,
+161,active,Everyday Qatar,R,How many street lights line Qatar's highways?,lights,200000,80000,500000,6.2,High,Duplicate + contradiction,"Same question as #177 (street lights). #161 says 20 lamps/km = 200,000; #177 says 35 lamps/km = 350,000 on the same 10,000 km. Scheduled 8 days apart."
+162,active,Everyday Qatar,R,How many Qatar flags are flown on National Day?,flags,2000000,700000,5000000,7.1,,,
+163,active,Everyday Qatar,R,How many fire hydrants are there in Doha?,hydrants,15000,5000,50000,10.0,,,
+164,active,Travel,R,How many cups of coffee are sold inside Hamad Airport in a day?,cups,60000,20000,200000,10.0,High,Duplicate + contradiction,"Same question as #178 (coffee at Hamad Airport): 60,000 here (1 in 2.5) vs 37,000 (1 in 4). Scheduled 7 days apart."
+165,active,Sport,R,How many padel balls are hit in Qatar over a weekend?,balls,500000,150000,1500000,10.0,,,
+166,active,Food & drink,R,How many grilled meat skewers does Qatar eat on a weekend evening?,skewers,600000,200000,1500000,7.5,,,
+167,active,Geography,D,How many days a year does Qatar's temperature top 45°C?,days,60,25,120,4.8,Medium,Verify / mis-tagged,Tagged Derived but gives no source; 60 days a year above 45C looks high for Doha (inland is hotter). Needs a station and source.
+168,active,Food & drink,R,How many eggs does Qatar eat every day?,eggs,2400000,1000000,5000000,5.0,,,
+169,active,Food & drink,R,How many bananas does Qatar eat every day?,bananas,1000000,300000,2500000,8.3,,,
+170,active,Food & drink,R,How many kilograms of tomatoes does Qatar eat every day?,kg,240000,80000,600000,7.5,,,
+171,active,Food & drink,R,How many cartons of fresh milk does Qatar get through every day?,cartons,1200000,400000,3000000,7.5,,,
+172,active,Food & drink,R,How many kilograms of onions does Qatar get through every day?,kg,150000,50000,400000,8.0,,,
+173,active,Money,R,How many riyals does Qatar spend on food delivery every day?,QAR,24000000,8000000,80000000,10.0,,,
+174,active,Money,R,How many riyals does Qatar spend on haircuts every day?,QAR,3400000,1200000,10000000,8.3,,,
+175,active,Money,R,How many riyals does Qatar spend on supermarket shopping every day?,QAR,38000000,15000000,120000000,8.0,,,
+176,active,Roads,R,How many kilometres do Qatar's cars drive in a single day?,km,63000000,20000000,150000000,7.5,High,Factual error,"Fun fact says 63 million km is 'Earth to the Sun and back a few times'. The Sun is ~150 million km away, so it's under halfway there once."
+177,active,Roads,R,How many street lights line Qatar's roads?,lights,350000,150000,1000000,6.7,High,Duplicate + contradiction,See #161. Played today (11 Nov).
+178,active,Travel,R,How many cups of coffee are served at Hamad Airport every day?,cups,37000,12000,120000,10.0,High,Duplicate + contradiction,See #164. Scheduled 15 Nov.
+179,active,Travel,R,How many hours would it take to walk from the north of Qatar to the south?,hours,32,20,55,2.8,,,
+180,active,Geography,R,How many Qatars would fit inside Texas?,Qatars,60,30,120,4.0,,,
+181,active,Geography,R,"How many kilometres is Doha from Mecca, as the crow flies?",km,1270,700,2500,3.6,,,
+182,active,Resources,R,How many tonnes of plastic go into the water bottles Qatar drinks every day?,tonnes,120,40,400,10.0,,,
+183,active,Sport,R,How many people play football in Qatar's parks and pitches on a cool Friday evening?,players,55000,18000,180000,10.0,,,
+184,active,Sport,R,How many kilometres does a footballer run in a 90-minute match?,km,10.5,6,18,3.0,,,
+185,active,Sport,D,How many goals were scored at the 2022 World Cup in Qatar?,goals,172,100,300,3.0,Low,Mis-labelled,Exact public answer (172 goals) but the UI says 'No exact answer'. Should be Facts/Official.
+186,active,Facts,R,How many babies are born in Qatar every day?,babies,72,40,120,3.0,Low,Mis-tagged,Category Facts (UI says 'This one has a real answer' and labels 'Answer') but tagged Rough estimate.
+187,active,Everyday Qatar,R,How many times a day does the average person check their phone?,times,80,30,200,6.7,,,
+188,active,Doha life,R,How many unread WhatsApp messages does the average person in Doha have right now?,messages,200,30,2500,83.3,Low,Range too wide,"Plausible range 30-2,500 (x83). The 'plausible' edges score 23-35%."
+189,active,Doha life,R,How many times a week does someone in Doha say 'we should catch up soon' without picking a date?,times,4,1,15,15.0,,,
+190,active,Doha life,R,How many minutes does a car AC need to feel properly cool after sitting in the July sun?,minutes,8,3,20,6.7,,,
+191,active,Doha life,R,How many degrees Celsius is the AC actually set to in a typical Doha office?,°C,21,17,25,1.5,Medium,Scoring flaw,"Celsius is not a ratio scale, so log scoring gives 16C and 30C both 94-96%. Effectively free points. Range x1.47 is the narrowest in the bank."
+192,active,Doha life,R,"How many tradesmen are saved in the average Doha phone, like 'Ahmed AC', 'Plumber 2' and 'Electrician old'?",contacts,6,2,20,10.0,,,
+193,active,Doha life,R,How many minutes after the invitation time does a Doha dinner party actually start?,minutes,45,15,120,8.0,,,
+194,active,Doha life,R,How many photos are in the average Doha phone's camera roll?,photos,4000,800,20000,25.0,,,
+195,active,Doha life,R,How many times does someone say 'one last karak' before actually going home?,times,3,1,8,8.0,,,
+196,active,Doha life,R,"How many chargers does the average person in Doha own, including the ones that no longer work?",chargers,8,3,25,8.3,,,
+197,active,Doha life,R,How many extra minutes does 7:30 am traffic add to a 10-minute drive in Doha?,minutes,20,8,45,5.6,,,
