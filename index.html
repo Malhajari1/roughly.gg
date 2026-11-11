@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <title>Roughly Qatar – Daily Estimation Game</title>
-<script>window.RQ_BUILD="2026-11-11.10";</script>
+<script>window.RQ_BUILD="2026-11-11.12";</script>
 <meta name="description" content="A fresh set of three how-many questions about Qatar every day. No exact answers — just reason your way close. What would you have guessed?">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Roughly">
@@ -706,12 +706,12 @@ body{overscroll-behavior:none}
 .drop0::after{content:"";position:absolute;top:0;bottom:0;left:-45%;width:26%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.7),transparent);transform:skewX(-20deg);animation:bling 4s ease-in-out infinite;pointer-events:none}
 .drop0 .pastdrops::after{content:"";position:absolute;top:0;bottom:0;left:-45%;width:32%;background:linear-gradient(100deg,transparent,rgba(var(--cs),.16),transparent);transform:skewX(-20deg);animation:bling 4s ease-in-out infinite;pointer-events:none}
 .shareb{margin-top:14px}
-#sh{height:auto;padding:15px;border:0;border-radius:16px;font-weight:700;font-size:1.05rem;background:#fff;color:var(--c);box-shadow:0 10px 22px -10px rgba(0,0,0,.28);position:relative;overflow:hidden}
-#sh:hover{background:#fff;opacity:.95;transform:translateY(-1px)}
-#sh::after{content:"";position:absolute;top:0;bottom:0;width:32%;background:linear-gradient(100deg,transparent,rgba(var(--cs),.18),transparent);transform:skewX(-20deg);animation:bling 4s ease-in-out infinite;pointer-events:none}
+#sh,#dsh{height:auto;padding:15px;border:0;border-radius:16px;font-weight:700;font-size:1.05rem;background:#fff;color:var(--c);box-shadow:0 10px 22px -10px rgba(0,0,0,.28);position:relative;overflow:hidden}
+#sh:hover,#dsh:hover{background:#fff;opacity:.95;transform:translateY(-1px)}
+#sh::after,#dsh::after{content:"";position:absolute;top:0;bottom:0;width:32%;background:linear-gradient(100deg,transparent,rgba(var(--cs),.18),transparent);transform:skewX(-20deg);animation:bling 4s ease-in-out infinite;pointer-events:none}
 .res.card{position:relative;overflow:hidden}
 .res.card::after{content:"";position:absolute;top:0;bottom:0;width:18%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.3),transparent);transform:skewX(-20deg);animation:bling 4s ease-in-out infinite;pointer-events:none}
-@media (prefers-reduced-motion:reduce){#sh::after,.res.card::after{display:none}}
+@media (prefers-reduced-motion:reduce){#sh::after,#dsh::after,.res.card::after{display:none}}
 .gbtn{display:flex;align-items:center;gap:12px;width:100%;text-align:left;border:0;border-radius:26px;padding:16px 18px;margin-top:12px;cursor:pointer;font-family:inherit;color:#fff;background:linear-gradient(160deg,var(--c),var(--c2));box-shadow:0 18px 38px -16px rgba(var(--cs),.6);position:relative;overflow:hidden;transition:transform .15s}
 .gbtn:active{transform:scale(.98)}
 .gbtn>svg{flex:none;width:24px;height:24px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
@@ -739,7 +739,7 @@ body.fit main{justify-content:center}
 .res .qres{margin:7px 0}
 .res .qr{padding:6px 2px}
 .res .shareb{margin-top:0}
-.shrow{display:flex;gap:10px;margin-top:12px}.shrow button.main{margin-top:0;flex:1;width:auto;padding:0 10px;font-size:1.02rem}.shrow button.dashb{flex:.8;background:#fff;color:var(--c);box-shadow:inset 0 0 0 2px var(--c);animation:none}
+.shrow{display:flex;gap:10px;margin-top:12px}.shrow button.main{margin-top:0;flex:1;width:auto;padding:0 10px;font-size:1.02rem}.shrow button#dsh{flex:.8}
 .drop0{padding:13px;margin-top:9px}
 .drop0 .dropin small{font-size:.66rem}
 .drop0 .dropin b{font-size:2.1rem;margin:2px 0 9px}
@@ -781,7 +781,9 @@ header .hd{direction:ltr}
 .hmsc{display:flex;align-items:baseline;gap:4px;margin:4px 0 14px}.hmsc b{font-size:4rem;line-height:1;font-weight:800;letter-spacing:-2px}.hmsc i{font-style:normal;font-size:1.6rem;font-weight:700}
 .hmb{display:flex;gap:8px}.hmb button,.hmh.solo button{flex:1;border:0;border-radius:16px;padding:14px;font-family:inherit;font-weight:700;font-size:1rem;cursor:pointer}
 .hmh.solo button{width:100%;padding:20px;font-size:1.2rem}
-.hmg{background:rgba(255,255,255,.18);color:#fff}.hmw{background:#fff;color:var(--c)}
+.hmg,.hmw{background:#fff;color:var(--c);position:relative;overflow:hidden}
+.hmb button::after,.hmh.solo button::after{content:"";position:absolute;top:0;bottom:0;width:32%;background:linear-gradient(100deg,transparent,rgba(var(--cs),.18),transparent);transform:skewX(-20deg);animation:bling 4s ease-in-out infinite;pointer-events:none}
+@media (prefers-reduced-motion:reduce){.hmb button::after,.hmh.solo button::after{display:none}}
 .hmt{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .hmt>div{background:#fff;border-radius:20px;padding:14px;box-shadow:0 10px 26px -14px rgba(var(--cs),.4);display:flex;gap:12px;align-items:center}
 .hmt p{margin:0}.hmt b{display:block;font-size:1.7rem;line-height:1;color:#16213e}.hmt small{font-size:.74rem;color:#5b6b94;line-height:1.2;display:block;margin-top:3px}
@@ -1661,7 +1663,7 @@ function homeAvg(mine,tries){
   var note=function(t){el=document.getElementById("havg");if(el){el.innerHTML="<span>"+t+"</span>";el.className="hmavg on"}};
   if(tries===0)note(AR?"جارٍ تحميل متوسط اللاعبين…":"Loading players’ average…");
   realDayAvg().then(function(r){el=document.getElementById("havg");if(!el)return;
-    if(r.n>0){el.innerHTML="<span>"+(AR?"متوسط اللاعبين اليوم":"Players’ average today")+"</span><b>"+faD(r.avg)+PCT()+"</b><i>"+faD(r.n)+(AR?(r.n===1?" لاعب":" لاعبين"):(r.n===1?" player":" players"))+"</i>";el.className="hmavg on"}
+    if(r.n>0){el.innerHTML="<span>"+(AR?"متوسط اللاعبين":"Players’ average")+"</span><b>"+faD(r.avg)+PCT()+"</b><i>"+faD(r.n)+(AR?(r.n===1?" لاعب":" لاعبين"):(r.n===1?" player":" players"))+"</i>";el.className="hmavg on"}
     else if(tries<2)setTimeout(function(){homeAvg(mine,tries+1)},2500);
     else note(AR?"لا يوجد لاعبون آخرون بعد. ارجع لاحقاً.":"No other players yet. Check back later.")
   },function(e){var code=String((e&&(e.code||e.message))||"error").replace(/^.*\//,"").slice(0,40)+(e&&e.code&&e.message?": "+String(e.message).replace(/^.*?:\s*/,"").slice(0,70):"");try{console.error("players average:",e)}catch(x){}
@@ -2437,7 +2439,7 @@ function done(){
   "<div class='rtop'><div class='rsc'><small>"+(bonus?(LANG==="ar"?"نتيجة الجولة الإضافية":"Bonus game score"):(LANG==="ar"?"نتيجتك":"Your score"))+"</small><div class='hs'><span id='sn'>"+faD(0)+"</span><i>"+PCT()+"</i></div><div class='pillrow'><span class='hpill' id='pill' style='display:none'>"+(LANG==="ar"?"أفضل "+faD(100-pc)+"٪":"Top "+(100-pc)+"%")+"</span>"+(stats.streak&&!bonus?"<span class='stk'>"+ICON_FLAME+faD(stats.streak)+(LANG==="ar"?" يوم متتالي":" day streak")+"</span>":"")+(coinsGet().n?"<span class='stk'>"+ICON_COIN+faD(coinsGet().n)+(LANG==="ar"?" عملة":(coinsGet().n===1?" coin":" coins"))+"</span>":"")+"</div></div>"+
   "<div class='revg'>"+chartSlot("day")+"</div></div>"+
   h2h(avg)+
-  "<div class='qres'>"+qrows+"</div><div class='shrow'><button class='main dashb' id='dsh'>"+tr("Dashboard")+"</button><button class='main shareb' id='sh'>"+tr("Share result")+"</button></div></div>"+
+  "<div class='qres'>"+qrows+"</div><div class='shrow'><button class='main shareb' id='dsh'>"+tr("Dashboard")+"</button><button class='main shareb' id='sh'>"+tr("Share result")+"</button></div></div>"+
   "<div class='drop0"+(ARCHIVE_OPEN?"":" nb")+"'><div class='dropin'><small>"+tr("Next drop in")+"</small><b id='cdn'>"+fmtDur(nextMidnight())+"</b></div>"+(ARCHIVE_OPEN?"<button class='pastdrops' id='arch'>"+tr("Play past drops")+"</button>":"")+"</div>"+coinCard()+"<div id='gnudge'></div>");
   app.classList.add("plain");
   document.getElementById("sh").onclick=function(){openShare(tot)};

@@ -169,3 +169,8 @@ No test suite in the repo. Previously verified with jsdom smoke tests and Playwr
 
 ## Players' average sits opposite the score (11 Nov 2026, build .10)
 - On Home the players' average is a glass block on the right of the big score (`.hmrow`: score left, `#havg` right, mirrored in Arabic/RTL), instead of a bar under it. Checked at 390 and 320 px wide, English and Arabic.
+
+## Button styling pass (11 Nov 2026, build .12)
+- Results screen: "Dashboard" (`#dsh`) shares every rule of "Share result" (`#sh`): white, blue text, moving shine. Style both by ID together; the `.card.qb button.main` glass rule would otherwise win.
+- Home: See breakdown and Share are both white with the same shine (`.hmb button::after`, `bling` keyframes, tinted with `--cs` so it shows on white). Solo "Play today's drop" gets it too.
+- Label is now just "Players' average" (Arabic "متوسط اللاعبين"), no "today".
