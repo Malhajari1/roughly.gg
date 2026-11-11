@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <title>Roughly Qatar – Daily Estimation Game</title>
-<script>window.RQ_BUILD="2026-11-11.8";</script>
+<script>window.RQ_BUILD="2026-11-11.9";</script>
 <meta name="description" content="A fresh set of three how-many questions about Qatar every day. No exact answers — just reason your way close. What would you have guessed?">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Roughly">
@@ -1662,7 +1662,7 @@ function homeAvg(mine,tries){
     if(r.n>0){el.innerHTML="<span>"+(AR?"متوسط اللاعبين اليوم":"Players’ average today")+"</span><b>"+faD(r.avg)+PCT()+"</b><i>"+faD(r.n)+(AR?(r.n===1?" لاعب":" لاعبين"):(r.n===1?" player":" players"))+"</i>";el.className="hmavg on"}
     else if(tries<2)setTimeout(function(){homeAvg(mine,tries+1)},2500);
     else note(AR?"لا يوجد لاعبون آخرون بعد. ارجع لاحقاً.":"No other players yet. Check back later.")
-  },function(e){var code=String((e&&(e.code||e.message))||"error").replace(/^.*\//,"").slice(0,40);try{console.error("players average:",e)}catch(x){}
+  },function(e){var code=String((e&&(e.code||e.message))||"error").replace(/^.*\//,"").slice(0,40)+(e&&e.code&&e.message?": "+String(e.message).replace(/^.*?:\s*/,"").slice(0,70):"");try{console.error("players average:",e)}catch(x){}
     if(tries<2)setTimeout(function(){homeAvg(mine,tries+1)},2500);else note((AR?"تعذّر تحميل متوسط اللاعبين. جرّب لاحقاً.":"Couldn’t load the players’ average. Try again later.")+" ("+esc(code)+")")})}
 function home(){
   var AR=LANG==="ar",fin=st.g.length>=3&&!st.r,hist=stats.played>0,tot=0,avg=0,hero,i;
@@ -2575,8 +2575,8 @@ if(!firebaseConfig||!firebaseConfig.apiKey){
       async qStats(day,qi){await ready;const qs=await getDocs(query(collection(db,"answers"),where("day","==",day),where("qi","==",qi),limit(5000)));
         const bins=new Array(20).fill(0),rs=[];let n=0,over=0,under=0;qs.forEach(x=>{const d=x.data();if(!(d.s>=1&&d.s<=100))return;bins[Math.min(19,Math.floor(d.s/5))]++;n++;if(typeof d.r==='number')rs.push(Math.round(d.r*100)/100);if(d.r>0.05)over++;else if(d.r<-0.05)under++;});
         return {n,dist:bins,over,under,rs};},
-      async dayStats(day,ids){await ready;const qs=await getDocs(query(collection(db,"answers"),where("day","==",day),limit(15000)));
-        const per={};qs.forEach(x=>{const d=x.data();if(ids.indexOf(d.qi)<0||!(d.s>=1&&d.s<=100))return;(per[d.uid]=per[d.uid]||{})[d.qi]=d.s;});
+      async dayStats(day,ids){await ready;const snaps=await Promise.all(ids.map(qi=>getDocs(query(collection(db,"answers"),where("day","==",day),where("qi","==",qi),limit(5000)))));
+        const per={};snaps.forEach(qs=>qs.forEach(x=>{const d=x.data();if(ids.indexOf(d.qi)<0||!(d.s>=1&&d.s<=100))return;(per[d.uid]=per[d.uid]||{})[d.qi]=d.s;}));
         const bins=new Array(20).fill(0);let n=0,sum=0;for(const u in per){const v=Object.keys(per[u]).map(k=>per[u][k]);if(v.length<3)continue;const a=Math.round(v.reduce((p,c)=>p+c,0)/v.length);bins[Math.min(19,Math.floor(a/5))]++;n++;sum+=a;}
         return {n,dist:bins,sum};},
       async linkGoogle(){await ready;const prov=new GoogleAuthProvider();

@@ -163,3 +163,6 @@ No test suite in the repo. Previously verified with jsdom smoke tests and Playwr
 ## Players' average shows the real error code (11 Nov 2026, build .8)
 - After build .7 every player saw "Couldn't load the players' average". The app can't tell why from the outside, so the message now ends with the error code in brackets, e.g. "(permission-denied)", and the error is also logged to the console ("players average:"). Likely causes in order: `answers` rules not published in the Firebase console (see `backend/firestore.rules`), anonymous sign-in not enabled, or the Firebase scripts blocked on the player's network.
 - NB: the results/reveal graphs fall back to sample data silently when the real fetch fails (`DEMO_FILL` `bad()`), so they can look healthy while real reads are failing.
+
+## Players' average: invalid-argument fix (11 Nov 2026, build .9)
+- Real Firestore returned `invalid-argument` for the Home average. `dayStats` asked for a whole day of answers with `limit(15000)`; it now runs one query per question of the day (`day==` + `qi==`, `limit(5000)`, same shape as `qStats`) and joins them by uid. This is my best guess at the cause and is NOT confirmed against the live database. The error text now also shows Firestore's own message after the code so the next report says exactly what it objected to.
