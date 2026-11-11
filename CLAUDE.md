@@ -36,7 +36,7 @@ Owner: SWISS, solo founder based in Doha. Tone in copy: human, warm, a bit funny
 
 ## How the game works (index.html)
 - Day number = days since epoch (UTC date of the player's local date). `START` = 1 Oct 2026 (archive start). `today`/`day` globals.
-- Question bank `Q` (133 questions, ~98 regular + 35 category "Doha life"). Shape: `{c category, t text, u unit, m our estimate, lo, hi plausible range, s [logic steps], f fun fact, k optional kind}`. `HINTS` is a parallel array (same index) of `["Good to know", text]`.
+- Question bank `Q` (198 questions; 30 added 11 Nov 2026 at indices 168-197). Shape: `{c category, t text, u unit, m our estimate, lo, hi plausible range, s [logic steps], f fun fact, k optional kind}`. `HINTS` is a parallel array (same index) of `["Good to know", text]`.
 - APPEND new questions and hints at the end only. Never reorder: stats, saved games and sync match questions by index.
 - `pick(d)`: days before `ROT_START` (11 Nov 2026) use the old seeded random picker (`legacyPick`, kept so past days stay as played). From `ROT_START` on, questions rotate with no repeats: every question is used once per cycle and none returns sooner than about half a cycle. The first cycle serves questions that were never dropped under the old picker first. 2 regular + 1 Doha life per day, same for everyone. Pool order matters, so only append to `Q`/`HINTS`.
 - Answers are stored in base units. `UNITS` lets players answer in other units (km/miles, kg/lb, litres/gallons, hours/minutes, QAR/USD/EUR/GBP/INR/PKR/PHP, tonnes/US tons). Currency rates are fixed approximations in `UNITS`.
@@ -142,3 +142,10 @@ No test suite in the repo. Previously verified with jsdom smoke tests and Playwr
 
 ## Wordmark opens the old landing page (11 Nov 2026, build .3)
 - `landing()` is back, but only reachable by tapping "roughly.gg" (flag `landOn`). Nobody lands on it automatically. The house button and menu Home row go to the Home dashboard. Landing's Play buttons clear `landOn` and start the game.
+
+## 30 fresh questions, rotation serves them first (11 Nov 2026, build .4)
+- Bug: today's drop repeated questions players had already seen. `legacySeen()` rebuilds past drops from the CURRENT pool, but the pool was smaller when those days dropped, so it can't tell what was really served (git history only has the 168-question version). Do not trust it for "never dropped".
+- Fix: 30 new questions appended (indices 168-197: 20 regular, 10 Doha life), each with Arabic and a hint. First cycle order is now `i>=FRESH_FROM` (168) first, then `LATE_FROM` (133) to 167, then the rest (never-dropped by the old estimate, then the rest). Raise `FRESH_FROM` to the old length each time a new batch is appended so it is served next.
+- Result: the first 10 days from 11 Nov are 100% new questions with no repeats. After that the 133-167 batch (not guaranteed new), then older ones.
+- Players who already started today keep their saved questions (a saved game never changes mid-play); only unstarted days pick up the new ones.
+- Checked: counts of Q and HINTS match, every new question has Arabic with the same number of steps, lo < m < hi, all score 100 at their own estimate, no duplicates across 20 days, first question plays through. NOT checked: facts such as births per year and street-light counts are rough estimates and could be sharpened.
