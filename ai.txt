@@ -1,0 +1,8 @@
+# Roughly (roughly.gg): text and data mining reservation.
+# All rights reserved. The questions, estimates, reasoning steps, fun facts and hints on this site are
+# original work. They may not be collected, scraped or used to train, fine-tune, ground or evaluate
+# AI or machine-learning systems, or to build datasets, without written permission.
+# This is an express reservation of rights under Article 4(3) of EU Directive 2019/790 (TDM) and
+# applicable copyright law. Normal search indexing and link previews are allowed.
+User-Agent: *
+Disallow: /

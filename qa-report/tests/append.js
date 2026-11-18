@@ -1,0 +1,11 @@
+const {chromium}=require('playwright');const {install}=require('./fakefb.js');
+(async()=>{const b=await chromium.launch();const ctx=await b.newContext();await install(ctx);const p=await ctx.newPage();
+await p.goto("https://www.roughly.gg/");await p.waitForFunction(()=>typeof Q!=="undefined");
+const r=await p.evaluate(()=>{const days=[];for(let x=today;x<today+60;x++)days.push(x);
+  const before=days.map(d=>pick(d).join(","));
+  Q.push({c:"Doha life",t:"dummy",u:"times",m:5,lo:2,hi:10,s:["x"],f:"x",ar:{}});Q.push({c:"Food & drink",t:"dummy2",u:"kg",m:5,lo:2,hi:10,s:["x"],f:"x",ar:{}});
+  for(const k in ROT)delete ROT[k];
+  const after=days.map(d=>pick(d).join(","));
+  let ch=0,first=null;days.forEach((d,i)=>{if(before[i]!==after[i]){ch++;if(first===null)first=i}});
+  return {changed:ch,of:days.length,firstChangedOffset:first,today:[before[0],after[0]]};});
+console.log("Append 1 regular + 1 Doha-life question:",JSON.stringify(r));await b.close();})();

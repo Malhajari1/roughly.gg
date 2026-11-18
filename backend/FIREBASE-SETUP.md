@@ -69,3 +69,36 @@ You do steps 1–8 once (~10 min). No billing — the free **Spark** plan is ple
 - **Free tier:** Spark gives 50k reads / 20k writes a day and 1 GiB stored — far above what a friends game needs. If you ever outgrow it, upgrade to Blaze (pay-as-you-go) in the console; no code change.
 - **Your data:** everything (groups, names, scores) lives in **your** Firestore. Firestore → Data tab lets you browse, export or delete it. You can export a user's data or delete an account from the Authentication tab.
 - **What's deliberately left for later:** scores are still client-reported (same as the rest of the game), so a determined cheat could inflate their own number; server-side scoring (Cloud Functions) is a future hardening step. No group chat, no notifications yet.
+
+## Realtime Database for player stats (build 2026-11-18.1)
+
+Player stats move from one Firestore doc per answer (reads grew with players squared) to one small
+Realtime Database node per day. Realtime Database on the free Spark plan has no read/write operation
+limits, only 1 GB storage, 10 GB/month download and 100 simultaneous connections. The game talks to it
+with plain HTTPS requests, so no new library and no permanently open connection.
+
+Until these steps are done, the game keeps using the old Firestore path, now cached (about 3x fewer reads).
+
+1. Firebase console > Build > **Realtime Database** > Create database. Location: **europe-west1 (Belgium)**
+   (closest to Qatar). Start in **locked mode**.
+2. **Rules** tab: replace everything with the contents of `backend/database.rules.json`, then **Publish**.
+3. Copy the database URL shown at the top of the Data tab, e.g.
+   `https://roughly-16260-default-rtdb.europe-west1.firebasedatabase.app`
+   and send it to me (or paste it into `const RTDB_URL=""` in `index.html`).
+4. Check the rules in the **Rules Playground** (Rules tab, "Rules Playground"). Expected results:
+
+| Simulate | Location | Auth | Data | Expected |
+|---|---|---|---|---|
+| read | `/s/20775` | unauthenticated | | Allowed |
+| read | `/p/abc` | authenticated, UID `abc` | | Allowed |
+| read | `/p/abc` | authenticated, UID `xyz` | | Denied |
+| set | `/p/abc/h/20775` | UID `abc` | `{"a":50,"sb":"b10","q":{"5":{"b":"b120","s":50,"x":"e"}}}` | Allowed |
+| set | `/p/abc/h/20775` | UID `xyz` | same | Denied |
+| set | `/s/20775/n` | UID `abc` | `5` | Denied (must come with your own history entry, +1 only) |
+| set | `/` (root) | UID `abc` | anything | Denied |
+
+What the rules guarantee: each player's history entry for a day is write-once, so a finished game is counted
+once even after refreshes, retries or a second tab; every counter can only go up by exactly 1 (the total by
+exactly the player's own average); a player can only add to the histogram bins named in their own entry;
+nobody can read another player's profile. Not checked by the rules (they can't do this without a server):
+that the day is today, and that a score matches its answer. Both are bounded by the write-once entry.

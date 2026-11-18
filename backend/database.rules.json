@@ -1,0 +1,61 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+
+    "s": {
+      ".read": true,
+      "$day": {
+        ".validate": "$day.matches(/^[0-9]{5}$/)",
+        "n": {
+          ".write": "auth != null && !root.child('p/' + auth.uid + '/h/' + $day).exists() && newData.parent().parent().parent().child('p/' + auth.uid + '/h/' + $day).exists()",
+          ".validate": "newData.isNumber() && newData.val() == (data.exists() ? data.val() : 0) + 1"
+        },
+        "sum": {
+          ".write": "auth != null && !root.child('p/' + auth.uid + '/h/' + $day).exists() && newData.parent().parent().parent().child('p/' + auth.uid + '/h/' + $day).exists()",
+          ".validate": "newData.isNumber() && newData.val() == (data.exists() ? data.val() : 0) + newData.parent().parent().parent().child('p/' + auth.uid + '/h/' + $day + '/a').val()"
+        },
+        "d": {
+          "$b": {
+            ".write": "auth != null && !root.child('p/' + auth.uid + '/h/' + $day).exists() && newData.parent().parent().parent().parent().child('p/' + auth.uid + '/h/' + $day).exists()",
+            ".validate": "newData.isNumber() && newData.val() == (data.exists() ? data.val() : 0) + 1 && newData.parent().parent().parent().parent().child('p/' + auth.uid + '/h/' + $day + '/sb').val() == $b"
+          }
+        },
+        "q": {
+          "$qi": {
+            "$k": {
+              ".write": "auth != null && !root.child('p/' + auth.uid + '/h/' + $day).exists() && newData.parent().parent().parent().parent().parent().child('p/' + auth.uid + '/h/' + $day + '/q/' + $qi).exists()",
+              ".validate": "newData.isNumber() && newData.val() == (data.exists() ? data.val() : 0) + 1 && ($k == 'n' || $k == newData.parent().parent().parent().parent().parent().child('p/' + auth.uid + '/h/' + $day + '/q/' + $qi + '/b').val() || $k == newData.parent().parent().parent().parent().parent().child('p/' + auth.uid + '/h/' + $day + '/q/' + $qi + '/x').val())"
+            }
+          }
+        },
+        "$other": { ".validate": false }
+      }
+    },
+
+    "p": {
+      "$uid": {
+        ".read": "auth != null && auth.uid == $uid",
+        "h": {
+          "$day": {
+            ".write": "auth != null && auth.uid == $uid && !data.exists()",
+            ".validate": "$day.matches(/^[0-9]{5}$/) && newData.hasChildren(['a', 'sb', 'q'])",
+            "a": { ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 100" },
+            "sb": { ".validate": "newData.isString() && newData.val().matches(/^b([0-9]|1[0-9])$/)" },
+            "q": {
+              "$qi": {
+                ".validate": "$qi.matches(/^[0-9]{1,4}$/) && newData.hasChildren(['b', 's', 'x'])",
+                "b": { ".validate": "newData.isString() && newData.val().matches(/^b[0-9]{1,3}$/)" },
+                "s": { ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 100" },
+                "x": { ".validate": "newData.isString() && newData.val().matches(/^[oue]$/)" },
+                "$other": { ".validate": false }
+              }
+            },
+            "$other": { ".validate": false }
+          }
+        },
+        "$other": { ".validate": false }
+      }
+    }
+  }
+}
