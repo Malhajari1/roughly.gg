@@ -86,6 +86,17 @@ The same ideas built entirely in Firestore: a profile marker doc, 2-3 stats coun
 
 ---
 
+### Data location (decided 18 Nov 2026)
+
+Realtime Database is only offered in the US, Belgium and Singapore, so it goes in **Belgium** (europe-west1). It holds only **anonymous** data: day stats, and the per-day "counted once" records (random ID + three scores).
+
+Everything identifying stays in the **Doha Firestore**:
+- Google profiles (email, name, cross-device history, coin ledger);
+- admin grants and the activity log;
+- groups.
+
+This changes sections 3 and 6: profiles and admin data move from RTDB to Firestore. The extra cost is small: one profile read a day and one write per finished game, for signed-in players only.
+
 ## 2. Measured sizes
 
 | Item | Size |
