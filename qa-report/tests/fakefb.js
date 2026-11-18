@@ -3,8 +3,8 @@ const APP=`export function initializeApp(c){return {c};}`;
 const AUTH=`
 let cur=null;const subs=[];
 export function getAuth(){return {get currentUser(){return cur;}};}
-export function onAuthStateChanged(a,cb){subs.push(cb);setTimeout(()=>{let id=localStorage.getItem("__fakeuid");if(id)cur={uid:id,isAnonymous:true,email:""};cb(cur);},20);}
-export async function signInAnonymously(){const id="qa"+Math.random().toString(36).slice(2,8);localStorage.setItem("__fakeuid",id);cur={uid:id,isAnonymous:true,email:""};subs.forEach(f=>f(cur));return {user:cur};}
+export function onAuthStateChanged(a,cb){subs.push(cb);setTimeout(()=>{let id=localStorage.getItem("__fakeuid");if(id)cur={uid:id,isAnonymous:true,email:"",getIdToken:async()=>"tok-"+id};cb(cur);},20);}
+export async function signInAnonymously(){const id="qa"+Math.random().toString(36).slice(2,8);localStorage.setItem("__fakeuid",id);cur={uid:id,isAnonymous:true,email:"",getIdToken:async()=>"tok-"+id};subs.forEach(f=>f(cur));return {user:cur};}
 export class GoogleAuthProvider{}
 export async function linkWithPopup(){throw new Error("popup blocked in QA");}
 export async function signInWithPopup(){throw new Error("popup blocked in QA");}`;
@@ -28,7 +28,7 @@ export async function updateDoc(r,data){const d=L(),cur=Object.assign({},d[r.pat
   for(const k in data){const v=data[k];if(v&&v.__u){cur[k]=(cur[k]||[]).slice();v.__u.forEach(x=>{if(cur[k].indexOf(x)<0)cur[k].push(x)});}else if(v&&v.__r){cur[k]=(cur[k]||[]).filter(x=>v.__r.indexOf(x)<0);}else cur[k]=v;}
   d[r.path]=cur;S(d);window.__fsw.push(r.path);}
 export async function deleteDoc(r){const d=L();delete d[r.path];S(d);}
-export async function getDocs(q){const d=L(),out=[];const cp=q.cpath;
+export async function getDocs(q){window.__gd=(window.__gd||[]);window.__gd.push(q.cpath+' '+JSON.stringify((q.w||[]).filter(w=>w.t==='w').map(w=>w.f+w.op+(Array.isArray(w.v)?'[..]':w.v))));const d=L(),out=[];const cp=q.cpath;
   for(const k in d){if(k.indexOf(cp+"/")!==0||k.slice(cp.length+1).indexOf("/")>=0)continue;const v=d[k];let ok=true;
     for(const w of (q.w||[])){if(w.t!=="w")continue;if(w.op==="=="&&v[w.f]!==w.v)ok=false;if(w.op==="in"&&w.v.indexOf(v[w.f])<0)ok=false;if(w.op==="array-contains"&&(v[w.f]||[]).indexOf(w.v)<0)ok=false;}
     if(ok)out.push(snap(k,v));}

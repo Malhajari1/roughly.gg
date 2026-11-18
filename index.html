@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <title>Roughly Qatar – Daily Estimation Game</title>
-<script>window.RQ_BUILD="2026-11-11.14";</script>
+<script>window.RQ_BUILD="2026-11-18.1";</script>
 <meta name="description" content="A fresh set of three how-many questions about Qatar every day. No exact answers — just reason your way close. What would you have guessed?">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Roughly">
@@ -2537,6 +2537,28 @@ function gForget(id){gSaveList(gList().filter(x=>x!==id));}
 function gTodayAvg(){try{return window.RQ_todayAvg?window.RQ_todayAvg():0;}catch(e){return 0;}}
 function gToday(){try{return window.RQ_today?window.RQ_today():Math.floor(Date.now()/864e5);}catch(e){return Math.floor(Date.now()/864e5);}}
 
+/* Realtime Database for high-volume data (stats now; profiles next). Paste the database URL from
+   Firebase console > Realtime Database once it exists, e.g. https://roughly-16260-default-rtdb.europe-west1.firebasedatabase.app
+   and publish backend/database.rules.json there. Empty = the old Firestore stats path (cached). */
+const RTDB_URL="";
+const SX={},QC={},SG={},TTL=600000;
+/* RTDB: one GET per day, shared by every screen; kept 10 min in memory and localStorage. Empty days are not kept long. */
+function sDoc(day){const c=SX[day];if(c&&Date.now()-c.t<c.ttl)return c.p;
+  try{const ls=JSON.parse(localStorage.getItem("rq-sx-"+day)||"null");if(ls&&Date.now()-ls.t<TTL){const p=Promise.resolve(ls.d);SX[day]={t:ls.t,ttl:TTL,p};return p;}}catch(e){}
+  const p=fetch(RTDB_URL+"/s/"+day+".json").then(r=>{if(!r.ok)throw new Error("stats "+r.status);return r.json();}).then(d=>{d=d||{};
+    if(d.n){try{localStorage.setItem("rq-sx-"+day,JSON.stringify({t:Date.now(),d}));}catch(e){}}else if(SX[day])SX[day].ttl=20000;return d;});
+  SX[day]={t:Date.now(),ttl:TTL,p};p.catch(()=>{delete SX[day];});return p;}
+/* Rebuilds the old qStats shape from a histogram node: score bins, over/under, and r values at bin centres. */
+function fromQ(q){q=q||{};const dist=new Array(20).fill(0),rs=[];
+  for(const k in q){if(k.charAt(0)!=="b")continue;const b=+k.slice(1),c=q[k]|0,r=(b+0.5)*0.025-3,sc=Math.max(1,Math.round(100/(1+r*r/0.36)));
+    dist[Math.min(19,Math.floor(sc/5))]+=c;for(let i=0;i<c&&rs.length<5000;i++)rs.push(Math.round(r*100)/100);}
+  return {n:q.n||0,dist,over:q.o||0,under:q.u||0,rs};}
+/* Firestore path: each (day, question) query runs once per 10 min and is shared by qStats and dayStats. */
+function qDocs(day,qi){const k=day+"_"+qi,c=QC[k];if(c&&Date.now()-c.t<TTL)return c.p;
+  const p=FSq(day,qi);QC[k]={t:Date.now(),p};p.then(ds=>{if(!ds.length)delete QC[k];},()=>{delete QC[k];});return p;}
+let FSq=()=>Promise.resolve([]);
+/* Drop local caches and markers older than three days. */
+try{const t0=gToday();for(let i=localStorage.length-1;i>=0;i--){const k=localStorage.key(i)||"",m=/^rq-(sx|sa|sg|gok)-(\d+)$/.exec(k);if(m&&+m[2]<t0-3)localStorage.removeItem(k);}}catch(e){}
 if(!firebaseConfig||!firebaseConfig.apiKey){
   window.RQGroups={enabled:false};
 }else{
@@ -2549,6 +2571,7 @@ if(!firebaseConfig||!firebaseConfig.apiKey){
     let resolveReady;const ready=new Promise(r=>resolveReady=r);
     onAuthStateChanged(auth,u=>{if(!u){signInAnonymously(auth).catch(()=>{});}else{resolveReady(u);}});
     const uid=()=>auth.currentUser&&auth.currentUser.uid;
+    FSq=(day,qi)=>getDocs(query(collection(db,"answers"),where("day","==",day),where("qi","==",qi),limit(5000))).then(qs=>qs.docs.map(x=>x.data()));
     // Write today's score (if today's drop is finished) to one group straight away.
     async function writeToday(id,name){const a=gTodayAvg();if(!a)return;const me=uid(),d=gToday();
       try{await setDoc(doc(db,"groups",id,"scores",d+"__"+me),{uid:me,name:gClean(name)||gName()||"Player",day:d,avg:Math.max(1,Math.min(100,Math.round(a)))},{merge:true});}catch(e){}}
@@ -2566,13 +2589,13 @@ if(!firebaseConfig||!firebaseConfig.apiKey){
       async createGroup(name){await ready;name=gClean(name);if(!name)throw new Error("Give the group a name");const id=gGenId(),u=uid();
         await setDoc(doc(db,"groups",id),{name,ownerUid:u,memberUids:[u],createdAt:serverTimestamp()});
         await setDoc(doc(db,"groups",id,"members",u),{name:gName()||"Player",joinedAt:serverTimestamp()});
-        gRemember(id);await writeToday(id);
+        gRemember(id);await writeToday(id);try{localStorage.removeItem("rq-gok-"+gToday());}catch(e){}
         return {id,name};},
       async groupMeta(id){await ready;if(!GID_RE.test(id))throw new Error("That code doesn’t look right");const s=await getDoc(doc(db,"groups",id));if(!s.exists())throw new Error("No group with that code");const d=s.data();return {id,name:d.name,isMember:(d.memberUids||[]).indexOf(uid())>=0,members:(d.memberUids||[]).length};},
       async joinGroup(id,name){await ready;const meta=await this.groupMeta(id),u=uid();
         if(!meta.isMember)await updateDoc(doc(db,"groups",id),{memberUids:arrayUnion(u)});
         await setDoc(doc(db,"groups",id,"members",u),{name:gClean(name)||gName()||"Player",joinedAt:serverTimestamp()});
-        gRemember(id);await writeToday(id,name);
+        gRemember(id);await writeToday(id,name);try{localStorage.removeItem("rq-gok-"+gToday());}catch(e){}
         return {id,name:meta.name};},
       async leaveGroup(id){await ready;const u=uid();await updateDoc(doc(db,"groups",id),{memberUids:arrayRemove(u)});gForget(id);try{await deleteDoc(doc(db,"groups",id,"members",u));}catch(e){}return true;},
       async listGroups(){const docs=await myGroupDocs(),wk=gWeek(gToday()),me=uid(),out=[];
@@ -2597,20 +2620,50 @@ if(!firebaseConfig||!firebaseConfig.apiKey){
       async submitDay(day,avg,quiet){const t=gToday();if(day!==t&&day!==t-1)return false;
         try{await ready;avg=Math.max(1,Math.min(100,Math.round(avg)));const docs=await myGroupDocs(),me=uid(),nm=gName()||"Player";
           const res=await Promise.all(docs.map(g=>setDoc(doc(db,"groups",g.id,"scores",day+"__"+me),{uid:me,name:nm,day,avg},{merge:true}).then(()=>true,()=>false)));
-          if(res.every(Boolean)){try{localStorage.removeItem("rq-gdirty");}catch(e){}return true;}
+          if(res.every(Boolean)){try{localStorage.removeItem("rq-gdirty");localStorage.setItem("rq-gok-"+day,"1");}catch(e){}return true;}
         }catch(e){}
         try{localStorage.setItem("rq-gdirty","1");}catch(e){}
         if(!quiet)gRetry(0);
         return false;},
-      // ---- live player data (replaces the old demo curve). One answer doc per player per question, created once.
-      async submitAnswer(day,qi,s,r){if(day!==gToday())return false;const fk="rq-as-"+day+"-"+qi;try{if(localStorage.getItem(fk))return true;}catch(e){}
+      // ---- live player data.
+      // RTDB mode (RTDB_URL set): one small node per day, /s/{day}, updated with server-side increments once per
+      // finished game (submitGame). Reads are one cached GET per day, so cost no longer grows with players squared.
+      // Firestore mode (RTDB_URL empty, the old path): one answer doc per player per question; the three per-question
+      // queries are cached for 10 minutes and shared by the reveal, results and Home screens.
+      async submitAnswer(day,qi,s,r){if(day!==gToday())return false;
+        if(RTDB_URL){const k="rq-sa-"+day;let a={};try{a=JSON.parse(localStorage.getItem(k)||"{}")||{};}catch(e){a={};}
+          a[qi]={s:Math.round(s),r:Math.round(r*1000)/1000};try{localStorage.setItem(k,JSON.stringify(a));}catch(e){}
+          return Object.keys(a).length>=3?APIg.submitGame(day):true;}
+        const fk="rq-as-"+day+"-"+qi;try{if(localStorage.getItem(fk))return true;}catch(e){}
         try{await ready;const me=uid();s=Math.max(1,Math.min(100,Math.round(s)));r=Math.max(-6,Math.min(6,Math.round(r*1000)/1000));
-          await setDoc(doc(db,"answers",day+"__"+qi+"__"+me),{uid:me,day,qi,s,r});try{localStorage.setItem(fk,"1");}catch(e){}return true;}catch(e){return false;}},
-      async qStats(day,qi){await ready;const qs=await getDocs(query(collection(db,"answers"),where("day","==",day),where("qi","==",qi),limit(5000)));
-        const bins=new Array(20).fill(0),rs=[];let n=0,over=0,under=0;qs.forEach(x=>{const d=x.data();if(!(d.s>=1&&d.s<=100))return;bins[Math.min(19,Math.floor(d.s/5))]++;n++;if(typeof d.r==='number')rs.push(Math.round(d.r*100)/100);if(d.r>0.05)over++;else if(d.r<-0.05)under++;});
+          await setDoc(doc(db,"answers",day+"__"+qi+"__"+me),{uid:me,day,qi,s,r});try{localStorage.setItem(fk,"1");}catch(e){}delete QC[day+"_"+qi];return true;}catch(e){return false;}},
+      // One atomic multi-path write per finished game. The rules accept it only once per player per day
+      // (the history entry p/{uid}/h/{day} is write-once) and only as +1 increments on the player's own bins.
+      submitGame(day){if(SG[day])return SG[day];const p=APIg._submitGame(day);SG[day]=p;p.finally(()=>{delete SG[day];});return p;},
+      async _submitGame(day){if(!RTDB_URL)return false;const fk="rq-sg-"+day;try{if(localStorage.getItem(fk))return true;}catch(e){}
+        let a={};try{a=JSON.parse(localStorage.getItem("rq-sa-"+day)||"{}")||{};}catch(e){a={};}
+        const qis=Object.keys(a).filter(k=>/^\d{1,4}$/.test(k)).slice(0,3);if(qis.length<3)return false;
+        try{await ready;const u=auth.currentUser;if(!u)throw new Error("no user");const tok=await u.getIdToken();
+          const avg=Math.max(1,Math.min(100,Math.round(qis.reduce((t,q)=>t+a[q].s,0)/3))),sb="b"+Math.min(19,Math.floor(avg/5)),inc={".sv":{"increment":1}},base="s/"+day,H={a:avg,sb,q:{}},P={};
+          qis.forEach(q=>{const r=Math.max(-3,Math.min(2.999,+a[q].r||0)),b="b"+Math.min(239,Math.max(0,Math.floor((r+3)/0.025))),x=r>0.05?"o":r<-0.05?"u":"e";
+            H.q[q]={b,s:Math.max(1,Math.min(100,a[q].s|0)),x};P[base+"/q/"+q+"/"+b]=inc;P[base+"/q/"+q+"/n"]=inc;P[base+"/q/"+q+"/"+x]=inc;});
+          P[base+"/d/"+sb]=inc;P[base+"/n"]=inc;P[base+"/sum"]={".sv":{"increment":avg}};P["p/"+u.uid+"/h/"+day]=H;
+          const res=await fetch(RTDB_URL+"/.json?auth="+encodeURIComponent(tok),{method:"PATCH",body:JSON.stringify(P)});
+          let ok=res.ok;
+          if(!ok&&(res.status===401||res.status===403)){ // refused: already counted (refresh, retry, second tab)?
+            const h=await fetch(RTDB_URL+"/p/"+u.uid+"/h/"+day+".json?auth="+encodeURIComponent(tok)).then(x=>x.ok?x.json():null).catch(()=>null);ok=!!h;}
+          if(ok){try{localStorage.setItem(fk,"1");localStorage.removeItem("rq-sgp");localStorage.removeItem("rq-sx-"+day);}catch(e){}delete SX[day];return true;}
+        }catch(e){}
+        try{localStorage.setItem("rq-sgp",String(day));}catch(e){}return false;},
+      async qStats(day,qi){
+        if(RTDB_URL){const d=await sDoc(day);return fromQ(d&&d.q&&d.q[qi]);}
+        await ready;const ds=await qDocs(day,qi);
+        const bins=new Array(20).fill(0),rs=[];let n=0,over=0,under=0;ds.forEach(d=>{if(!(d.s>=1&&d.s<=100))return;bins[Math.min(19,Math.floor(d.s/5))]++;n++;if(typeof d.r==='number')rs.push(Math.round(d.r*100)/100);if(d.r>0.05)over++;else if(d.r<-0.05)under++;});
         return {n,dist:bins,over,under,rs};},
-      async dayStats(day,ids){await ready;const snaps=await Promise.all(ids.map(qi=>getDocs(query(collection(db,"answers"),where("day","==",day),where("qi","==",qi),limit(5000)))));
-        const per={};snaps.forEach(qs=>qs.forEach(x=>{const d=x.data();if(ids.indexOf(d.qi)<0||!(d.s>=1&&d.s<=100))return;(per[d.uid]=per[d.uid]||{})[d.qi]=d.s;}));
+      async dayStats(day,ids){
+        if(RTDB_URL){const d=await sDoc(day)||{},dd=d.d||{},bins=new Array(20).fill(0);for(let i=0;i<20;i++)bins[i]=dd["b"+i]||0;return {n:d.n||0,dist:bins,sum:d.sum||0};}
+        await ready;const all=await Promise.all(ids.map(qi=>qDocs(day,qi)));
+        const per={};all.forEach(ds=>ds.forEach(d=>{if(ids.indexOf(d.qi)<0||!(d.s>=1&&d.s<=100))return;(per[d.uid]=per[d.uid]||{})[d.qi]=d.s;}));
         const bins=new Array(20).fill(0);let n=0,sum=0;for(const u in per){const v=Object.keys(per[u]).map(k=>per[u][k]);if(v.length<3)continue;const a=Math.round(v.reduce((p,c)=>p+c,0)/v.length);bins[Math.min(19,Math.floor(a/5))]++;n++;sum+=a;}
         return {n,dist:bins,sum};},
       async linkGoogle(){await ready;const prov=new GoogleAuthProvider();
@@ -2622,14 +2675,16 @@ if(!firebaseConfig||!firebaseConfig.apiKey){
     window.RQGroups=APIg;
     const gDelays=[4000,15000,60000];
     function gRetry(n){if(n>=gDelays.length)return;setTimeout(async()=>{const a=gTodayAvg();if(!a)return;const ok=await APIg.submitDay(gToday(),a,true);if(!ok)gRetry(n+1);},gDelays[n]);}
-    function gFlush(){let dirty="";try{dirty=localStorage.getItem("rq-gdirty")||"";}catch(e){}if(!dirty)return;const a=gTodayAvg();if(a)APIg.submitDay(gToday(),a,true);}
+    function gFlush(){try{const pd=+localStorage.getItem("rq-sgp");if(pd&&pd>=gToday()-1)APIg.submitGame(pd);}catch(e){}let dirty="";try{dirty=localStorage.getItem("rq-gdirty")||"";}catch(e){}if(!dirty)return;const a=gTodayAvg();if(a)APIg.submitDay(gToday(),a,true);}
     window.addEventListener("online",gFlush);
     document.addEventListener("visibilitychange",()=>{if(!document.hidden)gFlush();});
     ready.then(async()=>{try{await restore();}catch(e){}
       if(window.RQ_onGroupsReady)window.RQ_onGroupsReady();
       try{(window.RQ_answers?window.RQ_answers():[]).forEach(function(a){APIg.submitAnswer(a.day,a.qi,a.s,a.r);});}catch(e){}
-      const a=gTodayAvg();if(a)APIg.submitDay(gToday(),a);
-      try{const y=window.RQ_dayAvg?window.RQ_dayAvg(gToday()-1):0;if(y)APIg.submitDay(gToday()-1,y,true);}catch(e){}
+      const gok=d=>{try{return !!localStorage.getItem("rq-gok-"+d);}catch(e){return false;}};
+      const a=gTodayAvg();if(a&&!gok(gToday()))APIg.submitDay(gToday(),a);
+      try{const y=window.RQ_dayAvg?window.RQ_dayAvg(gToday()-1):0;if(y&&!gok(gToday()-1))APIg.submitDay(gToday()-1,y,true);}catch(e){}
+      try{const pd=+localStorage.getItem("rq-sgp");if(pd&&pd>=gToday()-1)APIg.submitGame(pd);}catch(e){}
       const m=/[?&]g=([0-9a-z]{7})/.exec(location.search||"");const id=(m&&m[1])||window.__rqG;if(id&&window.RQ_inviteFlow)window.RQ_inviteFlow(id);});
   }catch(e){window.RQGroups={enabled:false};}
 }

@@ -177,3 +177,11 @@ No test suite in the repo. Previously verified with jsdom smoke tests and Playwr
 - Results screen: "Dashboard" (`#dsh`) shares every rule of "Share result" (`#sh`): white, blue text, moving shine. Style both by ID together; the `.card.qb button.main` glass rule would otherwise win.
 - Home: See breakdown and Share are both white with the same shine (`.hmb button::after`, `bling` keyframes, tinted with `--cs` so it shows on white). Solo "Play today's drop" gets it too.
 - Label is now just "Players' average" (Arabic "متوسط اللاعبين"), no "today".
+
+## Player stats on Realtime Database (18 Nov 2026, build 2026-11-18.1)
+- `RTDB_URL` (Firebase module, top of the script) switches stats to Realtime Database. Empty = old Firestore `answers` path, now cached: the three per-question queries run once per 10 min and are shared by reveal, results and Home (`qDocs`, 9 -> 3 queries per player session, measured).
+- RTDB layout: `/s/{day}` = `{n, sum, d:{b0..b19 score bins}, q:{qi:{n, o, u, e, b0..b239 r-bins of 0.025 decade}}}`; `/p/{uid}/h/{day}` = `{a, sb, q:{qi:{b, s, x}}}` (write-once). Rules: `backend/database.rules.json`.
+- `submitAnswer` collects the day's answers in `rq-sa-<day>`; the third one triggers `submitGame(day)`: ONE multi-path REST PATCH (history + all increments, server-side `.sv increment`). Success sets `rq-sg-<day>`. A refusal is checked against the history entry (already counted = success). Failure queues `rq-sgp` and retries on load, reconnect and reopen. Concurrent calls share one in-flight request.
+- Stats reads: `sDoc(day)` one GET, 10 min cache in memory + `rq-sx-<day>`; `fromQ()` rebuilds the old `{n,dist,over,under,rs}` shape so the graphs are unchanged. Own answers join the stats when the game is finished (agreed).
+- Group scores: once a day's write lands (`rq-gok-<day>`), the page no longer re-submits (and re-queries groups) on every load. Joining a group clears it.
+- Tested against a mock RTDB that mirrors the rules (one write per game, 20 parallel = 1, lost flag, forged writes, offline queue, graphs, Home average). NOT tested against real Realtime Database rules (no emulator/staging by choice): check with the Rules Playground table in `backend/FIREBASE-SETUP.md` after publishing.
