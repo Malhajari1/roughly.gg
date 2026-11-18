@@ -17,6 +17,7 @@ User-agent: Applebot
 Allow: /
 Disallow: /qa-report/
 Disallow: /backend/
+Disallow: /dev.html
 
 # --- AI training, AI search/answer engines and AI agents: blocked ---
 User-agent: GPTBot
@@ -70,3 +71,4 @@ User-agent: *
 Allow: /
 Disallow: /qa-report/
 Disallow: /backend/
+Disallow: /dev.html

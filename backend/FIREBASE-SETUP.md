@@ -102,3 +102,37 @@ once even after refreshes, retries or a second tab; every counter can only go up
 exactly the player's own average); a player can only add to the histogram bins named in their own entry;
 nobody can read another player's profile. Not checked by the rules (they can't do this without a server):
 that the day is today, and that a score matches its answer. Both are bounded by the write-once entry.
+
+## Sign-in, profiles, groups, Dev page and analytics (build 2026-11-18.3)
+
+**Order matters: publish the rules first, then deploy the site.** The new rules also work with the current
+site; the new site needs the new rules for profiles, member removal, gifts and the Dev page.
+
+1. **Firestore rules:** Firebase console → Firestore Database → Rules: paste all of `backend/firestore.rules`, Publish.
+2. **Google sign-in:** Authentication → Sign-in method → Google: Enabled (set a support email).
+   Authentication → Settings → Authorized domains: make sure `roughly.gg` and `www.roughly.gg` are listed.
+   Do NOT click "Upgrade to Identity Platform" (it adds a 3,000 daily-user cap on the free plan).
+3. **Make yourself an admin:** open https://www.roughly.gg/dev.html, sign in with your Google account. It shows
+   "Not an admin" and your user ID. In Firestore → Data: Start collection `admins`, Document ID = that user ID,
+   add any field (e.g. `name` = `SWISS`), Save. Reload dev.html.
+4. **Google Analytics (optional, free):** create a GA4 property at analytics.google.com (Web stream for
+   https://www.roughly.gg) and copy its Measurement ID (`G-…`) into `var GA_ID=""` in `index.html`.
+   For the Dev page numbers: in Google Cloud console (project roughly-16260) → APIs & Services: enable
+   "Google Analytics Data API"; Credentials → Create credentials → OAuth client ID → Web application,
+   Authorised JavaScript origins `https://www.roughly.gg`. Put the GA4 **property ID** (numbers, from GA Admin →
+   Property details) and the **client ID** at the top of `dev.html`. Only Google accounts that can see the GA
+   property can read the numbers.
+
+### Rules Playground checks for Firestore (Rules tab → Rules Playground)
+
+| Simulate | Path | Auth | Expected |
+|---|---|---|---|
+| get | `/admins/{your uid}` | your uid | Allowed |
+| create | `/admins/xyz` | any user | Denied |
+| create | `/players/abc` with `{"grants":{"x":{"n":5}}}` | uid `abc` (Google) | Denied (players can't grant themselves) |
+| update | `/players/abc` setting `grants` | an admin uid | Allowed |
+| get | `/players/abc` | uid `xyz` (not admin) | Denied |
+| create | `/gifts/G1` | non-admin | Denied |
+| update | `/groups/{id}` removing another member | the owner | Allowed (also needs `removed` updated) |
+| update | `/groups/{id}` removing another member | not the owner | Denied |
+| update | `/groups/{id}` adding yourself, when listed in `removed` | that user | Denied |

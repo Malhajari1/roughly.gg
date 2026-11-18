@@ -1,19 +1,32 @@
 rules_version = '2';
-// Roughly — Firestore security rules for Groups.
+// Roughly — Firestore security rules.
 // Paste these in Firebase Console → Firestore Database → Rules → Publish.
 // Model (see FIREBASE-SETUP.md):
-//   groups/{gid}                     { name, createdAt, ownerUid, memberUids:[uid…] }
+//   groups/{gid}                     { name, createdAt, ownerUid, memberUids:[uid…], removed:[uid…], swapFrom }
 //   groups/{gid}/members/{uid}       { name, joinedAt }
-//   groups/{gid}/scores/{day}__{uid} { uid, name, day, avg }
+//   groups/{gid}/scores/{day}__{uid} { uid, name, day, avg, from? }
+//   players/{uid}                    Google-linked profile: { name, nameLower, email, emailLower, days:{day: "…"},
+//                                     coins:{…}, carry:{…}, merged:[uid…], mergedFrom, created, upd } + grants:{id:{n,reason,at,by}} (admins only)
+//   aliases/{anonUid}                { to: googleUid, at }  written once by the anonymous user when it hands over to a Google account
+//   admins/{uid}                     created by hand in the console; never writable from the app
+//   gifts/{id}                       { n, reason, by, at, claimedBy, claimedAt }  made by admins, claimed once
+//   adminLog/{id}                    { by, at, action, uid?, n?, reason? }  append-only
+//   answers/{day}__{qi}__{uid}       old stats path (until Realtime Database is switched on)
 service cloud.firestore {
   match /databases/{database}/documents {
 
     function signedIn() { return request.auth != null; }
     function me()       { return request.auth.uid; }
+    function google()   { return signedIn() && request.auth.token.firebase.sign_in_provider != 'anonymous'; }
+    function isAdmin()  { return signedIn() && exists(/databases/$(database)/documents/admins/$(me())); }
+    function aliasTo(a) { return a is string && exists(/databases/$(database)/documents/aliases/$(a))
+                                 && get(/databases/$(database)/documents/aliases/$(a)).data.to == me(); }
+    function today()    { return math.floor(request.time.toMillis() / 86400000); }
     function isMember(gid) {
       return signedIn()
         && me() in get(/databases/$(database)/documents/groups/$(gid)).data.memberUids;
     }
+    function changed()  { return request.resource.data.diff(resource.data).affectedKeys(); }
 
     match /groups/{gid} {
       // get: any signed-in user (so an invite link can show the group name before joining).
@@ -27,27 +40,48 @@ service cloud.firestore {
         && request.resource.data.memberUids == [me()]
         && request.resource.data.name is string
         && request.resource.data.name.size() > 0
-        && request.resource.data.name.size() <= 24;
+        && request.resource.data.name.size() <= 24
+        && !('removed' in request.resource.data);
 
-      // update: name + owner never change here; the ONLY allowed change is adding or
-      // removing yourself from memberUids (join / leave). You cannot add or remove anyone else.
-      allow update: if signedIn()
-        && request.resource.data.name == resource.data.name
-        && request.resource.data.ownerUid == resource.data.ownerUid
-        && (
-          // join: every existing member kept, I'm newly present, exactly one added (me)
-          ( request.resource.data.memberUids.hasAll(resource.data.memberUids)
-            && me() in request.resource.data.memberUids
-            && !(me() in resource.data.memberUids)
-            && request.resource.data.memberUids.size() == resource.data.memberUids.size() + 1
-            && request.resource.data.memberUids.size() <= 200 )
-          ||
-          // leave: no one added, I'm newly absent, exactly one removed (me)
-          ( resource.data.memberUids.hasAll(request.resource.data.memberUids)
-            && me() in resource.data.memberUids
-            && !(me() in request.resource.data.memberUids)
-            && request.resource.data.memberUids.size() == resource.data.memberUids.size() - 1 )
-        );
+      // update: exactly one of four changes, each limited to the fields it needs.
+      allow update: if signedIn() && (isJoin() || isLeave() || isKick() || isSwap());
+
+      function before()  { return resource.data.memberUids.toSet(); }
+      function after()   { return request.resource.data.memberUids.toSet(); }
+      function removedBefore() { return resource.data.get('removed', []).toSet(); }
+
+      // join: add myself only, unless the owner removed me.
+      function isJoin() {
+        return changed().hasOnly(['memberUids'])
+          && after().difference(before()) == [me()].toSet()
+          && before().difference(after()).size() == 0
+          && !(me() in removedBefore())
+          && request.resource.data.memberUids.size() <= 200;
+      }
+      // leave: remove myself only.
+      function isLeave() {
+        return changed().hasOnly(['memberUids'])
+          && before().difference(after()) == [me()].toSet()
+          && after().difference(before()).size() == 0;
+      }
+      // kick: only the owner; removes exactly one other member and records them in `removed`.
+      function isKick() {
+        return me() == resource.data.ownerUid
+          && changed().hasOnly(['memberUids', 'removed'])
+          && before().difference(after()).size() == 1
+          && after().difference(before()).size() == 0
+          && !(resource.data.ownerUid in before().difference(after()))
+          && request.resource.data.removed.toSet() == removedBefore().union(before().difference(after()));
+      }
+      // swap: an anonymous player who signed in to an existing Google account hands its seat to that account.
+      // The anonymous user proved it by writing aliases/{anon} = { to: me } before switching.
+      function isSwap() {
+        return changed().hasOnly(['memberUids', 'swapFrom'])
+          && aliasTo(request.resource.data.swapFrom)
+          && before().difference(after()) == [request.resource.data.swapFrom].toSet()
+          && after().difference(before()).hasOnly([me()])
+          && !(me() in removedBefore());
+      }
 
       allow delete: if false; // groups are not deleted from the client in v1
 
@@ -69,17 +103,95 @@ service cloud.firestore {
           && request.resource.data.day is int
           && request.resource.data.day >= 20000 && request.resource.data.day <= 30000
           // Only today's drop counts (±1 day for time zones): past drops never reach the board.
-          && request.resource.data.day >= math.floor(request.time.toMillis() / 86400000) - 1
-          && request.resource.data.day <= math.floor(request.time.toMillis() / 86400000) + 1
+          && request.resource.data.day >= today() - 1
+          && request.resource.data.day <= today() + 1
           && sid == string(request.resource.data.day) + '__' + me()
           && request.resource.data.avg is number
           && request.resource.data.avg >= 1
           && request.resource.data.avg <= 100
           && request.resource.data.name is string
           && request.resource.data.name.size() <= 24
+          && !('from' in request.resource.data)
+          && isMember(gid);
+        // Handover copy: the Google account may copy the anonymous account's score for the same day, unchanged.
+        allow create: if signedIn()
+          && request.resource.data.uid == me()
+          && aliasTo(request.resource.data.from)
+          && request.resource.data.day is int
+          && sid == string(request.resource.data.day) + '__' + me()
+          && request.resource.data.avg == get(/databases/$(database)/documents/groups/$(gid)/scores/$(string(request.resource.data.day) + '__' + request.resource.data.from)).data.avg
+          && request.resource.data.name is string
+          && request.resource.data.name.size() <= 24
           && isMember(gid);
         allow delete: if false;
       }
+    }
+
+    match /players/{uid} {
+      allow get: if signedIn() && (uid == me() || isAdmin());
+      allow list: if isAdmin();
+
+      // The player's own profile (Google accounts only). `grants` is never theirs to write.
+      allow create: if google() && uid == me()
+        && !('grants' in request.resource.data)
+        && request.resource.data.keys().hasOnly(['name', 'nameLower', 'email', 'emailLower', 'days', 'coins', 'carry', 'merged', 'mergedFrom', 'created', 'upd']);
+      allow update: if google() && uid == me()
+        && !changed().hasAny(['grants'])
+        && changed().hasOnly(['name', 'nameLower', 'email', 'emailLower', 'days', 'coins', 'carry', 'merged', 'mergedFrom', 'created', 'upd'])
+        && daysOk();
+      // New finished days only for today (±1 for time zones), except: the first upload, or one merge from an
+      // anonymous account that handed over to this one (proved by its alias).
+      function daysOk() {
+        return !('days' in changed())
+          || !('days' in resource.data)
+          || request.resource.data.days.diff(resource.data.days).affectedKeys()
+               .hasOnly([string(today() - 1), string(today()), string(today() + 1)])
+          || ( aliasTo(request.resource.data.mergedFrom)
+               && !(request.resource.data.mergedFrom in resource.data.get('merged', []))
+               && request.resource.data.merged.hasAll(resource.data.get('merged', []))
+               && request.resource.data.mergedFrom in request.resource.data.merged );
+      }
+
+      // Admins grant coins: they may only touch `grants` (and create a doc holding just that for any player).
+      allow create: if isAdmin() && request.resource.data.keys().hasOnly(['grants']);
+      allow update: if isAdmin() && changed().hasOnly(['grants']);
+      allow delete: if false;
+    }
+
+    match /aliases/{a} {
+      allow get: if signedIn() && (a == me() || resource.data.to == me());
+      allow create: if signedIn() && a == me()
+        && request.resource.data.keys().hasOnly(['to', 'at'])
+        && request.resource.data.to is string && request.resource.data.to != me();
+      allow update, delete: if false;
+    }
+
+    match /admins/{uid} {
+      allow get: if signedIn() && uid == me();
+      allow list, write: if false;
+    }
+
+    match /gifts/{id} {
+      allow get: if signedIn();
+      allow list: if isAdmin();
+      allow create: if isAdmin()
+        && request.resource.data.keys().hasOnly(['n', 'reason', 'by', 'at', 'claimedBy', 'claimedAt'])
+        && request.resource.data.n is int && request.resource.data.n >= 1 && request.resource.data.n <= 20
+        && request.resource.data.reason is string && request.resource.data.reason.size() <= 200
+        && request.resource.data.by == me()
+        && request.resource.data.claimedBy == null;
+      // A player claims it once, while unclaimed.
+      allow update: if signedIn()
+        && resource.data.claimedBy == null
+        && request.resource.data.claimedBy == me()
+        && changed().hasOnly(['claimedBy', 'claimedAt']);
+      allow delete: if isAdmin();
+    }
+
+    match /adminLog/{id} {
+      allow read: if isAdmin();
+      allow create: if isAdmin() && request.resource.data.by == me();
+      allow update, delete: if false;
     }
 
     // Live player data for the score curve and "Top X%". One doc per player per question, created once, never edited.
@@ -90,8 +202,8 @@ service cloud.firestore {
         && request.resource.data.keys().hasOnly(['uid','day','qi','s','r'])
         && request.resource.data.uid == me()
         && request.resource.data.day is int
-        && request.resource.data.day >= math.floor(request.time.toMillis() / 86400000) - 1
-        && request.resource.data.day <= math.floor(request.time.toMillis() / 86400000) + 1
+        && request.resource.data.day >= today() - 1
+        && request.resource.data.day <= today() + 1
         && request.resource.data.qi is int && request.resource.data.qi >= 0 && request.resource.data.qi < 5000
         && aid == string(request.resource.data.day) + '__' + string(request.resource.data.qi) + '__' + me()
         && request.resource.data.s is int && request.resource.data.s >= 1 && request.resource.data.s <= 100

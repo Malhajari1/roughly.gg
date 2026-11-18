@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <title>Roughly Qatar – Daily Estimation Game</title>
-<script>window.RQ_BUILD="2026-11-18.1";</script>
+<script>window.RQ_BUILD="2026-11-18.3";</script>
 <meta name="description" content="A fresh set of three how-many questions about Qatar every day. No exact answers — just reason your way close. What would you have guessed?">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Roughly">
@@ -643,6 +643,11 @@ body:not([data-view=land]) main{min-height:calc(100dvh - 76px);display:flex;flex
 .gcode small{font-size:.7rem;letter-spacing:1px;text-transform:uppercase;color:var(--mut);font-weight:700}
 .gcode b{flex:1;font-size:1.5rem;letter-spacing:3px;font-weight:800;color:var(--ink);text-align:center;font-family:inherit}
 .gcode .shl{flex:none;padding:8px 14px}
+.toast{position:fixed;left:50%;bottom:22px;transform:translate(-50%,20px);background:#141018;color:#fff;font-weight:700;font-size:.92rem;padding:11px 18px;border-radius:999px;box-shadow:0 10px 30px rgba(0,0,0,.25);opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;z-index:200;max-width:90vw;text-align:center}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+.lbx{background:none;border:0;padding:0 0 0 6px;font:inherit;font-size:.72rem;font-weight:700;color:#dc2626;cursor:pointer}
+.main.danger{background:linear-gradient(135deg,#ef4444,#dc2626);box-shadow:0 12px 24px -8px rgba(220,38,38,.5)}
+.pidl{margin:14px 4px 0;font-size:.75rem;color:var(--mut);text-align:center}.pidl b{color:var(--ink);letter-spacing:1px}
 .shl.arm{background:#dc2626;border-color:#dc2626;color:#fff}
 .h2hm{font-weight:700;font-size:1rem;text-align:center;margin:10px 0 0;color:var(--ink)}
 .card.qb .h2hm{color:#fff}
@@ -1362,6 +1367,16 @@ var ICON_TARGET="<svg viewBox='0 0 24 24'><circle cx='12' cy='12' r='9'/><circle
 var ICON_FLAME="<svg viewBox='0 0 24 24'><path d='M12 2c.6 2.6-1.6 3.9-1.6 6.1 0 1.1.9 1.9 1.6 1.9.8 0 1.3-.8 1.3-1.6 1.2 1.1 2.1 2.7 2.1 4.4a5.4 5.4 0 0 1-10.8 0c0-3.2 2.5-4.9 4-7.1 1-1.5 1.7-3.2 1.4-3.7 .7.2 1.6.9 2 1.7z'/></svg>";
 var app=document.getElementById("app"),raf=0,busy=false,day,today,cm,ids,st,stats,intro;
 var reduce=window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches;
+/* ===== Google Analytics 4: off until GA_ID (G-...) is set. No cookies and no banner: GA is told not to store anything
+   (client_storage:'none') and is given the game's existing anonymous device id (rq-pid) instead, so visitor, new/returning
+   and daily/weekly/monthly active counts stay accurate. Ads features are off. No Firestore writes for analytics.
+   Events: game_start, game_complete, share, challenge_open, invite_open, group_join, group_create. */
+var GA_ID="";
+function ga(n,p){try{if(window.gtag)window.gtag("event",n,p||{})}catch(e){}}
+function gaInit(){if(!GA_ID||window.gtag)return;window.dataLayer=window.dataLayer||[];window.gtag=function(){window.dataLayer.push(arguments)};
+  gtag("consent","default",{analytics_storage:"granted",ad_storage:"denied",ad_user_data:"denied",ad_personalization:"denied"});
+  gtag("js",new Date());gtag("config",GA_ID,{client_storage:"none",client_id:pid(),allow_google_signals:false,allow_ad_personalization_signals:false});
+  var sc=document.createElement("script");sc.async=true;sc.src="https://www.googletagmanager.com/gtag/js?id="+GA_ID;document.head.appendChild(sc)}
 function dayNum(){var d=new Date();return Math.floor(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate())/864e5)}
 function rng(s){return function(){s|=0;s=s+0x6D2B79F5|0;var t=Math.imul(s^s>>>15,1|s);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
 var SKIP={16:1,106:1,134:1,139:1,140:1}; /* retired BEFORE the rotation started (kept in Q so indices stay aligned). Frozen: retire new questions with RETIRE below, never here. */
@@ -1424,9 +1439,36 @@ function save(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
 var START=Math.floor(Date.UTC(2026,9,1)/864e5);
 /* ===== switches ===== */
 var ARCHIVE_OPEN=false,STREAK_COIN_EVERY=3,bonus=null;
-function coinsGet(){var c=load("rq-coins",null);if(!c||typeof c.n!=="number"||c.n<0)c={n:0,aw:0};return c}
-function coinsSet(c){save("rq-coins",c)}
-function awardCoin(d){var c=coinsGet();if(c.aw===d)return false;c.n=Math.min(99,c.n+1);c.aw=d;coinsSet(c);return true}
+/* ===== Coins: a ledger of facts, so replays, two tabs and merging devices can never count twice.
+   b = {deviceId: coins carried over from the old counter}, e = {day: 1 earned | 0 already inside b},
+   s = {bonusId: 1} spent, g = {grantId: n} gifts and admin grants. Balance = sum(b) + earned + grants - spent (0..99). */
+function ledger(){var c=load("rq-coins",null)||{};
+  if(typeof c.n==="number"&&!c.e){var nc={b:{},e:{},s:{},g:{}};nc.b[pid()]=Math.max(0,Math.min(99,c.n|0));if(c.aw)nc.e[c.aw]=0;save("rq-coins",nc);c=nc}
+  c.b=c.b&&typeof c.b==="object"?c.b:{};c.e=c.e||{};c.s=c.s||{};c.g=c.g||{};return c}
+function coinBal(c){var n=0,k;for(k in c.b)n+=(+c.b[k]||0);for(k in c.e)n+=c.e[k]?1:0;for(k in c.s)n-=1;for(k in c.g)n+=(+c.g[k]||0);return Math.max(0,Math.min(99,n))}
+function coinsGet(){return {n:coinBal(ledger())}}
+function coinSync(){try{if(window.RQGroups&&window.RQGroups.pushProfile)window.RQGroups.pushProfile()}catch(e){}}
+function awardCoin(d){var c=ledger();if(d in c.e)return false;c.e[d]=1;save("rq-coins",c);coinSync();return true}
+function grantCoins(id,n){var c=ledger();if(id in c.g)return false;c.g[id]=n;save("rq-coins",c);coinSync();return true}
+/* ===== Streaks: derived from the finished daily games on this device (tk8-s<day> with three scores, finished that
+   day or just after its midnight). Never incremented, so refreshes, replays, two tabs and device merges can't double count.
+   rq-carry keeps anything the old counter had that the records can't show (set once by migrateStats), so no one's
+   streak, played count or total drops when this code arrives. Days follow the player's own device clock. */
+function playedDays(){var o={},i,k,m,x,d;
+  try{for(i=0;i<localStorage.length;i++){k=localStorage.key(i);m=/^tk8-s(\d+)$/.exec(k||"");if(!m)continue;d=+m[1];x=load(k,null);
+    if(!x||x.day!==d||!Array.isArray(x.s)||x.s.length!==3||!Array.isArray(x.g)||x.g.length!==3)continue;
+    o[d]={c:!x.pd||x.pd===d||x.pd===d+1,t:x.s[0]+x.s[1]+x.s[2]}}}catch(e){}
+  return o}
+function deriveStats(){
+  var P=playedDays(),T=dayNum(),d,run=0,last=0,played=0,total=0,k,cv=load("rq-carry",null)||{};
+  for(k in P){played++;total+=P[k].t}
+  d=(P[T]&&P[T].c)?T:T-1;if(P[d]&&P[d].c){last=d;while(P[d]&&P[d].c){run++;d--}}
+  var extra=0;if(cv.n&&cv.a){if(last&&last-run+1<=cv.a+1&&last>=cv.a)extra=cv.n;else if(!last&&cv.a>=T-1)extra=cv.n}
+  stats={streak:run+extra,last:last||(extra?cv.a:0),played:played+(cv.p|0),total:total+(cv.t|0)};save("tk7-stats",stats);return stats}
+function migrateStats(){if(load("rq-sv2",null))return;var o=load("tk7-stats",null);save("rq-sv2",{t:Date.now()});
+  if(!o||typeof o.streak!=="number")return;var P=playedDays(),played=0,total=0,k,d=o.last,R=0,T=dayNum();
+  for(k in P){played++;total+=P[k].t}while(P[d]&&P[d].c){R++;d--}
+  save("rq-carry",{n:o.last>=T-1?Math.max(0,o.streak-R):0,a:o.last|0,p:Math.max(0,(o.played|0)-played),t:Math.max(0,(o.total|0)-total)})}
 function skey(){return bonus?"tk8-b"+today+"-"+bonus.n:"tk8-s"+day}
 function saveActive(v){if(v)save("rq-active",v);else{try{localStorage.removeItem("rq-active")}catch(e){}}}
 function blank(d){return {day:d,ids:pick(d),g:[],s:[],un:[],r:false,hu:[0,0,0],nt:["","",""]}}
@@ -1477,24 +1519,27 @@ function bonusOpen(){return !!(bonus&&(st.g.length<3||st.r))}
 function spendCoin(){
   var c=coinsGet(),n=0;if(c.n<1||!dailyDone()||bonusOpen())return false;
   try{while(localStorage.getItem("tk8-b"+today+"-"+n)!==null)n++}catch(e){}
-  c.n--;coinsSet(c);
+  var L=ledger();L.s[today+"-"+n]=1;save("rq-coins",L);coinSync();
   var bd=bonusDrop(),x={day:today,b:n,bd:bd?bd.d:0,ids:bd?bd.ids:pickBonus(n),g:[],s:[],un:[],r:false,hu:[0,0,0],nt:["","",""]};
   save("tk8-b"+today+"-"+n,x);saveActive({d:today,n:n});
   bonus={n:n};st=x;ids=x.ids;intro=false;streak();render();window.scrollTo(0,0);return true}
 function exitBonus(){bonus=null;saveActive(null);selectDay(today);intro=false;render();window.scrollTo(0,0)}
+function resumeLate(){
+  if(bonus||new Date().getHours()>=3)return;var y=load("tk8-s"+(today-1),null);
+  if(!y||y.day!==today-1||!Array.isArray(y.g)||!y.g.length||(y.g.length>=3&&!y.r))return;
+  var t=load("tk8-s"+today,null);if(t&&Array.isArray(t.g)&&t.g.length)return;
+  selectDay(today-1)}
 function init(){
   giftInit();today=dayNum();bonus=null;selectDay(today);
   var ra=load("rq-active",null);
   if(ra&&ra.d===today&&typeof ra.n==="number"){var bs=loadBonus(ra.n);if(bs&&(bs.g.length<3||bs.r)){bonus={n:ra.n};st=bs;ids=bs.ids}else saveActive(null)}
   else if(ra)saveActive(null);
-  stats=load("tk7-stats",null);
-  if(!stats||typeof stats.streak!=="number")stats={streak:0,last:0,played:0,total:0};
-  if(stats.last<today-1&&stats.last!==today)stats.streak=0;
+  migrateStats();deriveStats();resumeLate();
   var d=new Date(today*864e5);cm={y:d.getUTCFullYear(),m:d.getUTCMonth()};
   intro=!!(st&&st.g&&st.g.length>=3&&!st.r&&!bonus);
-  if(parseChallenge())intro=false;
-  var gf=/[?&]gift=(\d{1,2})\.([a-z0-9]{6})\.([a-z0-9]{6,14})/.exec(location.search||"");
-  if(gf){window.__rqGift=[parseInt(gf[1],10),gf[2],gf[3]];intro=false;try{window.history.replaceState(null,"",location.pathname)}catch(e){}}
+  if(parseChallenge()){intro=false;ga("challenge_open")}
+  var gf=/[?&]gift2=([A-Za-z0-9]{16,32})/.exec(location.search||""),go=/[?&]gift=/.test(location.search||"");
+  if(gf||go){window.__rqGift=gf?{id:gf[1]}:{old:1};intro=false;try{window.history.replaceState(null,"",location.pathname)}catch(e){}}
   var gm=/[?&]g=([0-9a-z]{7})/.exec(location.search||"");
   if(gm){window.__rqG=gm[1];intro=false;try{window.history.replaceState(null,"",location.pathname)}catch(e){}}
 }
@@ -1784,7 +1829,7 @@ function openMenu(){
     if(b.hasAttribute("data-d")){selectDay(parseInt(b.getAttribute("data-d"),10));intro=false;closeSheet();render();window.scrollTo(0,0)}
     else if(b.hasAttribute("data-nav")){var v=cm.y*12+cm.m+parseInt(b.getAttribute("data-nav"),10);cm={y:Math.floor(v/12),m:v%12};openMenu()}
     else if(b.hasAttribute("data-home")){closeSheet();selectDay(today);landOn=false;intro=true;render();window.scrollTo(0,0)}
-    else if(b.hasAttribute("data-act")){var a=b.getAttribute("data-act");if(a==="signin")openSignIn(1,"");else if(a==="groups")openGroups();else if(a==="dev")openDev();else if(a==="lang"){toggleLang();openMenu()}else if(a==="signout"){setAcct(null);openMenu()}}
+    else if(b.hasAttribute("data-act")){var a=b.getAttribute("data-act");if(a==="signin")openSignIn();else if(a==="groups")openGroups();else if(a==="lang"){toggleLang();openMenu()}else if(a==="signout"){b.disabled=true;window.RQGroups.signOut().then(function(){openMenu()},function(){openMenu()})}else if(a==="copyid"){var uu=fbUser();if(uu)copyText(uu.uid,null,function(ok){b.textContent=ok?(LANG==="ar"?"تم النسخ":"Copied!"):uu.uid})}}
     else if(b.id==="mspend"){closeSheet();spendCoin()}
     else if(b.id==="sx")closeSheet()};
   sc.onclick=closeSheet;sh.classList.add("open");sc.classList.add("open");document.body.style.overflow="hidden";
@@ -1968,14 +2013,15 @@ ICON_COIN="<svg viewBox='0 0 64 64' stroke-linejoin='round'><g stroke='#c97a00' 
 ICON_LANG="<svg viewBox='0 0 24 24'><circle cx='12' cy='12' r='9'/><path d='M3 12h18M12 3c2.5 2.7 3.8 5.7 3.8 9s-1.3 6.3-3.8 9c-2.5-2.7-3.8-5.7-3.8-9S9.5 5.7 12 3z'/></svg>",
 ICON_DEV="<svg viewBox='0 0 24 24'><path d='M14.7 6.3a4 4 0 0 0-5.4 5.4L3.5 17.5a1.8 1.8 0 0 0 2.5 2.5l5.8-5.8a4 4 0 0 0 5.4-5.4l-2.6 2.6-2.2-.4-.4-2.2z'/></svg>",
 ICON_USERS="<svg viewBox='0 0 24 24'><circle cx='9' cy='8' r='3.2'/><circle cx='17' cy='9' r='2.4'/><path d='M3.5 20c0-3 2.8-5 5.5-5s5.5 2 5.5 5M15.5 20c0-2.2 1-3.8 3.4-3.8'/></svg>";
+function fbUser(){try{return window.RQGroups&&window.RQGroups.user?window.RQGroups.user():null}catch(e){return null}}
 function menuRows(){
-  var a=acct(),AR=LANG==="ar";
+  var u=fbUser(),gu=u&&!u.anon,AR=LANG==="ar";
   return "<div class='mis'>"+
-  (a.t?"<div class='mi static'>"+ICON_USER+"<div><b>"+(AR?"مسجّل الدخول":"Signed in")+"</b><span>"+esc(a.e)+"</span></div><button class='lnk' data-act='signout'>"+(AR?"خروج":"Sign out")+"</button></div>"
-      :"<button class='mi' data-act='signin'>"+ICON_USER+"<div><b>"+(AR?"تسجيل الدخول":"Sign in")+"</b><span>"+(AR?"اختياري. احتفظ بسلسلتك بين أجهزتك.":"Optional. Keep your streak across devices.")+"</span></div>"+ICON_R+"</button>")+
+  (gu?"<div class='mi static'>"+ICON_USER+"<div><b>"+(AR?"مسجّل الدخول":"Signed in")+"</b><span>"+esc(u.email||u.name||"")+"</span></div><button class='lnk' data-act='signout'>"+(AR?"خروج":"Sign out")+"</button></div>"
+      :"<button class='mi' data-act='signin'>"+ICON_USER+"<div><b>"+(AR?"تسجيل الدخول":"Sign in")+"</b><span>"+(AR?"اختياري. تبقى سلسلتك وعملاتك ومجموعاتك معك على كل أجهزتك.":"Optional. Keep your streak, coins and groups on every device.")+"</span></div>"+ICON_R+"</button>")+
   "<button class='mi' data-act='groups'>"+ICON_USERS+"<div><b>"+(AR?"المجموعات":"Groups")+"</b><span>"+(AR?"نافس أصدقاءك على لوحة أسبوعية":"Race friends on a weekly leaderboard")+"</span></div>"+ICON_R+"</button>"+
-  "<button class='mi' data-act='lang'>"+ICON_LANG+"<div><b>"+(AR?"English":"العربية")+"</b><span>"+(AR?"Switch to English":"Switch to Arabic")+"</span></div>"+ICON_R+"</button>"+
-  "<button class='mi' data-act='dev'>"+ICON_DEV+"<div><b>Dev</b><span>Locked. Owner tools.</span></div>"+ICON_R+"</button></div>"}
+  "<button class='mi' data-act='lang'>"+ICON_LANG+"<div><b>"+(AR?"English":"العربية")+"</b><span>"+(AR?"Switch to English":"Switch to Arabic")+"</span></div>"+ICON_R+"</button>"+"</div>"+
+  (u?"<p class='pidl'>"+(AR?"رقم اللاعب":"Player ID")+" <b dir='ltr'>"+esc(u.uid.slice(0,8))+"</b> <button class='lnk' data-act='copyid'>"+(AR?"نسخ":"Copy")+"</button></p>":"")}
 var __sf=0;
 function fitSheet(){return;var sh=document.getElementById("sheet");if(!sh||!sh.classList.contains("open"))return;
   if(__sf)clearTimeout(__sf);
@@ -1990,28 +2036,40 @@ function sheetShell(title,body){
   sh.innerHTML="<div class='grab'></div><div class='shh'><b>"+title+"</b><button class='x' id='sx' aria-label='Close'>"+ICON_X+"</button></div>"+body;
   sh.onclick=null;document.getElementById("sx").onclick=closeSheet;sc.onclick=closeSheet;
   sh.classList.add("open");sc.classList.add("open");document.body.style.overflow="hidden";return sh}
-function openSignIn(step,email,msg){
-  var body,AR=LANG==="ar",g=function(i){return document.getElementById(i)};
-  if(!API)body="<p class='sub'>"+(AR?"تسجيل الدخول غير مُفعَّل بعد. سيصبح متاحاً عند إطلاق اللعبة رسمياً، لتتبعك سلسلتك وإحصاءاتك بين هاتفك وحاسوبك. ولا تحتاج إلى حساب للعب أبداً.":"Sign-in isn’t switched on yet. It arrives when the game goes live, so your streak and stats can follow you between your phone and your laptop. You never need an account to play.")+"</p>";
-  else if(step===3)body="<p class='sub'>"+(AR?"سجّلت الدخول باسم <b>"+esc(email)+"</b>. تقدّمك الآن يتبعك بين الأجهزة.":"You’re signed in as <b>"+esc(email)+"</b>. Your progress now follows you between devices.")+"</p><button class='main' id='sd'>"+(AR?"تم":"Done")+"</button>";
-  else if(step===2)body="<p class='sub'>"+esc(msg||(AR?"أرسلنا رمزاً من 6 أرقام إلى "+email+".":"We emailed a 6-digit code to "+email+"."))+"</p><input id='sc' class='inp' inputmode='numeric' maxlength='6' autocomplete='one-time-code' placeholder='"+(AR?"الرمز المكوّن من 6 أرقام":"6-digit code")+"'><p class='err' id='se'></p><button class='main' id='sv' style='margin-top:12px'>"+(AR?"تحقّق وسجّل الدخول":"Verify and sign in")+"</button>";
-  else body="<p class='sub'>"+(AR?"اختياري. سجّل الدخول للاحتفاظ بسلسلتك وإحصاءاتك عند تغيير الجهاز. بدون كلمة مرور، نرسل إليك رمزاً لمرة واحدة فقط.":"Optional. Sign in to keep your streak and stats when you switch devices. No password, we just email you a one-time code.")+"</p><input id='s1' class='inp' type='email' autocomplete='email' placeholder='you@example.com'><p class='err' id='se'></p><button class='main' id='ss' style='margin-top:12px'>"+(AR?"أرسل رمزي":"Send my code")+"</button>";
-  sheetShell(AR?"تسجيل الدخول":"Sign in",body+(step===3?"":"<button class='ghost' id='bk' style='width:100%;margin-top:12px'>"+(AR?"الرجوع للقائمة":"Back to menu")+"</button>"));
-  if(g("bk"))g("bk").onclick=openMenu;
-  function fail(e){if(g("se"))g("se").textContent=e.message;var b=g("ss")||g("sv");if(b)b.disabled=false}
-  if(g("ss"))g("ss").onclick=function(){
-    var em=g("s1").value.trim().toLowerCase();
-    if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em)){g("se").textContent=AR?"هذا البريد لا يبدو صحيحاً.":"That email doesn’t look right.";return}
-    g("ss").disabled=true;
-    api("/auth/start",{method:"POST",body:{email:em}}).then(function(r){openSignIn(2,em,r.devCode?(AR?"وضع المطور: رمزك هو "+r.devCode:"Dev mode: your code is "+r.devCode):"")},fail)};
-  if(g("sv"))g("sv").onclick=function(){
-    var code=g("sc").value.trim();if(!/^\d{6}$/.test(code)){g("se").textContent=AR?"أدخل الرمز المكوّن من 6 أرقام.":"Enter the 6-digit code.";return}
-    g("sv").disabled=true;
-    api("/auth/verify",{method:"POST",body:{email:email,code:code}}).then(function(r){
-      setAcct(r.token,email);
-      return pullSync().then(pushAll,function(){}).then(function(){openSignIn(3,email)})},fail)};
-  if(g("sd"))g("sd").onclick=function(){closeSheet();streak();selectDay(day);render()};
-  if(g("s1"))setTimeout(function(){try{g("s1").focus()}catch(e){}},300)}
+function signInMsg(e){var AR=LANG==="ar",c=(e&&e.code)||"",m=(e&&e.message)||"";
+  if(/popup-closed|cancelled-popup/.test(c))return "";
+  if(/popup-blocked|operation-not-supported|web-storage|unauthorized-domain|disallowed/.test(c)||/disallowed_useragent/.test(m))return AR?"افتح roughly.gg في المتصفح (Safari أو Chrome) لتسجيل الدخول.":"Open roughly.gg in your browser (Safari or Chrome) to sign in.";
+  if(/network/.test(c))return AR?"لا يوجد اتصال. جرّب مرة أخرى.":"No connection. Try again.";
+  return AR?"لم ينجح تسجيل الدخول. جرّب مرة أخرى.":"Sign-in didn’t work. Please try again."}
+/* One sign-in everywhere: Google through Firebase. Used by the menu and by the Groups "save your spot" button. */
+function signInGoogle(btn,errEl,done){
+  if(!groupsOn()){if(errEl)errEl.textContent=LANG==="ar"?"تسجيل الدخول غير متاح الآن. جرّب بعد قليل.":"Sign-in isn’t available right now. Try again in a moment.";return}
+  if(btn)btn.disabled=true;if(errEl)errEl.textContent="";
+  window.RQGroups.signIn().then(function(u){deriveStats();streak();if(done)done(u)},function(e){if(btn)btn.disabled=false;if(errEl)errEl.textContent=signInMsg(e)})}
+function openSignIn(){var AR=LANG==="ar",g=function(i){return document.getElementById(i)};
+  sheetShell(AR?"تسجيل الدخول":"Sign in","<p class='sub'>"+(AR?"اختياري. سجّل الدخول بحساب جوجل لتبقى سلسلتك وعملاتك ومجموعاتك معك على كل أجهزتك. بلا كلمة مرور ولا نماذج.":"Optional. Sign in with Google and your streak, coins and groups follow you to every device. No password, no forms.")+"</p>"+
+    "<p class='err' id='se'></p><button class='main' id='sgo'>"+(AR?"المتابعة بحساب جوجل":"Continue with Google")+"</button><button class='ghost' id='bk' style='width:100%;margin-top:10px'>"+(AR?"ليس الآن":"Not now")+"</button>");
+  g("bk").onclick=openMenu;
+  g("sgo").onclick=function(){signInGoogle(g("sgo"),g("se"),function(u){
+    sheetShell(AR?"تسجيل الدخول":"Sign in","<p class='sub'>"+(AR?"سجّلت الدخول باسم <b>"+esc(u.email||"")+"</b>. سلسلتك وعملاتك ومجموعاتك تتبعك الآن بين أجهزتك.":"You’re signed in as <b>"+esc(u.email||"")+"</b>. Your streak, coins and groups now follow you between devices.")+"</p><button class='main' id='sd'>"+(AR?"تم":"Done")+"</button>");
+    g("sd").onclick=function(){closeSheet();selectDay(day);render()}})}}
+/* Profile helpers used by the Firebase module: what this device has, and merging a cloud copy into it (union of facts). */
+window.RQ_profile=function(){var days={},i,k,m,x;
+  try{for(i=0;i<localStorage.length;i++){k=localStorage.key(i);m=/^tk8-s(\d+)$/.exec(k||"");if(!m)continue;x=load(k,null);
+    if(!x||x.day!==+m[1]||!Array.isArray(x.s)||x.s.length!==3||!Array.isArray(x.g)||x.g.length!==3||!Array.isArray(x.ids)||x.ids.length!==3)continue;
+    days[m[1]]=[x.s.join(","),x.g.map(function(v){return +(+v).toPrecision(6)}).join(","),x.ids.join(","),x.pd||x.day].join("|")}}catch(e){}
+  return {days:days,coins:ledger(),carry:load("rq-carry",null)||{}}};
+window.RQ_applyProfile=function(P){P=P||{};var ch=false,d,k;
+  var days=P.days||{};for(d in days){var p=String(days[d]).split("|");if(p.length<4)continue;
+    var sc=p[0].split(",").map(Number),gs=p[1].split(",").map(Number),qs=p[2].split(",").map(Number),dn=+d;
+    if(!(dn>=START)||sc.length!==3||gs.length!==3||qs.length!==3||qs.some(function(i){return !Q[i]}))continue;
+    var loc=load("tk8-s"+dn,null);if(loc&&loc.day===dn&&Array.isArray(loc.g)&&loc.g.length>=3)continue;
+    save("tk8-s"+dn,{day:dn,ids:qs,g:gs,s:sc,un:[],r:false,hu:[0,0,0],nt:["","",""],pd:+p[3]||dn});ch=true}
+  if(P.coins&&typeof P.coins==="object"){var L=ledger();["b","e","s","g"].forEach(function(f){var src=P.coins[f]||{};for(k in src){if(!(k in L[f])){L[f][k]=src[k];ch=true}else if(f==="e"&&src[k]&&!L.e[k])L.e[k]=1}});save("rq-coins",L)}
+  if(P.carry&&typeof P.carry==="object"){var cv=load("rq-carry",null)||{},pc=P.carry;if((pc.n|0)>(cv.n|0)){cv.n=pc.n|0;cv.a=pc.a|0;ch=true}cv.p=Math.max(cv.p|0,pc.p|0);cv.t=Math.max(cv.t|0,pc.t|0);save("rq-carry",cv)}
+  if(P.grants&&typeof P.grants==="object"){var L2=ledger();for(k in P.grants){var gr=P.grants[k];if(gr&&gr.n>0&&!(("adm:"+k) in L2.g)){L2.g["adm:"+k]=Math.min(20,gr.n|0);ch=true}}save("rq-coins",L2)}
+  deriveStats();return ch};
+window.RQ_profileApplied=function(){streak();if(busy)return;var keep=st.g.length>0&&st.g.length<3;if(!keep){selectDay(day);render()}};
 function dayPayload(x){return {ids:x.ids,g:x.g,s:x.s,un:x.un||[],hu:x.hu||[0,0,0],pd:x.pd||0}}
 function pushDay(d){
   if(!API||!acct().t)return;var x=load("tk8-s"+d,null);if(!x||!x.g||!x.g.length)return;
@@ -2029,14 +2087,7 @@ function pullSync(){
       var local=load("tk8-s"+d,null);if(local&&local.day===d&&Array.isArray(local.g)&&local.g.length>=p.g.length)return;
       save("tk8-s"+d,{day:d,ids:p.ids,g:p.g,s:p.s,un:p.un||[],r:false,hu:p.hu||[0,0,0],nt:["","",""],pd:p.pd||0});changed=true});
     if(changed)rebuildStats();return changed})}
-function rebuildStats(){
-  var played=0,total=0,set={},i,k,m,x,d;
-  try{for(i=0;i<localStorage.length;i++){k=localStorage.key(i);m=/^tk8-s(\d+)$/.exec(k||"");if(!m)continue;x=load(k,null);
-    if(!x||!Array.isArray(x.s)||x.s.length!==3)continue;played++;total+=x.s[0]+x.s[1]+x.s[2];d=parseInt(m[1],10);if(!x.pd||x.pd===d)set[d]=1}}catch(e){}
-  var last=0,run=0;d=set[today]?today:today-1;if(set[d]){last=d;while(set[d]){run++;d--}}
-  if(played>=stats.played){stats.played=played;stats.total=total}
-  if(run>stats.streak){stats.streak=run;stats.last=last}
-  save("tk7-stats",stats)}
+function rebuildStats(){deriveStats()}
 var SITE="roughly.gg/"+COUNTRY;
 function myName(){return cleanName((load("rq-name",{})||{}).n)}
 function chLink(){if(bonus)return "https://"+SITE;var n=myName();return "https://"+SITE+"?c="+chEnc(day+"."+st.s.join("-")+(n?"."+n:""))}
@@ -2088,6 +2139,7 @@ function openShare(tot){
   ta.onclick=function(){try{ta.focus();ta.select()}catch(x){}};
   cp.onclick=function(){copyText(t,ta,function(ok){cp.textContent=ok?(AR?"تم النسخ":"Copied!"):(AR?"حدّد النص بالأعلى وانسخه":"Select the text above");if(ok){cp.classList.add("copok");setTimeout(function(){cp.classList.remove("copok");cp.textContent=(AR?"انسخ إلى الحافظة":"Copy to clipboard")},1700)}})};
   if(nat)nat.onclick=function(){try{navigator.share({text:t}).catch(function(){})}catch(x){}};
+  ["wa","tg","tw","cp2","nat"].forEach(function(i){var b=g(i);if(b)b.addEventListener("click",function(){ga("share",{method:i})})});
   sh.classList.add("open");sc.classList.add("open");document.body.style.overflow="hidden";
 }
 function shareResult(tot){openShare(tot)}
@@ -2146,7 +2198,7 @@ function openGroup(id,cb){var AR=LANG==="ar";
     function met(r){return mode==="avg"?r.avg:mode==="var"?(r.varp===null?-1e9:r.varp):r.total}
     function wk(r){return mode==="avg"?(r.days?faD(Math.round(r.avg)):"–"):mode==="var"?(r.varp===null?"–":(r.varp>0?"+":"")+faD(r.varp)+PCT()):faD(r.total)}
     var sorted=b.rows.slice().sort(function(x,y){return met(y)-met(x)});
-    var rows=sorted.map(function(r,i){return "<div class='lbr"+(r.you?" me":"")+"'><span class='rk'>"+faD(i+1)+"</span><span class='nm'>"+esc(r.name)+(r.you?(AR?" (أنت)":" (you)"):"")+"</span><span class='td'>"+(r.today?faD(r.today):"–")+"</span><span class='pts'>"+wk(r)+"</span></div>"}).join("");
+    var rows=sorted.map(function(r,i){return "<div class='lbr"+(r.you?" me":"")+"'><span class='rk'>"+faD(i+1)+"</span><span class='nm'>"+esc(r.name)+(r.you?(AR?" (أنت)":" (you)"):"")+(b.iOwn&&!r.you?" <button class='lbx' data-rm='"+esc(r.uid)+"' data-nm='"+esc(r.name)+"'>"+(AR?"إزالة":"Remove")+"</button>":"")+"</span><span class='td'>"+(r.today?faD(r.today):"–")+"</span><span class='pts'>"+wk(r)+"</span></div>"}).join("");
     var MODES=[["total",AR?"المجموع":"Total"],["avg",AR?"المتوسط":"Average"],["var",AR?"مقابل المجموعة":"vs group"]],
       WKH={total:AR?"الأسبوع":"Week",avg:AR?"متوسط الأسبوع":"Week avg","var":AR?"مقابل المجموعة":"vs group"};
     var lbt="<div class='lbm' role='tablist'>"+MODES.map(function(m){return "<button role='tab' aria-selected='"+(m[0]===mode)+"' class='"+(m[0]===mode?"on":"")+"' data-gm='"+m[0]+"'>"+m[1]+"</button>"}).join("")+"</div>",
@@ -2165,12 +2217,18 @@ function openGroup(id,cb){var AR=LANG==="ar";
       if(!glv.classList.contains("arm")){glv.classList.add("arm");glv.textContent=AR?"اضغط مجدداً للمغادرة":"Tap again to leave";
         glt=setTimeout(function(){glv.classList.remove("arm");glv.textContent=AR?"غادر":"Leave"},3500);return}
       clearTimeout(glt);glv.disabled=true;window.RQGroups.leaveGroup(id).then(openGroups,openGroups)};
-    var gl=document.getElementById("glink");if(gl)gl.onclick=function(){gl.disabled=true;window.RQGroups.linkGoogle().then(function(){openGroup(id)},function(e){gl.disabled=false;gl.textContent=(e&&e.message)||(AR?"تعذّر تسجيل الدخول":"Sign-in failed")})};
+    var gl=document.getElementById("glink");if(gl)gl.onclick=function(){var ge=document.createElement("p");ge.className="err";gl.parentNode.insertBefore(ge,gl.nextSibling);signInGoogle(gl,ge,function(){openGroup(id)})};
+    Array.prototype.forEach.call(box.querySelectorAll("[data-rm]"),function(bt){bt.onclick=function(){confirmRemove(id,b.name,bt.getAttribute("data-rm"),bt.getAttribute("data-nm"))}});
   }
   if(cb){paint(cb);return}
   sheetShell(AR?"المجموعة":"Group","<div id='gbox'><p class='note'>"+(AR?"جارٍ التحميل…":"Loading…")+"</p></div>");
   Promise.race([window.RQGroups.board(id),new Promise(function(_,rej){setTimeout(function(){rej(new Error("__slow__"))},7000)})]).then(paint,function(e){var box=document.getElementById("gbox");if(!box)return;var slow=e&&e.message==="__slow__";box.innerHTML="<p class='"+(slow?"note":"err")+"' style='text-align:center'>"+(slow?(AR?"يستغرق وقتاً أطول من المعتاد. تحقّق من اتصالك.":"Taking longer than usual. Check your connection."):esc((e&&e.message)||"Couldn’t load the group"))+"</p><button class='main' id='gretry'>"+(AR?"إعادة المحاولة":"Retry")+"</button><button class='ghost' id='gbk2' style='width:100%;margin-top:10px'>"+(AR?"رجوع":"Back")+"</button>";document.getElementById("gretry").onclick=function(){openGroup(id)};document.getElementById("gbk2").onclick=openGroups});
 }
+function confirmRemove(id,gname,who,nm){var AR=LANG==="ar",g=function(i){return document.getElementById(i)};
+  sheetShell(AR?"إزالة عضو":"Remove member","<p class='sub'>"+(AR?"إزالة <b>"+esc(nm)+"</b> من «"+esc(gname)+"»؟ تبقى نتائجه السابقة في سجل المجموعة، ولن يستطيع العودة برابط الدعوة.":"Remove <b>"+esc(nm)+"</b> from “"+esc(gname)+"”? Their past scores stay in the group’s history, and they can’t rejoin with the invite link.")+"</p>"+
+    "<p class='err' id='ge'></p><button class='main danger' id='rmy'>"+(AR?"إزالة":"Remove")+"</button><button class='ghost' id='rmn' style='width:100%;margin-top:10px'>"+(AR?"إلغاء":"Cancel")+"</button>");
+  g("rmn").onclick=function(){openGroup(id)};
+  g("rmy").onclick=function(){g("rmy").disabled=true;window.RQGroups.removeMember(id,who).then(function(){openGroup(id)},function(e){g("rmy").disabled=false;g("ge").textContent=(e&&e.message)||(AR?"تعذّرت الإزالة. جرّب مرة أخرى.":"Couldn’t remove them. Try again.")})}}
 function openInvite(id,name){var AR=LANG==="ar",e=encodeURIComponent,g=function(i){return document.getElementById(i)};
   var link="https://"+SITE+"?g="+id;
   var msg=(AR?"انضم لمجموعتي في Roughly "+COUNTRY+" ونشوف مين يكسب هذا الأسبوع: ":"Join my group on Roughly "+COUNTRY+" and let’s see who wins this week: ")+link+(AR?"\nأو استخدم الرمز: ":"\nOr use the code: ")+id;
@@ -2191,22 +2249,37 @@ function openInvite(id,name){var AR=LANG==="ar",e=encodeURIComponent,g=function(
   if(g("nat"))g("nat").onclick=function(){try{navigator.share({title:"Roughly "+COUNTRY,text:msg}).catch(function(){})}catch(e){}};
   g("gbk").onclick=function(){openGroup(id)};
 }
+/* Group invite. The sheet opens at once from the link (no waiting for Firebase); the group's name fills in when it
+   arrives. Join = one membership write, then straight into the game with a short note; the board loads in the
+   background. The pending invite sits in sessionStorage so a refresh mid-join resumes it. Joining twice is harmless. */
+function invPending(id){try{if(id)sessionStorage.setItem("rq-inv",id);else sessionStorage.removeItem("rq-inv")}catch(e){}}
+function toast(t){var el=document.getElementById("toast");if(!el){el=document.createElement("div");el.id="toast";el.className="toast";el.setAttribute("role","status");document.body.appendChild(el)}
+  el.textContent=t;el.classList.add("on");clearTimeout(toast.t);toast.t=setTimeout(function(){el.classList.remove("on")},3200)}
+function intoGame(){closeSheet();if(!bonus)selectDay(today);intro=!!(st.g.length>=3&&!st.r&&!bonus);landOn=false;render();window.scrollTo(0,0)}
 window.RQ_inviteFlow=function(id){
-  if(!groupsOn())return;var AR=LANG==="ar";
-  window.RQGroups.groupMeta(id).then(function(m){
-    if(m.isMember){openGroup(id);return;} // already a member — show the group board
-    sheetShell(AR?"دعوة لمجموعة":"Group invite",
-      "<div class='shp' style='background:linear-gradient(135deg,var(--c),var(--c2))'><small>"+(AR?"دعوة":"Invitation")+"</small><b>"+esc(m.name)+"</b><span>"+faD(m.members)+(AR?" أعضاء":" members")+"</span></div>"+
-      "<label class='nl' for='gjn' style='margin-top:4px'>"+(AR?"اسمك":"Your name")+"</label><input id='gjn' class='inp' maxlength='24' autocomplete='off' placeholder='"+(AR?"مثلاً: سلطان":"e.g. Sam")+"'>"+
-      "<p class='err' id='ge'></p>"+
-      "<button class='main' id='gok'>"+(AR?"انضم إلى «"+esc(m.name)+"»":"Join “"+esc(m.name)+"”")+"</button>"+
-      "<button class='ghost' id='gno' style='width:100%;margin-top:10px'>"+(AR?"ربما لاحقاً":"Maybe later")+"</button>");
-    var g=function(i){return document.getElementById(i)};
-    g("gjn").value=myName();g("gno").onclick=closeSheet;
-    g("gok").onclick=function(){var yn=cleanName(g("gjn").value);if(yn)save("rq-name",{n:yn});g("gok").disabled=true;
-      window.RQGroups.joinGroup(id,yn).then(function(){openGroup(id)},function(e){g("ge").textContent=(e&&e.message)||"Couldn’t join";g("gok").disabled=false})};
-  },function(){/* bad or unreachable id — ignore, just let them play */});
-};
+  var AR=LANG==="ar",g=function(i){return document.getElementById(i)},meta=null,want=false,T=AR?"دعوة لمجموعة":"Group invite";invPending(id);ga("invite_open");
+  sheetShell(T,"<div class='shp' style='background:linear-gradient(135deg,var(--c),var(--c2))'><small>"+(AR?"دعوة":"Invitation")+"</small><b id='ivn'>"+(AR?"جارٍ التحميل…":"Loading…")+"</b><span id='ivm'>&nbsp;</span></div>"+
+    "<label class='nl' for='gjn' style='margin-top:4px'>"+(AR?"اسمك":"Your name")+"</label><input id='gjn' class='inp' maxlength='24' autocomplete='off' placeholder='"+(AR?"مثلاً: سلطان":"e.g. Sam")+"'>"+
+    "<p class='err' id='ge'></p><button class='main' id='gok'>"+(AR?"انضم":"Join")+"</button>"+
+    "<button class='ghost' id='gno' style='width:100%;margin-top:10px'>"+(AR?"ربما لاحقاً":"Maybe later")+"</button>");
+  g("gjn").value=myName();g("gno").onclick=function(){invPending(null);closeSheet()};
+  function label(){return meta?(AR?"انضم إلى «"+meta.name+"»":"Join “"+meta.name+"”"):(AR?"انضم":"Join")}
+  function bad(msg,retry){invPending(retry?id:null);if(!g("gjn"))return;
+    sheetShell(T,"<p class='sub'>"+msg+"</p>"+(retry?"<button class='ghost' id='grt' style='width:100%;margin-bottom:10px'>"+(AR?"إعادة المحاولة":"Try again")+"</button>":"")+"<button class='main' id='gpl'>"+(AR?"العب أسئلة اليوم":"Play today’s drop")+"</button>");
+    g("gpl").onclick=function(){invPending(null);intoGame()};if(g("grt"))g("grt").onclick=function(){window.RQ_inviteFlow(id)}}
+  function join(){var b=g("gok");if(!b)return;var yn=cleanName(g("gjn").value);if(yn)save("rq-name",{n:yn});b.disabled=true;b.textContent=AR?"جارٍ الانضمام…":"Joining…";
+    window.RQGroups.joinGroup(id,yn,meta).then(function(r){invPending(null);intoGame();toast(AR?"انضممت إلى «"+r.name+"»":"You joined “"+r.name+"”");try{window.RQGroups.board(id).catch(function(){})}catch(e){}},
+      function(e){var b2=g("gok");if(!b2)return;b2.disabled=false;b2.textContent=label();g("ge").textContent=(e&&e.message)||(AR?"تعذّر الانضمام. تحقّق من اتصالك وجرّب مرة أخرى.":"Couldn’t join. Check your connection and try again.")})}
+  g("gok").onclick=function(){if(meta)join();else{want=true;g("gok").disabled=true;g("gok").textContent=AR?"جارٍ الانضمام…":"Joining…"}};
+  function got(m){meta=m;if(!g("ivn"))return;
+    if(m.removed){bad(AR?"أزالك منشئ هذه المجموعة، لذا لا يعمل هذا الرابط معك.":"The group’s creator removed you, so this invite doesn’t work for you.");return}
+    if(m.isMember){invPending(null);intoGame();toast(AR?"أنت في «"+m.name+"» بالفعل":"You’re already in “"+m.name+"”");return}
+    if(m.members>=200){bad(AR?"هذه المجموعة ممتلئة.":"This group is full.");return}
+    g("ivn").textContent=m.name;g("ivm").textContent=faD(m.members)+(AR?" أعضاء":" members");
+    if(want)join();else{g("gok").textContent=label();g("gok").disabled=false}}
+  function fail(e){var gone=e&&/No group|look right/.test(e.message||"");
+    bad(gone?(AR?"رابط الدعوة هذا لا يعمل. اطلب من صديقك رابطاً جديداً.":"This invite link doesn’t work. Ask your friend for a new one."):(AR?"تعذّر تحميل الدعوة. تحقّق من اتصالك.":"Couldn’t load the invite. Check your connection."),!gone)}
+  var t=0;(function w(){var R=window.RQGroups;if(R&&R.enabled){R.groupMeta(id).then(got,fail);return}if((R&&!R.enabled)||t++>100){fail();return}setTimeout(w,150)})()};
 var TIPS=["Break big numbers into things you can picture: homes, people, cars, days.","Round to friendly numbers. 3 million people, 4 per home, 8 windows each. Good enough.","Sanity check: is your answer more than everyone in Qatar? Less than one per person?","Being off by 2× still scores well. Don’t agonise over the last digit.","Not sure where to start? Begin with the population, then ask how many do it in a day."];
 var TIPS_AR=["قسّم الأرقام الكبيرة إلى أشياء يمكن تخيّلها: بيوت، أشخاص، سيارات، أيام.","قرّب إلى أرقام سهلة. 3 ملايين نسمة، 4 لكل بيت، 8 نوافذ لكل واحد. يكفي.","تحقّق بالمنطق: هل جوابك أكبر من كل سكان قطر؟ أم أقل من واحد لكل شخص؟","الخطأ بمقدار الضعف يسجّل نتيجة جيدة. لا تُرهق نفسك بآخر رقم.","لا تعرف من أين تبدأ؟ ابدأ بعدد السكان، ثم اسأل كم شخصاً يفعلها في اليوم."];
 var CAT_AR={"Facts":"حقائق","Sport":"الرياضة","Food & drink":"الأكل والشرب","Roads":"الطرق","Geography":"الجغرافيا","Travel":"السفر","Money":"المال","Resources":"الموارد","Everyday Qatar":"قطر اليومية","Doha life":"حياة الدوحة"};
@@ -2301,9 +2374,10 @@ function ask(n){
   if(un)un.onchange=function(){var p=load("rq-units",{});p[q.u]=un.value;save("rq-units",p);inp.oninput();try{inp.focus({preventScroll:true})}catch(e){}};
   function lock(){
     var x=val();if(busy||!ok(x)||st.g.length!==n)return;busy=true;
-    var c=cur(),bx=x*c[1];st.un=st.un||[];st.un[n]=c[0];st.g.push(bx);st.s.push(score(bx,q));st.r=true;if(st.g.length===3)st.pd=today;
-    if(st.g.length===3&&!bonus){stats.played++;stats.total+=st.s.reduce(function(a,b){return a+b},0);if(day===today&&stats.last!==today){stats.streak=(stats.last===today-1)?stats.streak+1:1;stats.last=today;if(stats.streak%STREAK_COIN_EVERY===0&&awardCoin(today))st.cg=1}save("tk7-stats",stats);streak()}
-    saveState();pendingSend=sendAnswer(n);if(st.g.length===3&&!bonus)pushDay(day);busy=false;render()}
+    var c=cur(),bx=x*c[1];st.un=st.un||[];st.un[n]=c[0];st.g.push(bx);st.s.push(score(bx,q));st.r=true;if(st.g.length===3)st.pd=dayNum();saveState();
+    if(!bonus){if(st.g.length===1)ga("game_start");if(st.g.length===3)ga("game_complete",{score:Math.round((st.s[0]+st.s[1]+st.s[2])/3)})}
+    if(st.g.length===3&&!bonus){deriveStats();if(stats.last===day&&stats.streak>0&&stats.streak%STREAK_COIN_EVERY===0&&awardCoin(day)){st.cg=1;saveState()}streak();if(window.RQGroups&&window.RQGroups.pushProfile)try{window.RQGroups.pushProfile(day)}catch(e){}}
+pendingSend=sendAnswer(n);if(st.g.length===3&&!bonus)pushDay(day);busy=false;render()}
   go.onclick=lock;inp.onkeydown=function(e){if(e.key==="Enter"&&!e.repeat)lock()};
   setTimeout(function(){try{inp.focus({preventScroll:true})}catch(e){}},80);
 }
@@ -2401,55 +2475,22 @@ function giftShow(){
   popup({title:A?"شكراً لدعمك":"Thank you for playing",
     body:A?"كنت معنا في أيام التجربة، وملاحظاتك تصنع اللعبة. هديتنا لك عملتان من عملات السلسلة، وكل عملة تفتح جولة إضافية بثلاثة أسئلة جديدة.":"You’ve been with Roughly Qatar through its testing days, and your support is shaping the game. As a thank you, here are 2 streak coins. Each one unlocks an extra game of three fresh questions.",
     btn:A?"استلم العملتين":"Claim my 2 coins",
-    done:function(){var c=coinsGet();c.n=Math.min(99,c.n+2);coinsSet(c);try{localStorage.setItem("rq-gift","d")}catch(e){}streak();if(!intro&&st.g.length>=3&&!st.r)render()}})}
-/* ===== Dev tab: coins for this device, and gift links for other players =====
-   Not real security. The password and the gift key live in this file, so anyone who reads the source can get past them.
-   Coins are device-only and never touch streaks, stats or boards, so the worst case is a free bonus game. */
-function h53(s){var h1=0xdeadbeef,h2=0x41c6ce57,i,c;for(i=0;i<s.length;i++){c=s.charCodeAt(i);h1=Math.imul(h1^c,2654435761);h2=Math.imul(h2^c,1597334677)}h1=Math.imul(h1^(h1>>>16),2246822507)^Math.imul(h2^(h2>>>13),3266489909);h2=Math.imul(h2^(h2>>>16),2246822507)^Math.imul(h1^(h1>>>13),3266489909);return (4294967296*(2097151&h2)+(h1>>>0)).toString(36)}
-var DEVH="1ufnauzhjdw",GKEY="rq-gift-v1",devOK=false,devTries=0;
-function giftSig(n,id){return h53("gift|"+n+"|"+id+"|"+GKEY)}
-function giftBase(){return location.protocol==="file:"?"https://"+SITE:location.origin+location.pathname}
-function devClose(){closeSheet();if(!intro&&st.g.length>=3&&!st.r)render()}
-function openDev(msg){
-  var g=function(i){return document.getElementById(i)},c=coinsGet(),body;
-  if(!devOK){
-    body="<p class='sub'>Owner tools. Enter the code to continue.</p><input id='dpw' class='inp' type='password' inputmode='numeric' autocomplete='off' maxlength='12' placeholder='Code'><p class='err' id='dpe'></p><button class='main' id='dgo' style='margin-top:12px'>Unlock</button>"}
-  else{
-    body="<p class='sub'>This device has <b id='dcn'>"+c.n+"</b> coin"+(c.n===1?"":"s")+".</p>"+
-    "<label class='nl' for='dn' style='margin-top:6px'>Add coins to this device</label><input id='dn' class='inp' type='number' inputmode='numeric' min='1' max='99' value='1'>"+
-    "<button class='main' id='dadd' style='margin-top:10px'>Add coins</button>"+
-    "<button class='ghost' id='dzero' style='width:100%;margin-top:8px;flex:none'>Reset to 0</button>"+
-    "<h3 class='bh' style='margin-top:22px'>Gift another player</h3><p class='sub'>Coins stay on each device, so this makes a link. When they open it they get the coins once, on that device.</p>"+
-    "<label class='nl' for='gn' style='margin-top:6px'>Coins in the gift</label><input id='gn' class='inp' type='number' inputmode='numeric' min='1' max='20' value='1'>"+
-    "<button class='main' id='gmk' style='margin-top:10px'>Make gift link</button><div id='gout'></div>"+
-    "<button class='lnk' id='dlock' style='margin:16px auto 0;display:block'>Lock again</button>"}
-  var sh=sheetShell("Dev",body);
-  g("sx").onclick=devClose;document.getElementById("scrim").onclick=devClose;
-  if(!devOK){
-    var tryIt=function(){
-      if(devTries>=5){g("dpe").textContent="Too many tries. Reload the page to try again.";return}
-      if(h53("rq-dev|"+g("dpw").value)===DEVH){devOK=true;devTries=0;openDev()}
-      else{devTries++;g("dpe").textContent="That isn’t it.";g("dpw").value="";g("dpw").focus()}};
-    g("dgo").onclick=tryIt;g("dpw").onkeydown=function(e){if(e.key==="Enter")tryIt()};
-    setTimeout(function(){try{g("dpw").focus()}catch(e){}},50);return}
-  var num=function(id,mx){var v=parseInt(g(id).value,10);return isNaN(v)?1:Math.max(1,Math.min(mx,v))};
-  g("dadd").onclick=function(){var cc=coinsGet();cc.n=Math.min(99,cc.n+num("dn",99));coinsSet(cc);g("dcn").textContent=cc.n;};
-  g("dzero").onclick=function(){var cc=coinsGet();cc.n=0;coinsSet(cc);g("dcn").textContent="0"};
-  g("dlock").onclick=function(){devOK=false;openDev()};
-  g("gmk").onclick=function(){
-    var n=num("gn",20),id=Math.random().toString(36).slice(2,8).replace(/[^a-z0-9]/g,"x");while(id.length<6)id+="x";
-    var url=giftBase()+"?gift="+n+"."+id+"."+giftSig(n,id);
-    g("gout").innerHTML="<textarea class='linkbox' id='glk' rows='3' readonly></textarea><button class='ghost' id='gcp' style='width:100%;margin-top:8px;flex:none'>Copy link</button>";
-    g("glk").value=url;
-    g("gcp").onclick=function(){var t=g("glk");t.focus();t.select();var ok=false;try{ok=document.execCommand("copy")}catch(e){}
-      if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(url).then(function(){g("gcp").textContent="Copied"},function(){g("gcp").textContent=ok?"Copied":"Press and hold to copy"})}else g("gcp").textContent=ok?"Copied":"Press and hold to copy"}}}
+    done:function(){grantCoins("thanks",2);try{localStorage.setItem("rq-gift","d")}catch(e){}streak();if(!intro&&st.g.length>=3&&!st.r)render()}})}
+/* ===== Gift links, made in dev.html: ?gift2=<id>. The gift lives in Firestore gifts/{id}; the rules let a player claim it
+   once, only while unclaimed, so links can't be forged or reused. Old ?gift= links (signed with a key that used to sit in
+   this file) are retired and say so. */
 function devGiftShow(){
-  var gf=window.__rqGift;if(!gf)return;window.__rqGift=null;
-  var A=LANG==="ar",n=gf[0],id=gf[1],used=load("rq-gifts",[]);if(!Array.isArray(used))used=[];
-  if(n<1||n>20||giftSig(n,id)!==gf[2])return;
-  if(used.indexOf(id)>=0){popup({title:A?"استُخدمت هذه الهدية":"Gift already claimed",body:A?"استلمت هذه الهدية من قبل على هذا الجهاز.":"This gift link has already been used on this device.",btn:A?"حسناً":"OK"});return}
-  popup({title:A?"هدية لك":"A gift for you",body:A?"وصلتك "+faD(n)+(n===1?" عملة":" عملات")+" من عملات السلسلة. كل عملة تفتح جولة إضافية بثلاثة أسئلة جديدة.":"You got "+n+" streak coin"+(n===1?"":"s")+". Each one unlocks a bonus round of three fresh questions.",btn:A?"استلم":"Claim",
-    done:function(){var u=load("rq-gifts",[]);if(!Array.isArray(u))u=[];if(u.indexOf(id)<0){u.push(id);save("rq-gifts",u.slice(-50));var c=coinsGet();c.n=Math.min(99,c.n+n);coinsSet(c)}if(!intro&&st.g.length>=3&&!st.r)render()}})}
+  var gf=window.__rqGift;if(!gf)return;window.__rqGift=null;var A=LANG==="ar";
+  var bad=function(t,b){popup({title:t,body:b,btn:A?"حسناً":"OK"})};
+  if(gf.old){bad(A?"انتهت صلاحية رابط الهدية":"This gift link has expired",A?"اطلب رابطاً جديداً ممن أرسله لك.":"Ask whoever sent it for a new one.");return}
+  if(ledger().g["gift:"+gf.id]!=null){bad(A?"استُخدمت هذه الهدية":"Gift already claimed",A?"استلمت هذه الهدية من قبل.":"You’ve already claimed this gift.");return}
+  var t=0;(function w(){var R=window.RQGroups;if(R&&R.enabled&&R.giftGet){go(R);return}if((R&&!R.enabled)||t++>60)return;setTimeout(w,250)})();
+  function go(R){R.giftGet(gf.id).then(function(g){
+    if(!g||!(g.n>=1)){bad(A?"رابط الهدية غير صالح":"This gift link doesn’t work",A?"اطلب رابطاً جديداً ممن أرسله لك.":"Ask whoever sent it for a new one.");return}
+    if(g.claimedBy&&!g.mine){bad(A?"استُخدمت هذه الهدية":"Gift already claimed",A?"هذا الرابط استُخدم على جهاز آخر.":"This link has already been used.");return}
+    popup({title:A?"هدية لك":"A gift for you",body:A?"وصلتك "+faD(g.n)+(g.n===1?" عملة":" عملات")+" من عملات السلسلة. كل عملة تفتح جولة إضافية بثلاثة أسئلة جديدة.":"You got "+g.n+" streak coin"+(g.n===1?"":"s")+". Each one unlocks a bonus round of three fresh questions.",btn:A?"استلم":"Claim",
+      done:function(){R.giftClaim(gf.id).then(function(ok){if(ok){grantCoins("gift:"+gf.id,g.n);streak();if(!intro&&st.g.length>=3&&!st.r)render()}else bad(A?"تعذّر استلام الهدية":"Couldn’t claim the gift",A?"جرّب مرة أخرى لاحقاً.":"Please try again in a moment.")})}})
+  },function(){})}}
 function explainCoins(){
   var A=LANG==="ar",left=STREAK_COIN_EVERY-(stats.streak%STREAK_COIN_EVERY);
   popup({title:A?"كيف تعمل عملات السلسلة":"How streak coins work",
@@ -2470,19 +2511,20 @@ function done(){
   "<div class='revg'>"+chartSlot("day")+"</div></div>"+
   h2h(avg)+
   "<div class='qres'>"+qrows+"</div><div class='shrow'><button class='main shareb' id='dsh'>"+tr("Dashboard")+"</button><button class='main shareb' id='sh'>"+tr("Share result")+"</button></div></div>"+
-  "<div class='drop0"+(ARCHIVE_OPEN?"":" nb")+"'><div class='dropin'><small>"+tr("Next drop in")+"</small><b id='cdn'>"+fmtDur(nextMidnight())+"</b></div>"+(ARCHIVE_OPEN?"<button class='pastdrops' id='arch'>"+tr("Play past drops")+"</button>":"")+"</div>"+coinCard()+"<div id='gnudge'></div>");
+  (!bonus&&day<dayNum()?"<div class='drop0'><div class='dropin'><small>"+(LANG==="ar"?"أسئلة اليوم جاهزة":"Today’s drop is out")+"</small></div><button class='pastdrops' id='tnew'>"+(LANG==="ar"?"العب أسئلة اليوم":"Play today’s drop")+"</button>":"<div class='drop0"+(ARCHIVE_OPEN?"":" nb")+"'><div class='dropin'><small>"+tr("Next drop in")+"</small><b id='cdn'>"+fmtDur(nextMidnight())+"</b></div>")+(ARCHIVE_OPEN?"<button class='pastdrops' id='arch'>"+tr("Play past drops")+"</button>":"")+"</div>"+coinCard()+"<div id='gnudge'></div>");
   app.classList.add("plain");
   document.getElementById("sh").onclick=function(){openShare(tot)};
   document.getElementById("dsh").onclick=function(){landOn=false;intro=true;render();window.scrollTo(0,0)};
   var ab=document.getElementById("arch");if(ab)ab.onclick=function(){var d=new Date(day*864e5);cm={y:d.getUTCFullYear(),m:d.getUTCMonth()};openMenu()};
-  wireCoin();
+  wireCoin();var tn=document.getElementById("tnew");if(tn)tn.onclick=function(){today=dayNum();selectDay(today);intro=false;render();window.scrollTo(0,0)};
   if(!bonus&&st.cg&&!st.cgs){st.cgs=1;saveState();setTimeout(earnedShow,600)}
   if(cdTimer)clearInterval(cdTimer);
   cdTimer=setInterval(function(){var el=document.getElementById("cdn");if(!el){clearInterval(cdTimer);cdTimer=null;return}el.textContent=fmtDur(nextMidnight())},1000);
   animate(avg,pc);chartLater("day",0,avg,viewTok);
-  if(groupsOn()&&day===today&&!bonus)window.RQGroups.submitDay(day,avg);
+  if(groupsOn()&&day===today&&!bonus&&!gokDay(day))window.RQGroups.submitDay(day,avg);
   groupNudge();
 }
+function gokDay(d){try{return !!localStorage.getItem("rq-gok-"+d)}catch(e){return false}}
 function groupNudge(){
   if(!groupsOn())return;var gel=document.getElementById("gnudge");if(!gel||gel.getAttribute("data-on"))return;gel.setAttribute("data-on","1");
   gel.innerHTML="<button class='gbtn' id='gnb'>"+ICON_USERS+"<div><b>"+(LANG==="ar"?"المجموعات":"Groups")+"</b><span id='gnbsub'>"+(LANG==="ar"?"لوحات أسبوعية · ادعُ أصدقاءك":"Weekly leaderboards · invite friends")+"</span></div>"+ICON_R+"</button>";var nb=document.getElementById("gnb");if(nb)nb.onclick=function(){openGroups()};window.RQGroups.listGroups().then(function(gs){var sub=document.getElementById("gnbsub");if(sub&&gs&&gs.length){var best=gs.slice().sort(function(a,b){return (a.myRank||99)-(b.myRank||99)})[0];sub.textContent=(LANG==="ar"?faD(gs.length)+" مجموعات · أفضل #"+faD(best.myRank||"-"):gs.length+" group"+(gs.length>1?"s":"")+" · best #"+(best.myRank||"-")+" this week")}},function(){});
@@ -2494,8 +2536,12 @@ document.getElementById("menu").onclick=function(){var d=new Date(day*864e5);cm=
 document.getElementById("lang").onclick=toggleLang;
 document.getElementById("homeb").onclick=function(){selectDay(today);landOn=false;intro=true;render();window.scrollTo(0,0)};
 document.querySelector(".wordmark").onclick=function(){selectDay(today);landOn=true;intro=true;render();window.scrollTo(0,0)};
-document.addEventListener("visibilitychange",function(){if(!document.hidden&&dayNum()!==day){init();streak();render()}});
-applyLang();init();streak();render();setTimeout(function(){devGiftShow();giftShow()},900);
+document.addEventListener("visibilitychange",function(){if(document.hidden)return;var nd=dayNum();if(nd===today)return;
+  if(!bonus&&!intro&&day===today&&st.g.length>0&&(st.g.length<3||st.r)){today=nd;deriveStats();streak();return} /* mid-game at midnight: finish it, it counts for its own day */
+  init();streak();render()});
+applyLang();gaInit();init();streak();render();
+(function(){var iv=window.__rqG;try{iv=iv||sessionStorage.getItem("rq-inv")}catch(e){}if(iv&&/^[0-9a-z]{7}$/.test(iv))window.RQ_inviteFlow(iv)})();
+setTimeout(function(){devGiftShow();if(!document.getElementById("sheet").classList.contains("open"))giftShow()},900);
 if(API&&acct().t)pullSync().then(function(c){if(c){streak();selectDay(day);if(!busy)render()}},function(){});
 /* Auto-update: if a newer build is published, reload once (heals stale browser cache). */
 (function(){var B=window.RQ_BUILD;if(!B)return;var KEY="rq-build-seen",last=0;
@@ -2566,11 +2612,49 @@ if(!firebaseConfig||!firebaseConfig.apiKey){
     const V="10.12.5",B="https://www.gstatic.com/firebasejs/"+V+"/";
     const [A,AU,FS]=await Promise.all([import(B+"firebase-app.js"),import(B+"firebase-auth.js"),import(B+"firebase-firestore.js")]);
     const app=A.initializeApp(firebaseConfig),auth=AU.getAuth(app),db=FS.getFirestore(app);
-    const {onAuthStateChanged,signInAnonymously,GoogleAuthProvider,linkWithPopup,signInWithPopup}=AU;
+    const {onAuthStateChanged,signInAnonymously,GoogleAuthProvider,linkWithPopup,signInWithPopup,signInWithCredential,updateCurrentUser}=AU;
     const {doc,getDoc,setDoc,updateDoc,deleteDoc,collection,getDocs,query,where,limit,arrayUnion,arrayRemove,serverTimestamp}=FS;
     let resolveReady;const ready=new Promise(r=>resolveReady=r);
     onAuthStateChanged(auth,u=>{if(!u){signInAnonymously(auth).catch(()=>{});}else{resolveReady(u);}});
     const uid=()=>auth.currentUser&&auth.currentUser.uid;
+    const isG=()=>{const u=auth.currentUser;return !!(u&&!u.isAnonymous);};
+    let LG=null;const BC={};const dropGroupCache=id=>{LG=null;if(id)delete BC[id];else for(const k in BC)delete BC[k];};
+    // ---- Profile (Firestore players/{uid}, Doha). Google accounts sync finished days, the coin ledger and the streak carry.
+    // Anonymous players only read it, at most once a day, to pick up coins an admin granted them.
+    async function syncProfile(fromA){
+      const u=auth.currentUser;if(!u)return;const ref=doc(db,"players",u.uid);let snap;
+      try{snap=await getDoc(ref);}catch(e){return;}
+      try{localStorage.setItem("rq-pchk",String(Date.now()));}catch(e){}
+      const cloud=snap.exists()?snap.data():null;
+      if(cloud&&window.RQ_applyProfile&&window.RQ_applyProfile(cloud)&&window.RQ_profileApplied)window.RQ_profileApplied();
+      if(u.isAnonymous)return;
+      const P=window.RQ_profile(),nm=gClean(u.displayName||gName()||"Player")||"Player";
+      const base={name:nm,nameLower:nm.toLowerCase(),email:u.email||"",emailLower:(u.email||"").toLowerCase(),coins:P.coins,carry:P.carry,upd:serverTimestamp()};
+      if(!cloud||!cloud.days){const body=Object.assign({},base,{days:P.days});if(!cloud){body.created=serverTimestamp();await setDoc(ref,body);}else await updateDoc(ref,body);return;}
+      const upd=Object.assign({},base);for(const d in P.days)if(cloud.days[d]!==P.days[d])upd["days."+d]=P.days[d];
+      if(fromA){upd.mergedFrom=fromA;upd.merged=arrayUnion(fromA);}
+      try{await updateDoc(ref,upd);}
+      catch(e){const t=Math.floor(Date.now()/864e5),keep={};for(const k in upd){const m=/^days\.(\d+)$/.exec(k);if(k!=="merged"&&k!=="mergedFrom"&&(!m||Math.abs(+m[1]-t)<=1))keep[k]=upd[k];}
+        try{await updateDoc(ref,keep);}catch(x){}}}
+    let pushT=null,pushDays={};
+    function pushProfile(day){if(!isG())return;if(day)pushDays[day]=1;clearTimeout(pushT);
+      pushT=setTimeout(async()=>{const u=auth.currentUser;if(!u||u.isAnonymous)return;const P=window.RQ_profile(),upd={coins:P.coins,carry:P.carry,upd:serverTimestamp()};
+        for(const d in pushDays)if(P.days[d])upd["days."+d]=P.days[d];pushDays={};
+        try{await updateDoc(doc(db,"players",u.uid),upd);}catch(e){try{await syncProfile();}catch(x){}}},1500);}
+    // An anonymous player signed in to a Google account that already exists: move its group seats and this week's
+    // scores to that account. aliases/{anon} (written by the anonymous user) is what lets the rules allow it.
+    async function handover(a,g){
+      for(const id of gList()){try{
+        const ref=doc(db,"groups",id),gs=await getDoc(ref);if(!gs.exists())continue;const m=gs.data().memberUids||[];if(m.indexOf(a)<0)continue;
+        const nm=m.filter(x=>x!==a);if(nm.indexOf(g)<0)nm.push(g);
+        await updateDoc(ref,{memberUids:nm,swapFrom:a});
+        let mname=gName()||"Player";try{const ms=await getDoc(doc(db,"groups",id,"members",a));if(ms.exists()&&ms.data().name)mname=ms.data().name;}catch(e){}
+        await setDoc(doc(db,"groups",id,"members",g),{name:mname,joinedAt:serverTimestamp()},{merge:true});
+        const ss=await getDocs(query(collection(db,"groups",id,"scores"),where("day","in",gWeek(gToday()))));const had={};
+        ss.forEach(x=>{const v=x.data();if(v.uid===g)had[v.day]=1;});
+        for(const x of ss.docs){const v=x.data();if(v.uid!==a||had[v.day])continue;try{await setDoc(doc(db,"groups",id,"scores",v.day+"__"+g),{uid:g,name:mname,day:v.day,avg:v.avg,from:a});}catch(e){}}
+      }catch(e){}}
+      dropGroupCache();}
     FSq=(day,qi)=>getDocs(query(collection(db,"answers"),where("day","==",day),where("qi","==",qi),limit(5000))).then(qs=>qs.docs.map(x=>x.data()));
     // Write today's score (if today's drop is finished) to one group straight away.
     async function writeToday(id,name){const a=gTodayAvg();if(!a)return;const me=uid(),d=gToday();
@@ -2580,30 +2664,57 @@ if(!firebaseConfig||!firebaseConfig.apiKey){
       let ok=true;
       if(last&&last!==u){for(const id of gList()){try{const s=await getDoc(doc(db,"groups",id));if(!s.exists()){gForget(id);continue;}
         if((s.data().memberUids||[]).indexOf(u)<0){await updateDoc(doc(db,"groups",id),{memberUids:arrayUnion(u)});
-          await setDoc(doc(db,"groups",id,"members",u),{name:gName()||"Player",joinedAt:serverTimestamp()});}}catch(e){ok=false;}}}
+          await setDoc(doc(db,"groups",id,"members",u),{name:gName()||"Player",joinedAt:serverTimestamp()});}}catch(e){if(e&&/permission/i.test(e.code||e.message||""))gForget(id);else ok=false;}}}
       if(ok){try{localStorage.setItem(UKEY,u);}catch(e){}}}
     async function myGroupDocs(){await ready;const qs=await getDocs(query(collection(db,"groups"),where("memberUids","array-contains",uid())));return qs.docs;}
     const APIg={
       enabled:true, ready,
-      user(){const u=auth.currentUser;return u?{uid:u.uid,anon:u.isAnonymous,email:u.email||"",name:gName()}:null;},
+      user(){const u=auth.currentUser;return u?{uid:u.uid,anon:u.isAnonymous,email:u.email||"",name:u.displayName||gName()}:null;},
+      pushProfile,
+      async signIn(){await ready;const prov=new GoogleAuthProvider();try{prov.setCustomParameters({prompt:"select_account"});}catch(e){}
+        const a=auth.currentUser;let from=null;
+        try{await linkWithPopup(a,prov);}   // same user id: nothing moves, the device history uploads once
+        catch(e){if(!(e&&e.code==="auth/credential-already-in-use"))throw e;
+          const cred=GoogleAuthProvider.credentialFromError(e);if(!cred)throw e;
+          // Keep the anonymous user signed in on a second Auth instance so it can hand over after we switch.
+          const app2=A.initializeApp(firebaseConfig,"rq-handover-"+Date.now()),auth2=AU.getAuth(app2),db2=FS.getFirestore(app2);
+          try{await updateCurrentUser(auth2,a);}catch(x){}
+          await signInWithCredential(auth,cred);const g=auth.currentUser.uid;
+          if(a&&a.uid!==g){from=a.uid;try{await setDoc(doc(db2,"aliases",a.uid),{to:g,at:serverTimestamp()});}catch(x){}await handover(a.uid,g);}
+          try{await AU.signOut(auth2);await A.deleteApp(app2);}catch(x){}}
+        try{localStorage.setItem(UKEY,auth.currentUser.uid);}catch(e){}
+        try{await syncProfile(from);}catch(e){}const t=gTodayAvg();if(t)APIg.submitDay(gToday(),t,true);
+        return APIg.user();},
+      async linkGoogle(){return APIg.signIn();},
+      async signOut(){await AU.signOut(auth);try{localStorage.removeItem(GKEY);localStorage.removeItem(UKEY);localStorage.removeItem("rq-pchk");}catch(e){}dropGroupCache();return true;},
+      async giftGet(id){await ready;const sn=await getDoc(doc(db,"gifts",id));if(!sn.exists())return null;const d=sn.data();return {n:d.n|0,claimedBy:d.claimedBy||null,mine:!!d.claimedBy&&d.claimedBy===uid()};},
+      async giftClaim(id){await ready;try{await updateDoc(doc(db,"gifts",id),{claimedBy:uid(),claimedAt:serverTimestamp()});return true;}
+        catch(e){try{const sn=await getDoc(doc(db,"gifts",id));return sn.exists()&&sn.data().claimedBy===uid();}catch(x){return false;}}},
+      async removeMember(id,who){await ready;const ref=doc(db,"groups",id),gs=await getDoc(ref);if(!gs.exists())throw new Error("Group not found");const d=gs.data();
+        if(d.ownerUid!==uid())throw new Error("Only the group’s creator can remove members");if(who===d.ownerUid)throw new Error("The creator can’t be removed");
+        const rm=(d.removed||[]).slice();if(rm.indexOf(who)<0)rm.push(who);
+        await updateDoc(ref,{memberUids:(d.memberUids||[]).filter(x=>x!==who),removed:rm});dropGroupCache(id);return true;},
       async createGroup(name){await ready;name=gClean(name);if(!name)throw new Error("Give the group a name");const id=gGenId(),u=uid();
         await setDoc(doc(db,"groups",id),{name,ownerUid:u,memberUids:[u],createdAt:serverTimestamp()});
         await setDoc(doc(db,"groups",id,"members",u),{name:gName()||"Player",joinedAt:serverTimestamp()});
-        gRemember(id);await writeToday(id);try{localStorage.removeItem("rq-gok-"+gToday());}catch(e){}
+        gRemember(id);dropGroupCache();try{window.ga&&window.ga("group_create");}catch(e){}await writeToday(id);try{localStorage.removeItem("rq-gok-"+gToday());}catch(e){}
         return {id,name};},
-      async groupMeta(id){await ready;if(!GID_RE.test(id))throw new Error("That code doesn’t look right");const s=await getDoc(doc(db,"groups",id));if(!s.exists())throw new Error("No group with that code");const d=s.data();return {id,name:d.name,isMember:(d.memberUids||[]).indexOf(uid())>=0,members:(d.memberUids||[]).length};},
-      async joinGroup(id,name){await ready;const meta=await this.groupMeta(id),u=uid();
+      async groupMeta(id){await ready;if(!GID_RE.test(id))throw new Error("That code doesn’t look right");const s=await getDoc(doc(db,"groups",id));if(!s.exists())throw new Error("No group with that code");const d=s.data();return {id,name:d.name,isMember:(d.memberUids||[]).indexOf(uid())>=0,removed:(d.removed||[]).indexOf(uid())>=0,members:(d.memberUids||[]).length};},
+      async joinGroup(id,name,known){await ready;const meta=known&&known.id===id?known:await this.groupMeta(id),u=uid();
+        if(meta.removed)throw new Error("The group’s creator removed you from this group");dropGroupCache(id);
         if(!meta.isMember)await updateDoc(doc(db,"groups",id),{memberUids:arrayUnion(u)});
         await setDoc(doc(db,"groups",id,"members",u),{name:gClean(name)||gName()||"Player",joinedAt:serverTimestamp()});
-        gRemember(id);await writeToday(id,name);try{localStorage.removeItem("rq-gok-"+gToday());}catch(e){}
+        gRemember(id);try{if(!meta.isMember&&window.ga)window.ga("group_join");}catch(e){}await writeToday(id,name);try{localStorage.removeItem("rq-gok-"+gToday());}catch(e){}
         return {id,name:meta.name};},
-      async leaveGroup(id){await ready;const u=uid();await updateDoc(doc(db,"groups",id),{memberUids:arrayRemove(u)});gForget(id);try{await deleteDoc(doc(db,"groups",id,"members",u));}catch(e){}return true;},
-      async listGroups(){const docs=await myGroupDocs(),wk=gWeek(gToday()),me=uid(),out=[];
+      async leaveGroup(id){await ready;dropGroupCache(id);const u=uid();await updateDoc(doc(db,"groups",id),{memberUids:arrayRemove(u)});gForget(id);try{await deleteDoc(doc(db,"groups",id,"members",u));}catch(e){}return true;},
+      listGroups(){if(LG&&Date.now()-LG.t<60000)return LG.p;const p=APIg._listGroups();LG={t:Date.now(),p};p.catch(()=>{LG=null;});return p;},
+      async _listGroups(){const docs=await myGroupDocs(),wk=gWeek(gToday()),me=uid(),out=[];
         for(const g of docs){let my=0,rank=0;gRemember(g.id);
           try{const ss=await getDocs(query(collection(db,"groups",g.id,"scores"),where("day","in",wk)));const tot={};ss.forEach(x=>{const d=x.data();tot[d.uid]=(tot[d.uid]||0)+(d.avg||0);});my=tot[me]||0;rank=1;for(const k in tot)if(tot[k]>my)rank++;}catch(e){rank=0;}
           out.push({id:g.id,name:g.data().name,members:(g.data().memberUids||[]).length,myTotal:Math.round(my),myRank:rank});}
         return out;},
-      async board(id){await ready;const wk=gWeek(gToday()),me=uid();
+      board(id,fresh){const c=BC[id];if(!fresh&&c&&Date.now()-c.t<60000)return c.p;const p=APIg._board(id);BC[id]={t:Date.now(),p};p.catch(()=>{delete BC[id];});return p;},
+      async _board(id){await ready;const wk=gWeek(gToday()),me=uid();
         const [g,ms,ss]=await Promise.all([
           getDoc(doc(db,"groups",id)),
           getDocs(collection(db,"groups",id,"members")).catch(()=>null),
@@ -2614,13 +2725,13 @@ if(!firebaseConfig||!firebaseConfig.apiKey){
         const tot={},cnt={},tdy={},t0=gToday();if(ss)ss.forEach(x=>{const d=x.data();tot[d.uid]=(tot[d.uid]||0)+(d.avg||0);cnt[d.uid]=(cnt[d.uid]||0)+1;if(d.day===t0)tdy[d.uid]=d.avg||0;if(d.name&&!names[d.uid])names[d.uid]=d.name;});
         const uids=g.data().memberUids||[];
         const rows=uids.map(u=>({uid:u,name:names[u]||"Player",total:Math.round(tot[u]||0),days:cnt[u]||0,avg:cnt[u]?tot[u]/cnt[u]:0,today:Math.round(tdy[u]||0),you:u===me})).sort((a,b)=>b.total-a.total);
-        return {id,name:g.data().name,members:uids.length,rows};},
+        const owner=g.data().ownerUid;return {id,name:g.data().name,members:uids.length,rows,owner,iOwn:owner===me};},
       // Writes one finished day (today or yesterday) to every group I'm in. Returns true only if every write landed.
       // If anything fails it is remembered (rq-gdirty) and retried: a few times right away, on reconnect, and whenever the app is reopened.
       async submitDay(day,avg,quiet){const t=gToday();if(day!==t&&day!==t-1)return false;
         try{await ready;avg=Math.max(1,Math.min(100,Math.round(avg)));const docs=await myGroupDocs(),me=uid(),nm=gName()||"Player";
           const res=await Promise.all(docs.map(g=>setDoc(doc(db,"groups",g.id,"scores",day+"__"+me),{uid:me,name:nm,day,avg},{merge:true}).then(()=>true,()=>false)));
-          if(res.every(Boolean)){try{localStorage.removeItem("rq-gdirty");localStorage.setItem("rq-gok-"+day,"1");}catch(e){}return true;}
+          if(res.every(Boolean)){try{localStorage.removeItem("rq-gdirty");localStorage.setItem("rq-gok-"+day,"1");}catch(e){}dropGroupCache();return true;}
         }catch(e){}
         try{localStorage.setItem("rq-gdirty","1");}catch(e){}
         if(!quiet)gRetry(0);
@@ -2666,11 +2777,6 @@ if(!firebaseConfig||!firebaseConfig.apiKey){
         const per={};all.forEach(ds=>ds.forEach(d=>{if(ids.indexOf(d.qi)<0||!(d.s>=1&&d.s<=100))return;(per[d.uid]=per[d.uid]||{})[d.qi]=d.s;}));
         const bins=new Array(20).fill(0);let n=0,sum=0;for(const u in per){const v=Object.keys(per[u]).map(k=>per[u][k]);if(v.length<3)continue;const a=Math.round(v.reduce((p,c)=>p+c,0)/v.length);bins[Math.min(19,Math.floor(a/5))]++;n++;sum+=a;}
         return {n,dist:bins,sum};},
-      async linkGoogle(){await ready;const prov=new GoogleAuthProvider();
-        try{await linkWithPopup(auth.currentUser,prov);}
-        catch(e){if(e&&e.code==="auth/credential-already-in-use")await signInWithPopup(auth,prov);else throw e;}
-        await restore();const a=gTodayAvg();if(a)await APIg.submitDay(gToday(),a);
-        const u=auth.currentUser;return {email:u.email||"",name:u.displayName||gName()};}
     };
     window.RQGroups=APIg;
     const gDelays=[4000,15000,60000];
@@ -2685,7 +2791,8 @@ if(!firebaseConfig||!firebaseConfig.apiKey){
       const a=gTodayAvg();if(a&&!gok(gToday()))APIg.submitDay(gToday(),a);
       try{const y=window.RQ_dayAvg?window.RQ_dayAvg(gToday()-1):0;if(y&&!gok(gToday()-1))APIg.submitDay(gToday()-1,y,true);}catch(e){}
       try{const pd=+localStorage.getItem("rq-sgp");if(pd&&pd>=gToday()-1)APIg.submitGame(pd);}catch(e){}
-      const m=/[?&]g=([0-9a-z]{7})/.exec(location.search||"");const id=(m&&m[1])||window.__rqG;if(id&&window.RQ_inviteFlow)window.RQ_inviteFlow(id);});
+      try{const last=+localStorage.getItem("rq-pchk")||0;if(Date.now()-last>(isG()?600000:86400000))syncProfile();}catch(e){}
+      });
   }catch(e){window.RQGroups={enabled:false};}
 }
 </script>
