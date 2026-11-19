@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <title>Roughly Qatar – Daily Estimation Game</title>
-<script>window.RQ_BUILD="2026-11-18.3";</script>
+<script>window.RQ_BUILD="2026-11-19.1";</script>
 <meta name="description" content="A fresh set of three how-many questions about Qatar every day. No exact answers — just reason your way close. What would you have guessed?">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Roughly">
@@ -1808,7 +1808,9 @@ function coinMenu(){
       else note=A?"تصرف العملة من صفحة النتيجة بعد أن تنهي لعبة اليوم، أو احتفظ بها ليوم آخر.":"Spend a coin on your results page once today’s game is done, or keep it for another day.";
   return "<h3 class='bh' style='margin-top:20px'>"+(A?"عملات السلسلة":"Streak coins")+"</h3><div class='mi static'>"+ICON_COIN+"<div><b>"+(A?faD(c.n)+" عملة":c.n+" coin"+(c.n===1?"":"s"))+"</b><span>"+(A?"عملة لكل "+faD(STREAK_COIN_EVERY)+" أيام متتالية":"One for every "+STREAK_COIN_EVERY+" days of streak")+"</span></div></div>"+
   "<p class='note' style='margin-top:10px'>"+note+"</p>"}
-function openMenu(){
+function adminCheck(){var u=fbUser();if(!u||u.anon||window.__rqAdmin!==undefined||!window.RQGroups||!window.RQGroups.isAdmin)return;
+  window.__rqAdmin=false;window.RQGroups.isAdmin().then(function(a){window.__rqAdmin=!!a;var sh=document.getElementById("sheet");if(a&&sh&&sh.classList.contains("open")&&sh.querySelector("[data-act=groups]"))openMenu()},function(){window.__rqAdmin=undefined})}
+function openMenu(){setTimeout(adminCheck,0);
   var sh=document.getElementById("sheet"),sc=document.getElementById("scrim");
   var first=Date.UTC(cm.y,cm.m,1)/864e5,off=new Date(first*864e5).getUTCDay(),dim=new Date(Date.UTC(cm.y,cm.m+1,0)).getUTCDate();
   var sd=new Date(START*864e5),td=new Date(today*864e5),cur=cm.y*12+cm.m;
@@ -1829,7 +1831,7 @@ function openMenu(){
     if(b.hasAttribute("data-d")){selectDay(parseInt(b.getAttribute("data-d"),10));intro=false;closeSheet();render();window.scrollTo(0,0)}
     else if(b.hasAttribute("data-nav")){var v=cm.y*12+cm.m+parseInt(b.getAttribute("data-nav"),10);cm={y:Math.floor(v/12),m:v%12};openMenu()}
     else if(b.hasAttribute("data-home")){closeSheet();selectDay(today);landOn=false;intro=true;render();window.scrollTo(0,0)}
-    else if(b.hasAttribute("data-act")){var a=b.getAttribute("data-act");if(a==="signin")openSignIn();else if(a==="groups")openGroups();else if(a==="lang"){toggleLang();openMenu()}else if(a==="signout"){b.disabled=true;window.RQGroups.signOut().then(function(){openMenu()},function(){openMenu()})}else if(a==="copyid"){var uu=fbUser();if(uu)copyText(uu.uid,null,function(ok){b.textContent=ok?(LANG==="ar"?"تم النسخ":"Copied!"):uu.uid})}}
+    else if(b.hasAttribute("data-act")){var a=b.getAttribute("data-act");if(a==="signin")openSignIn();else if(a==="groups")openGroups();else if(a==="lang"){toggleLang();openMenu()}else if(a==="dev"){location.href="dev.html"}else if(a==="signout"){b.disabled=true;window.RQGroups.signOut().then(function(){openMenu()},function(){openMenu()})}else if(a==="copyid"){var uu=fbUser();if(uu)copyText(uu.uid,null,function(ok){b.textContent=ok?(LANG==="ar"?"تم النسخ":"Copied!"):uu.uid})}}
     else if(b.id==="mspend"){closeSheet();spendCoin()}
     else if(b.id==="sx")closeSheet()};
   sc.onclick=closeSheet;sh.classList.add("open");sc.classList.add("open");document.body.style.overflow="hidden";
@@ -2020,7 +2022,8 @@ function menuRows(){
   (gu?"<div class='mi static'>"+ICON_USER+"<div><b>"+(AR?"مسجّل الدخول":"Signed in")+"</b><span>"+esc(u.email||u.name||"")+"</span></div><button class='lnk' data-act='signout'>"+(AR?"خروج":"Sign out")+"</button></div>"
       :"<button class='mi' data-act='signin'>"+ICON_USER+"<div><b>"+(AR?"تسجيل الدخول":"Sign in")+"</b><span>"+(AR?"اختياري. تبقى سلسلتك وعملاتك ومجموعاتك معك على كل أجهزتك.":"Optional. Keep your streak, coins and groups on every device.")+"</span></div>"+ICON_R+"</button>")+
   "<button class='mi' data-act='groups'>"+ICON_USERS+"<div><b>"+(AR?"المجموعات":"Groups")+"</b><span>"+(AR?"نافس أصدقاءك على لوحة أسبوعية":"Race friends on a weekly leaderboard")+"</span></div>"+ICON_R+"</button>"+
-  "<button class='mi' data-act='lang'>"+ICON_LANG+"<div><b>"+(AR?"English":"العربية")+"</b><span>"+(AR?"Switch to English":"Switch to Arabic")+"</span></div>"+ICON_R+"</button>"+"</div>"+
+  "<button class='mi' data-act='lang'>"+ICON_LANG+"<div><b>"+(AR?"English":"العربية")+"</b><span>"+(AR?"Switch to English":"Switch to Arabic")+"</span></div>"+ICON_R+"</button>"+
+  (gu&&window.__rqAdmin?"<button class='mi' data-act='dev'>"+ICON_DEV+"<div><b>Dev</b><span>Players, coins, gift links, activity, analytics</span></div>"+ICON_R+"</button>":"")+"</div>"+
   (u?"<p class='pidl'>"+(AR?"رقم اللاعب":"Player ID")+" <b dir='ltr'>"+esc(u.uid.slice(0,8))+"</b> <button class='lnk' data-act='copyid'>"+(AR?"نسخ":"Copy")+"</button></p>":"")}
 var __sf=0;
 function fitSheet(){return;var sh=document.getElementById("sheet");if(!sh||!sh.classList.contains("open"))return;
@@ -2686,7 +2689,8 @@ if(!firebaseConfig||!firebaseConfig.apiKey){
         try{await syncProfile(from);}catch(e){}const t=gTodayAvg();if(t)APIg.submitDay(gToday(),t,true);
         return APIg.user();},
       async linkGoogle(){return APIg.signIn();},
-      async signOut(){await AU.signOut(auth);try{localStorage.removeItem(GKEY);localStorage.removeItem(UKEY);localStorage.removeItem("rq-pchk");}catch(e){}dropGroupCache();return true;},
+      async isAdmin(){if(!isG())return false;try{return (await getDoc(doc(db,"admins",uid()))).exists();}catch(e){return false;}},
+      async signOut(){await AU.signOut(auth);window.__rqAdmin=undefined;try{localStorage.removeItem(GKEY);localStorage.removeItem(UKEY);localStorage.removeItem("rq-pchk");}catch(e){}dropGroupCache();return true;},
       async giftGet(id){await ready;const sn=await getDoc(doc(db,"gifts",id));if(!sn.exists())return null;const d=sn.data();return {n:d.n|0,claimedBy:d.claimedBy||null,mine:!!d.claimedBy&&d.claimedBy===uid()};},
       async giftClaim(id){await ready;try{await updateDoc(doc(db,"gifts",id),{claimedBy:uid(),claimedAt:serverTimestamp()});return true;}
         catch(e){try{const sn=await getDoc(doc(db,"gifts",id));return sn.exists()&&sn.data().claimedBy===uid();}catch(x){return false;}}},
