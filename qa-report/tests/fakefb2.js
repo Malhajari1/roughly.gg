@@ -59,6 +59,6 @@ export async function getDocs(q){window.__gd.push(q.cpath);const all=(await kv("
 async function install(ctx,o={}){
   await ctx.route(/gstatic\.com\/firebasejs/,async r=>{const u=r.request().url();if(o.slowSdk)await new Promise(x=>setTimeout(x,o.slowSdk));
     r.fulfill({status:200,contentType:"application/javascript",headers:{"access-control-allow-origin":"*"},body:u.includes("firebase-app")?APP:u.includes("firebase-auth")?AUTH:FS});});
-  await ctx.route(/(googleapis\.com|firebaseio\.com|firebaseapp\.com|identitytoolkit|securetoken|googletagmanager|google-analytics)/,r=>{const u=r.request().url();if(/fonts\.googleapis\.com/.test(u))return r.continue();r.abort();});
+  await ctx.route(/(googleapis\.com|firebasedatabase\.app|firebaseio\.com|firebaseapp\.com|identitytoolkit|securetoken|googletagmanager|google-analytics)/,r=>{const u=r.request().url();if(/fonts\.googleapis\.com/.test(u))return r.continue();r.abort();});
 }
 module.exports={install};

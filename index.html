@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <title>Roughly Qatar – Daily Estimation Game</title>
-<script>window.RQ_BUILD="2026-11-19.1";</script>
+<script>window.RQ_BUILD="2026-11-21.1";</script>
 <meta name="description" content="A fresh set of three how-many questions about Qatar every day. No exact answers — just reason your way close. What would you have guessed?">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Roughly">
@@ -2589,7 +2589,7 @@ function gToday(){try{return window.RQ_today?window.RQ_today():Math.floor(Date.n
 /* Realtime Database for high-volume data (stats now; profiles next). Paste the database URL from
    Firebase console > Realtime Database once it exists, e.g. https://roughly-16260-default-rtdb.europe-west1.firebasedatabase.app
    and publish backend/database.rules.json there. Empty = the old Firestore stats path (cached). */
-const RTDB_URL="";
+const RTDB_URL="https://roughly-16260-default-rtdb.europe-west1.firebasedatabase.app";
 const SX={},QC={},SG={},TTL=600000;
 /* RTDB: one GET per day, shared by every screen; kept 10 min in memory and localStorage. Empty days are not kept long. */
 function sDoc(day){const c=SX[day];if(c&&Date.now()-c.t<c.ttl)return c.p;

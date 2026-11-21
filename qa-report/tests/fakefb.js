@@ -36,6 +36,6 @@ export async function getDocs(q){window.__gd=(window.__gd||[]);window.__gd.push(
 async function install(ctx){
   // Firebase SDK -> fakes; every other Google backend host -> aborted, as a second safety net.
   await ctx.route(/gstatic\.com\/firebasejs/,r=>{const u=r.request().url();r.fulfill({status:200,contentType:"application/javascript",headers:{"access-control-allow-origin":"*"},body:u.includes("firebase-app")?APP:u.includes("firebase-auth")?AUTH:FS});});
-  await ctx.route(/(googleapis\.com|firebaseio\.com|firebaseapp\.com|identitytoolkit|securetoken)/,r=>{const u=r.request().url();if(/fonts\.googleapis\.com/.test(u))return r.continue();r.abort();});
+  await ctx.route(/(googleapis\.com|firebasedatabase\.app|firebaseio\.com|firebaseapp\.com|identitytoolkit|securetoken)/,r=>{const u=r.request().url();if(/fonts\.googleapis\.com/.test(u))return r.continue();r.abort();});
 }
 module.exports={install};

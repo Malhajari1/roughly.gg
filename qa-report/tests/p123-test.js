@@ -1,5 +1,5 @@
 const {chromium,devices}=require('playwright');const {install}=require('./fakefb2.js');
-const U="http://127.0.0.1:8772/index.html",KV="http://127.0.0.1:8772/kv";let fails=0,B;
+const U="http://127.0.0.1:8772/rt.html",KV="http://127.0.0.1:8772/kv";let fails=0,B;
 const ok=(c,m,d)=>{console.log((c?"PASS ":"FAIL ")+m+(d!==undefined?" :: "+JSON.stringify(d):""));if(!c)fails++;};
 const kv=async(op,b)=>(await fetch(KV,{method:"POST",body:JSON.stringify(Object.assign({op},b||{}))})).json();
 const DOHA=s=>new Date(s+"+03:00");
