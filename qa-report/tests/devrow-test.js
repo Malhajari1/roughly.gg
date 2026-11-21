@@ -1,0 +1,15 @@
+const {chromium,devices}=require('playwright');const {install}=require('./fakefb2.js');
+const KV="http://127.0.0.1:8772/kv";const kv=async(op,b)=>(await fetch(KV,{method:"POST",body:JSON.stringify(Object.assign({op},b||{}))})).json();
+let fails=0;const ok=(c,m,d)=>{console.log((c?"PASS ":"FAIL ")+m+(d!==undefined?" :: "+JSON.stringify(d):""));if(!c)fails++;};
+(async()=>{const B=await chromium.launch();await fetch("http://127.0.0.1:8772/__reset");
+const c=await B.newContext({...devices["iPhone 13"]});await install(c);await c.addInitScript(()=>{localStorage.setItem("rq-gift","n")});const p=await c.newPage();const errs=[];p.on("pageerror",e=>errs.push(e.message));
+await p.goto("http://127.0.0.1:8772/index.html");await p.waitForFunction(()=>window.RQGroups&&window.RQGroups.user&&window.RQGroups.user());
+const menuHasDev=async()=>{await p.evaluate(()=>openMenu());await p.waitForTimeout(700);return !!(await p.$("[data-act=dev]"))};
+ok(!(await menuHasDev()),"anonymous player: no Dev row");
+await p.evaluate(()=>{window.__gEmail="swiss@example.com";closeSheet()});await p.evaluate(()=>window.RQGroups.signIn());
+ok(!(await menuHasDev()),"signed in but not an admin: no Dev row");
+const uid=await p.evaluate(()=>window.RQGroups.user().uid);await kv("set",{path:"admins/"+uid,v:{name:"SWISS"}});
+await p.evaluate(()=>{window.__rqAdmin=undefined;closeSheet()});ok(await menuHasDev(),"admin: Dev row appears in the menu");await p.screenshot({path:"t-menu-dev.png"});
+await p.click("[data-act=dev]");await p.waitForURL(/dev\.html/);await p.waitForSelector("[data-t]",{timeout:8000});ok(/swiss@example.com/.test(await p.textContent("#who")),"Dev row opens the Dev page, already signed in as the admin");
+await p.click("text=← Roughly");await p.waitForURL(u=>!/dev\.html/.test(u.toString()));ok(true,"back link returns to the game");
+ok(!errs.length,"no page errors",errs);await B.close();console.log(fails?fails+" FAILED":"ALL PASSED");process.exit(fails?1:0);})().catch(e=>{console.error(e);process.exit(2)});

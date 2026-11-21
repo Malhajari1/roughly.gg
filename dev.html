@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow, noai, noimageai">
+<title>Roughly Dev</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap">
+<style>
+:root{--c:#2f6bff;--ink:#141018;--mut:#7b7580;--line:#ecebf0;--bg:#f4f6fb}
+*{box-sizing:border-box}body{margin:0;font-family:"Plus Jakarta Sans",system-ui,sans-serif;background:var(--bg);color:var(--ink)}
+header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;background:#fff;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:2}
+header b{font-size:1.1rem}header span{font-size:.8rem;color:var(--mut)}
+main{max-width:900px;margin:0 auto;padding:18px}
+.card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:14px}
+h2{font-size:1rem;margin:0 0 10px}h3{font-size:.85rem;margin:14px 0 6px;color:var(--mut);text-transform:uppercase;letter-spacing:1px}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}.tabs button{border:1px solid var(--line);background:#fff;border-radius:999px;padding:8px 14px;font:inherit;font-weight:700;cursor:pointer}
+.tabs button.on{background:var(--c);color:#fff;border-color:var(--c)}
+input,select,textarea{font:inherit;padding:10px 12px;border:1.5px solid var(--line);border-radius:10px;width:100%;background:#fff}
+button.b{font:inherit;font-weight:700;border:0;border-radius:10px;padding:10px 16px;background:var(--c);color:#fff;cursor:pointer}button.b:disabled{opacity:.5}
+button.g{font:inherit;font-weight:700;border:1.5px solid var(--line);border-radius:10px;padding:9px 14px;background:#fff;cursor:pointer}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.row>*{flex:1}.row>button{flex:none}
+.note{font-size:.8rem;color:var(--mut);margin:6px 0}.err{color:#b3261e;font-size:.85rem;min-height:1.1em;margin:6px 0}.ok{color:#15803d;font-size:.85rem;margin:6px 0}
+table{width:100%;border-collapse:collapse;font-size:.85rem}td,th{text-align:left;padding:7px 6px;border-bottom:1px solid var(--line);vertical-align:top}th{color:var(--mut);font-weight:700}
+.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}.tile{background:var(--bg);border-radius:12px;padding:12px}.tile b{display:block;font-size:1.5rem}.tile span{font-size:.75rem;color:var(--mut)}
+code{background:var(--bg);padding:2px 6px;border-radius:6px;font-size:.8rem;word-break:break-all}
+.hide{display:none}
+</style>
+</head>
+<body>
+<header><b><a href="./" style="color:inherit;text-decoration:none">&larr; Roughly</a> &nbsp;Dev</b><span id="who"></span></header>
+<main id="main"><div class="card"><p class="note">Loading…</p></div></main>
+<script type="module">
+/* Private admin page. Nothing here is protected by hiding: every read and write below is allowed only if the
+   signed-in Google account has a doc at admins/{uid} in Firestore (added by hand in the Firebase console), as
+   enforced by backend/firestore.rules. No secrets live in this file. */
+const firebaseConfig={apiKey:"AIzaSyDOJ4CQe4VCw1pMzxzq6juJtdXTY9Q_2dE",authDomain:"roughly-16260.firebaseapp.com",projectId:"roughly-16260",storageBucket:"roughly-16260.firebasestorage.app",messagingSenderId:"1066078017871",appId:"1:1066078017871:web:61414c9e14eb0de47b0d3a"};
+const RTDB_URL="https://roughly-16260-default-rtdb.europe-west1.firebasedatabase.app";          // same value as in index.html, once Realtime Database exists (exact finished-game counts)
+const GA_PROPERTY_ID="";    // GA4 property ID (numbers only), e.g. "412345678"
+const OAUTH_CLIENT_ID="";   // OAuth 2.0 Web client ID from Google Cloud console, e.g. "1234-abc.apps.googleusercontent.com"
+const SITE="https://www.roughly.gg/";
+const V="10.12.5",BASE="https://www.gstatic.com/firebasejs/"+V+"/";
+const [A,AU,FS]=await Promise.all([import(BASE+"firebase-app.js"),import(BASE+"firebase-auth.js"),import(BASE+"firebase-firestore.js")]);
+const app=A.initializeApp(firebaseConfig),auth=AU.getAuth(app),db=FS.getFirestore(app);
+const {doc,getDoc,setDoc,getDocs,collection,query,where,orderBy,limit,startAt,endAt,serverTimestamp}=FS;
+const $=id=>document.getElementById(id),M=$("main");
+const esc=t=>String(t==null?"":t).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
+const rid=n=>{const a="ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789",x=new Uint8Array(n);crypto.getRandomValues(x);return Array.from(x,v=>a[v%a.length]).join("")};
+const when=t=>{if(!t)return "";const d=t.toDate?t.toDate():new Date(typeof t==="number"?t:t.seconds*1000);return d.toLocaleString("en-GB",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"})};
+const bal=c=>{if(!c)return null;let n=0;for(const k in c.b||{})n+=+c.b[k]||0;for(const k in c.e||{})n+=c.e[k]?1:0;for(const k in c.s||{})n-=1;for(const k in c.g||{})n+=+c.g[k]||0;return Math.max(0,Math.min(99,n))};
+let me=null;
+async function log(action,extra){await setDoc(doc(db,"adminLog",Date.now()+"_"+rid(6)),Object.assign({by:me.uid,byEmail:me.email||"",at:serverTimestamp(),action},extra||{}));}
+
+function signedOut(msg){$("who").textContent="";M.innerHTML=`<div class="card"><h2>Sign in</h2><p class="note">Admins only. Sign in with the Google account that has admin access.</p><p class="err">${esc(msg||"")}</p><button class="b" id="si">Sign in with Google</button></div>`;
+  $("si").onclick=async()=>{try{await AU.signInWithPopup(auth,new AU.GoogleAuthProvider());}catch(e){signedOut((e&&e.code)||"Sign-in failed")}};}
+AU.onAuthStateChanged(auth,async u=>{
+  if(!u||u.isAnonymous){signedOut();return}
+  me=u;$("who").innerHTML=esc(u.email)+` · <a href="#" id="so">Sign out</a>`;$("so").onclick=e=>{e.preventDefault();AU.signOut(auth)};
+  let ok=false;try{ok=(await getDoc(doc(db,"admins",u.uid))).exists();}catch(e){}
+  if(!ok){M.innerHTML=`<div class="card"><h2>Not an admin</h2><p class="note">This Google account doesn't have admin access yet. Send this ID to whoever manages Firebase. They create a collection <code>admins</code> in Firestore with a document whose ID is:</p><p><code>${esc(u.uid)}</code></p><p class="note">(any field, e.g. <code>name: "SWISS"</code>). Then reload this page.</p></div>`;return}
+  shell();});
+
+function shell(){
+  M.innerHTML=`<div class="tabs"><button data-t="players" class="on">Players &amp; coins</button><button data-t="gifts">Gift links</button><button data-t="log">Activity log</button><button data-t="stats">Analytics</button></div><div id="tab"></div>`;
+  M.querySelectorAll("[data-t]").forEach(b=>b.onclick=()=>{M.querySelectorAll("[data-t]").forEach(x=>x.classList.toggle("on",x===b));({players,gifts,activity,stats})[b.dataset.t==="log"?"activity":b.dataset.t]();});
+  players();}
+
+/* ---------- players and coins */
+function players(){
+  $("tab").innerHTML=`<div class="card"><h2>Find a player</h2><div class="row"><input id="q" placeholder="Player ID (from their menu), Google email, or name"><button class="b" id="go">Search</button></div>
+    <p class="note">Signed-in players can be found by email or name. Anonymous players: ask them to tap Copy next to "Player ID" in the menu and send it to you.</p><p class="err" id="qe"></p><div id="res"></div></div>`;
+  $("go").onclick=search;$("q").onkeydown=e=>{if(e.key==="Enter")search()};}
+async function search(){const q=$("q").value.trim(),out=$("res");$("qe").textContent="";out.innerHTML="<p class='note'>Searching…</p>";const found={};
+  try{
+    if(/^[A-Za-z0-9]{20,40}$/.test(q)){const s=await getDoc(doc(db,"players",q));found[q]=s.exists()?s.data():{};}
+    else if(q.includes("@")){(await getDocs(query(collection(db,"players"),where("emailLower","==",q.toLowerCase()),limit(10)))).forEach(d=>found[d.id]=d.data());}
+    else if(/^[A-Za-z0-9]{6,12}$/.test(q)){(await getDocs(query(collection(db,"players"),orderBy(FS.documentId()),startAt(q),endAt(q+""),limit(10)))).forEach(d=>found[d.id]=d.data());}
+    if(q.length>=2&&!q.includes("@")){const l=q.toLowerCase();(await getDocs(query(collection(db,"players"),orderBy("nameLower"),startAt(l),endAt(l+""),limit(10)))).forEach(d=>found[d.id]=d.data());}
+  }catch(e){$("qe").textContent=(e&&e.message)||"Search failed";}
+  const ids=Object.keys(found);if(!ids.length){out.innerHTML="<p class='note'>No player found. Anonymous players only have a record once they've been granted coins, so search them by their full Player ID.</p>";return}
+  out.innerHTML=ids.map(id=>{const p=found[id],b=bal(p.coins),gr=p.grants||{},gk=Object.keys(gr);
+    return `<div class="card" style="background:var(--bg)"><b>${esc(p.name||"Anonymous player")}</b> ${p.email?"· "+esc(p.email):""}<p class="note">Player ID <code>${esc(id)}</code></p>
+      <p class="note">${b==null?"Coin balance: kept on the player's device (not signed in). Grants below reach them within a day.":"Synced coin balance: <b>"+b+"</b>"}${p.days?" · finished days: "+Object.keys(p.days).length:""}</p>
+      ${gk.length?"<table><tr><th>Granted</th><th>Coins</th><th>Reason</th></tr>"+gk.sort().reverse().map(k=>`<tr><td>${esc(when(gr[k].at))}</td><td>${esc(gr[k].n)}</td><td>${esc(gr[k].reason)}</td></tr>`).join("")+"</table>":"<p class='note'>No grants yet.</p>"}
+      <h3>Grant coins</h3><div class="row"><select data-n="${esc(id)}">${[1,2,3,5,10,20].map(n=>`<option>${n}</option>`).join("")}</select><input data-r="${esc(id)}" placeholder="Reason (required, e.g. bug report)" maxlength="200"><button class="b" data-g="${esc(id)}">Grant</button></div><p class="note" data-m="${esc(id)}"></p></div>`}).join("");
+  out.querySelectorAll("[data-g]").forEach(btn=>btn.onclick=async()=>{const id=btn.dataset.g,n=+out.querySelector(`[data-n="${id}"]`).value,reason=out.querySelector(`[data-r="${id}"]`).value.trim(),m=out.querySelector(`[data-m="${id}"]`);
+    if(!reason){m.textContent="Add a reason first.";return}btn.disabled=true;
+    try{const gid=Date.now()+"_"+rid(4);await setDoc(doc(db,"players",id),{grants:{[gid]:{n,reason,at:serverTimestamp(),by:me.uid}}},{merge:true});await log("grant",{uid:id,n,reason});m.innerHTML=`<span class="ok">Granted ${n} coin${n===1?"":"s"}. The player gets them next time they open Roughly (signed-in players at once, others within a day).</span>`;}
+    catch(e){m.textContent=(e&&e.message)||"Grant failed";btn.disabled=false;}});}
+
+/* ---------- gift links */
+async function gifts(){
+  $("tab").innerHTML=`<div class="card"><h2>Make a gift link</h2><p class="note">Anyone who opens the link gets the coins once. Each link works for one player only.</p>
+    <div class="row"><select id="gn">${[1,2,3,5,10,20].map(n=>`<option>${n}</option>`).join("")}</select><input id="gr" placeholder="Reason (required)" maxlength="200"><button class="b" id="gm">Make link</button></div><p class="err" id="ge"></p><div id="gout"></div></div>
+    <div class="card"><h2>Recent gift links</h2><div id="glist"><p class="note">Loading…</p></div></div>`;
+  $("gm").onclick=async()=>{const n=+$("gn").value,reason=$("gr").value.trim();if(!reason){$("ge").textContent="Add a reason first.";return}$("ge").textContent="";$("gm").disabled=true;
+    try{const id=rid(20);await setDoc(doc(db,"gifts",id),{n,reason,by:me.uid,at:serverTimestamp(),claimedBy:null,claimedAt:null});await log("gift",{gift:id,n,reason});
+      const url=SITE+"?gift2="+id;$("gout").innerHTML=`<p class="ok">Link ready:</p><div class="row"><input id="gl" readonly value="${esc(url)}"><button class="g" id="gc">Copy</button></div>`;
+      $("gc").onclick=()=>{navigator.clipboard&&navigator.clipboard.writeText(url).then(()=>$("gc").textContent="Copied",()=>{$("gl").select()})};listGifts();}
+    catch(e){$("ge").textContent=(e&&e.message)||"Couldn't make the link";}$("gm").disabled=false;};
+  listGifts();}
+async function listGifts(){const box=$("glist");try{const qs=await getDocs(query(collection(db,"gifts"),orderBy("at","desc"),limit(30)));const rows=[];qs.forEach(d=>{const g=d.data();rows.push(`<tr><td>${esc(when(g.at))}</td><td>${esc(g.n)}</td><td>${esc(g.reason)}</td><td>${g.claimedBy?"Claimed "+esc(when(g.claimedAt)):"Not yet"}</td><td><code>${esc(d.id.slice(0,6))}…</code></td></tr>`)});
+  box.innerHTML=rows.length?"<table><tr><th>Made</th><th>Coins</th><th>Reason</th><th>Status</th><th>Link</th></tr>"+rows.join("")+"</table>":"<p class='note'>No gift links yet.</p>";}catch(e){box.innerHTML="<p class='err'>"+esc((e&&e.message)||"Couldn't load")+"</p>"}}
+
+/* ---------- activity log (append-only) */
+async function activity(){$("tab").innerHTML=`<div class="card"><h2>Admin activity</h2><div id="al"><p class="note">Loading…</p></div></div>`;
+  try{const qs=await getDocs(query(collection(db,"adminLog"),orderBy("at","desc"),limit(100)));const rows=[];
+    qs.forEach(d=>{const a=d.data();rows.push(`<tr><td>${esc(when(a.at))}</td><td>${esc(a.byEmail||a.by)}</td><td>${esc(a.action)}</td><td>${a.n?esc(a.n)+" coin"+(a.n===1?"":"s"):""} ${a.uid?"to <code>"+esc(a.uid.slice(0,8))+"</code>":""}</td><td>${esc(a.reason||"")}</td></tr>`)});
+    $("al").innerHTML=rows.length?"<table><tr><th>When</th><th>Admin</th><th>Action</th><th>Detail</th><th>Reason</th></tr>"+rows.join("")+"</table>":"<p class='note'>Nothing yet.</p>";}
+  catch(e){$("al").innerHTML="<p class='err'>"+esc((e&&e.message)||"Couldn't load")+"</p>"}}
+
+/* ---------- analytics: GA4 (visitors, events) read with the admin's own Google sign-in + exact game counts */
+let gaTok=null;
+function stats(){
+  $("tab").innerHTML=`<div class="card"><div class="row"><h2 style="flex:1;margin:0">Analytics</h2><select id="rng" style="flex:none;width:auto"><option value="7">Last 7 days</option><option value="30">Last 30 days</option><option value="90">Last 90 days</option></select></div>
+    <h3>Visitors (Google Analytics)</h3><div id="ga"></div><h3>Games (exact, from Roughly's own data)</h3><div id="ex"></div></div>`;
+  $("rng").onchange=()=>{ga();exact()};ga();exact();}
+function days(){return +$("rng").value}
+async function exact(){const box=$("ex");if(!RTDB_URL){box.innerHTML="<p class='note'>Shows exact finished games per day once Realtime Database is switched on (set RTDB_URL in this file).</p>";return}
+  const T=Math.floor(Date.now()/864e5),from=T-days()+1;box.innerHTML="<p class='note'>Loading…</p>";
+  try{const r=await fetch(RTDB_URL+`/s.json?orderBy="$key"&startAt="${from}"&endAt="${T}"`);const d=await r.json()||{};let tot=0,sum=0;const per=[];
+    for(let x=from;x<=T;x++){const n=(d[x]&&d[x].n)||0;tot+=n;sum+=(d[x]&&d[x].sum)||0;per.push([x,n])}
+    const peak=per.reduce((a,b)=>b[1]>a[1]?b:a,[0,0]);
+    box.innerHTML=`<div class="tiles"><div class="tile"><b>${tot.toLocaleString()}</b><span>finished games</span></div><div class="tile"><b>${Math.round(tot/days()).toLocaleString()}</b><span>per day on average</span></div><div class="tile"><b>${peak[1].toLocaleString()}</b><span>best day (${new Date(peak[0]*864e5).toLocaleDateString("en-GB",{day:"numeric",month:"short"})})</span></div><div class="tile"><b>${tot?Math.round(sum/tot)+"%":"–"}</b><span>average score</span></div></div>
+      <p class="note">Free-plan check: about ${Math.round(tot/days()*0.53).toLocaleString()} Firestore writes a day from games (free limit 20,000). Exact usage: Firebase console → Usage and billing.</p>`;}
+  catch(e){box.innerHTML="<p class='err'>"+esc((e&&e.message)||"Couldn't load")+"</p>"}}
+function ga(){const box=$("ga");
+  if(!GA_PROPERTY_ID||!OAUTH_CLIENT_ID){box.innerHTML=`<p class="note">Not connected yet. One-time setup (free): 1) create a Google Analytics 4 property and put its Measurement ID (G-…) in <code>GA_ID</code> in index.html; 2) in Google Cloud console for project roughly-16260, enable the "Google Analytics Data API" and create an OAuth client ID (Web application, authorised JavaScript origin <code>https://www.roughly.gg</code>); 3) put the property ID and the client ID at the top of this file. Only Google accounts with access to the GA property can read the numbers.</p>`;return}
+  if(!gaTok){box.innerHTML=`<button class="b" id="gac">Connect Google Analytics</button><p class="note">Asks your Google account for read-only access to Analytics.</p>`;
+    $("gac").onclick=()=>{const go=()=>{google.accounts.oauth2.initTokenClient({client_id:OAUTH_CLIENT_ID,scope:"https://www.googleapis.com/auth/analytics.readonly",callback:t=>{if(t&&t.access_token){gaTok=t.access_token;ga()}}}).requestAccessToken()};
+      if(window.google&&google.accounts)go();else{const s=document.createElement("script");s.src="https://accounts.google.com/gsi/client";s.onload=go;document.head.appendChild(s)}};return}
+  box.innerHTML="<p class='note'>Loading…</p>";const range=[{startDate:days()+"daysAgo",endDate:"today"}];
+  const run=body=>fetch(`https://analyticsdata.googleapis.com/v1beta/properties/${GA_PROPERTY_ID}:runReport`,{method:"POST",headers:{Authorization:"Bearer "+gaTok,"Content-Type":"application/json"},body:JSON.stringify(body)}).then(r=>r.json());
+  const EV=["game_start","game_complete","share","challenge_open","group_join","group_create","invite_open"];
+  Promise.all([
+    run({dateRanges:range,metrics:[{name:"totalUsers"},{name:"newUsers"},{name:"activeUsers"},{name:"sessions"}]}),
+    run({dateRanges:[{startDate:"today",endDate:"today"}],metrics:[{name:"active1DayUsers"},{name:"active7DayUsers"},{name:"active28DayUsers"}]}),
+    run({dateRanges:range,dimensions:[{name:"eventName"}],metrics:[{name:"eventCount"},{name:"totalUsers"}],dimensionFilter:{filter:{fieldName:"eventName",inListFilter:{values:EV}}}})
+  ]).then(([a,b,c])=>{
+    if(a.error||b.error||c.error){const e=a.error||b.error||c.error;if(e.code===401){gaTok=null;ga();return}box.innerHTML="<p class='err'>"+esc(e.message)+"</p>";return}
+    const v=(r,i)=>r.rows&&r.rows[0]?+r.rows[0].metricValues[i].value:0,ev={};(c.rows||[]).forEach(r=>ev[r.dimensionValues[0].value]={n:+r.metricValues[0].value,u:+r.metricValues[1].value});
+    const t=(n,l)=>`<div class="tile"><b>${(n||0).toLocaleString()}</b><span>${l}</span></div>`,U=k=>ev[k]?ev[k].u:0;
+    box.innerHTML=`<div class="tiles">${t(v(a,0),"visitors")}${t(v(a,1),"new visitors")}${t(Math.max(0,v(a,0)-v(a,1)),"returning visitors")}${t(v(b,0),"daily active (today)")}${t(v(b,1),"weekly active")}${t(v(b,2),"monthly active (28 days)")}</div>
+      <h3>From visit to play</h3><div class="tiles">${t(U("game_start"),"started a game")}${t(U("game_complete"),"finished a game")}${t(U("share"),"shared")}${t(U("challenge_open"),"arrived by challenge link")}${t(U("invite_open"),"opened a group invite")}${t(U("group_join"),"joined a group")}${t(U("group_create"),"created a group")}</div>
+      <p class="note">People, not events. Google Analytics runs without cookies here (it uses the game's anonymous device ID), so a player on two devices counts twice; ad blockers hide some visitors, and the newest day can lag by up to 24 hours.</p>`;
+  },e=>{box.innerHTML="<p class='err'>"+esc((e&&e.message)||"Couldn't reach Google Analytics")+"</p>"});}
+</script>
+</body>
+</html>

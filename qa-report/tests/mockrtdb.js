@@ -1,6 +1,6 @@
 // Static file server for the repo + a mock Realtime Database REST API that mirrors backend/database.rules.json.
 const http=require('http'),fs=require('fs'),path=require('path');const ROOT="/home/user/roughly.gg";
-const DB={};let log=[];
+const DB={};let log=[];const KVS={};
 const get=(p)=>p.split('/').filter(Boolean).reduce((o,k)=>o==null?undefined:o[k],DB);
 function set(p,v){const ks=p.split('/').filter(Boolean);let o=DB;ks.slice(0,-1).forEach(k=>{o[k]=o[k]||{};o=o[k]});o[ks[ks.length-1]]=v;}
 function check(uid,P){ // returns null if allowed, else reason
@@ -23,8 +23,11 @@ http.createServer((req,res)=>{const u=new URL(req.url,"http://x");
     if(req.method==="PATCH"){let b="";req.on("data",c=>b+=c);req.on("end",()=>{const P=JSON.parse(b);log.push("PATCH "+Object.keys(P).length+" paths");
       if(u.searchParams.get("slow")){} const why=check(uid,P);if(why){log.push("DENIED "+why);res.statusCode=401;res.end(JSON.stringify({error:"Permission denied",why}));return}
       for(const k in P){const v=P[k];if(v&&v[".sv"])set(k,(get(k)||0)+v[".sv"].increment);else set(k,v);}res.end("{}");});return}}
+  if(u.pathname==="/kv"){res.setHeader("access-control-allow-origin","*");if(req.method==="OPTIONS"){res.end();return}let b="";req.on("data",c=>b+=c);req.on("end",()=>{const q=JSON.parse(b||"{}");let v=null;
+      if(q.op==="get")v=KVS[q.path]===undefined?null:KVS[q.path];else if(q.op==="set"){KVS[q.path]=q.v;}else if(q.op==="del"){delete KVS[q.path];}else if(q.op==="list"){v={};for(const k in KVS)if(k.startsWith(q.prefix))v[k]=KVS[k];}else if(q.op==="dump")v=KVS;
+      res.setHeader("content-type","application/json");res.end(JSON.stringify({v}));});return}
   if(u.pathname==="/__log"){res.end(JSON.stringify({log,DB}));return}
-  if(u.pathname==="/__reset"){for(const k in DB)delete DB[k];log=[];res.end("ok");return}
-  let f=path.join(ROOT,u.pathname==="/"?"index.html":u.pathname);if(u.pathname==="/rt.html")f="/tmp/claude-0/-home-user-roughly-gg/d074bb44-b2c0-5a66-8866-5a879378e0ae/scratchpad/qa/rt.html";
+  if(u.pathname==="/__reset"){for(const k in DB)delete DB[k];for(const k in KVS)delete KVS[k];log=[];res.end("ok");return}
+  let f=path.join(ROOT,u.pathname==="/"?"index.html":u.pathname);if(u.pathname==="/ga.html")f="/tmp/claude-0/-home-user-roughly-gg/d074bb44-b2c0-5a66-8866-5a879378e0ae/scratchpad/qa/ga.html";else if(u.pathname==="/rt.html"||u.pathname==="/fs.html")f=u.pathname==="/fs.html"?"/home/user/roughly.gg/index.html":"/tmp/claude-0/-home-user-roughly-gg/d074bb44-b2c0-5a66-8866-5a879378e0ae/scratchpad/qa/rt.html";
   fs.readFile(f,(e,d)=>{if(e){res.statusCode=404;res.end();return}res.setHeader("content-type",f.endsWith(".html")?"text/html":"application/javascript");res.end(d)});
 }).listen(8772,"127.0.0.1",()=>console.log("mock up"));
