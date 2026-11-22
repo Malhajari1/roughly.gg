@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="format-detection" content="telephone=no, email=no, address=no, date=no">
 <meta name="robots" content="index, follow, noai, noimageai">
 <meta name="tdm-reservation" content="1">
 <meta name="tdm-policy" content="https://www.roughly.gg/ai.txt">
@@ -10,7 +11,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <title>Roughly Qatar – Daily Estimation Game</title>
-<script>window.RQ_BUILD="2026-11-21.1";</script>
+<script>window.RQ_BUILD="2026-11-22.1";</script>
 <meta name="description" content="A fresh set of three how-many questions about Qatar every day. No exact answers — just reason your way close. What would you have guessed?">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Roughly">
@@ -353,9 +354,11 @@ select.chip.uc{appearance:none;-webkit-appearance:none;border:0;cursor:pointer;f
 select.chip.uc:hover{box-shadow:0 0 0 3px rgba(122,18,48,.12)}
 select.chip.uc:focus-visible{outline:2px solid var(--mar);outline-offset:2px}
 #nt.sr{position:absolute!important;left:-9999px;top:0;width:1px!important;min-height:0!important;height:1px;opacity:0;padding:0;border:0}
-.mis{display:grid;gap:8px;margin-bottom:6px}
+.mis{display:grid;grid-template-columns:minmax(0,1fr);gap:8px;margin-bottom:6px}
 .mi{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:var(--tint);border:0;border-radius:16px;padding:12px 14px;cursor:pointer;font-family:inherit;color:var(--ink);transition:background .15s}
 .mi.static{cursor:default}
+.mi.static b{white-space:nowrap}.mi.static .lnk{flex:none;white-space:nowrap}
+a[x-apple-data-detectors]{color:inherit!important;text-decoration:none!important;font:inherit!important;pointer-events:none}
 .mi:hover:not(.static){background:#f4e3ea}
 .mi>svg{flex:none;width:22px;height:22px;stroke:var(--mar);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .mi>svg:last-child:not(:first-child){width:16px;height:16px;stroke:var(--mut);stroke-width:2.4}
