@@ -11,7 +11,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <title>Roughly Qatar – Daily Estimation Game</title>
-<script>window.RQ_BUILD="2026-11-22.1";</script>
+<script>window.RQ_BUILD="2026-11-23.1";</script>
 <meta name="description" content="A fresh set of three how-many questions about Qatar every day. No exact answers — just reason your way close. What would you have guessed?">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Roughly">
@@ -650,7 +650,7 @@ body:not([data-view=land]) main{min-height:calc(100dvh - 76px);display:flex;flex
 .toast.on{opacity:1;transform:translate(-50%,0)}
 .lbx{background:none;border:0;padding:0 0 0 6px;font:inherit;font-size:.72rem;font-weight:700;color:#dc2626;cursor:pointer}
 .main.danger{background:linear-gradient(135deg,#ef4444,#dc2626);box-shadow:0 12px 24px -8px rgba(220,38,38,.5)}
-.pidl{margin:14px 4px 0;font-size:.75rem;color:var(--mut);text-align:center}.pidl b{color:var(--ink);letter-spacing:1px}
+.pidl{margin:14px 4px 0;font-size:.8rem;color:var(--mut);text-align:center}.pidl b{color:var(--ink);font-weight:800}
 .shl.arm{background:#dc2626;border-color:#dc2626;color:#fff}
 .h2hm{font-weight:700;font-size:1rem;text-align:center;margin:10px 0 0;color:var(--ink)}
 .card.qb .h2hm{color:#fff}
@@ -1813,7 +1813,9 @@ function coinMenu(){
   "<p class='note' style='margin-top:10px'>"+note+"</p>"}
 function adminCheck(){var u=fbUser();if(!u||u.anon||window.__rqAdmin!==undefined||!window.RQGroups||!window.RQGroups.isAdmin)return;
   window.__rqAdmin=false;window.RQGroups.isAdmin().then(function(a){window.__rqAdmin=!!a;var sh=document.getElementById("sheet");if(a&&sh&&sh.classList.contains("open")&&sh.querySelector("[data-act=groups]"))openMenu()},function(){window.__rqAdmin=undefined})}
-function openMenu(){setTimeout(adminCheck,0);
+function handleCheck(){if(handleGet()||!window.RQGroups||!window.RQGroups.ensureHandle||handleCheck.busy)return;handleCheck.busy=true;
+  window.RQGroups.ensureHandle().then(function(){handleCheck.busy=false;var el=document.getElementById("hname");if(el&&handleGet())openMenu()},function(){handleCheck.busy=false})}
+function openMenu(){setTimeout(adminCheck,0);setTimeout(handleCheck,0);
   var sh=document.getElementById("sheet"),sc=document.getElementById("scrim");
   var first=Date.UTC(cm.y,cm.m,1)/864e5,off=new Date(first*864e5).getUTCDay(),dim=new Date(Date.UTC(cm.y,cm.m+1,0)).getUTCDate();
   var sd=new Date(START*864e5),td=new Date(today*864e5),cur=cm.y*12+cm.m;
@@ -1834,7 +1836,7 @@ function openMenu(){setTimeout(adminCheck,0);
     if(b.hasAttribute("data-d")){selectDay(parseInt(b.getAttribute("data-d"),10));intro=false;closeSheet();render();window.scrollTo(0,0)}
     else if(b.hasAttribute("data-nav")){var v=cm.y*12+cm.m+parseInt(b.getAttribute("data-nav"),10);cm={y:Math.floor(v/12),m:v%12};openMenu()}
     else if(b.hasAttribute("data-home")){closeSheet();selectDay(today);landOn=false;intro=true;render();window.scrollTo(0,0)}
-    else if(b.hasAttribute("data-act")){var a=b.getAttribute("data-act");if(a==="signin")openSignIn();else if(a==="groups")openGroups();else if(a==="lang"){toggleLang();openMenu()}else if(a==="dev"){location.href="dev.html"}else if(a==="signout"){b.disabled=true;window.RQGroups.signOut().then(function(){openMenu()},function(){openMenu()})}else if(a==="copyid"){var uu=fbUser();if(uu)copyText(uu.uid,null,function(ok){b.textContent=ok?(LANG==="ar"?"تم النسخ":"Copied!"):uu.uid})}}
+    else if(b.hasAttribute("data-act")){var a=b.getAttribute("data-act");if(a==="signin")openSignIn();else if(a==="groups")openGroups();else if(a==="lang"){toggleLang();openMenu()}else if(a==="dev"){location.href="dev.html"}else if(a==="signout"){b.disabled=true;window.RQGroups.signOut().then(function(){openMenu()},function(){openMenu()})}else if(a==="copyid"){var ht=handleText();if(ht)copyText(ht,null,function(ok){b.textContent=ok?(LANG==="ar"?"تم النسخ":"Copied!"):ht})}else if(a==="editname"){openName()}}
     else if(b.id==="mspend"){closeSheet();spendCoin()}
     else if(b.id==="sx")closeSheet()};
   sc.onclick=closeSheet;sh.classList.add("open");sc.classList.add("open");document.body.style.overflow="hidden";
@@ -2027,7 +2029,7 @@ function menuRows(){
   "<button class='mi' data-act='groups'>"+ICON_USERS+"<div><b>"+(AR?"المجموعات":"Groups")+"</b><span>"+(AR?"نافس أصدقاءك على لوحة أسبوعية":"Race friends on a weekly leaderboard")+"</span></div>"+ICON_R+"</button>"+
   "<button class='mi' data-act='lang'>"+ICON_LANG+"<div><b>"+(AR?"English":"العربية")+"</b><span>"+(AR?"Switch to English":"Switch to Arabic")+"</span></div>"+ICON_R+"</button>"+
   (gu&&window.__rqAdmin?"<button class='mi' data-act='dev'>"+ICON_DEV+"<div><b>Dev</b><span>Players, coins, gift links, activity, analytics</span></div>"+ICON_R+"</button>":"")+"</div>"+
-  (u?"<p class='pidl'>"+(AR?"رقم اللاعب":"Player ID")+" <b dir='ltr'>"+esc(u.uid.slice(0,8))+"</b> <button class='lnk' data-act='copyid'>"+(AR?"نسخ":"Copy")+"</button></p>":"")}
+  (u?"<p class='pidl'>"+(AR?"اسمك في اللعبة":"Player name")+" <b dir='auto' id='hname'>"+(handleGet()?esc(handleText()):"…")+"</b> <button class='lnk' data-act='editname'>"+(AR?"تعديل":"Edit")+"</button>"+(handleGet()?" <button class='lnk' data-act='copyid'>"+(AR?"نسخ":"Copy")+"</button>":"")+"</p>":"")}
 var __sf=0;
 function fitSheet(){return;var sh=document.getElementById("sheet");if(!sh||!sh.classList.contains("open"))return;
   if(__sf)clearTimeout(__sf);
@@ -2064,7 +2066,7 @@ window.RQ_profile=function(){var days={},i,k,m,x;
   try{for(i=0;i<localStorage.length;i++){k=localStorage.key(i);m=/^tk8-s(\d+)$/.exec(k||"");if(!m)continue;x=load(k,null);
     if(!x||x.day!==+m[1]||!Array.isArray(x.s)||x.s.length!==3||!Array.isArray(x.g)||x.g.length!==3||!Array.isArray(x.ids)||x.ids.length!==3)continue;
     days[m[1]]=[x.s.join(","),x.g.map(function(v){return +(+v).toPrecision(6)}).join(","),x.ids.join(","),x.pd||x.day].join("|")}}catch(e){}
-  return {days:days,coins:ledger(),carry:load("rq-carry",null)||{}}};
+  return {days:days,coins:ledger(),carry:load("rq-carry",null)||{},handle:handleGet()}};
 window.RQ_applyProfile=function(P){P=P||{};var ch=false,d,k;
   var days=P.days||{};for(d in days){var p=String(days[d]).split("|");if(p.length<4)continue;
     var sc=p[0].split(",").map(Number),gs=p[1].split(",").map(Number),qs=p[2].split(",").map(Number),dn=+d;
@@ -2074,6 +2076,7 @@ window.RQ_applyProfile=function(P){P=P||{};var ch=false,d,k;
   if(P.coins&&typeof P.coins==="object"){var L=ledger();["b","e","s","g"].forEach(function(f){var src=P.coins[f]||{};for(k in src){if(!(k in L[f])){L[f][k]=src[k];ch=true}else if(f==="e"&&src[k]&&!L.e[k])L.e[k]=1}});save("rq-coins",L)}
   if(P.carry&&typeof P.carry==="object"){var cv=load("rq-carry",null)||{},pc=P.carry;if((pc.n|0)>(cv.n|0)){cv.n=pc.n|0;cv.a=pc.a|0;ch=true}cv.p=Math.max(cv.p|0,pc.p|0);cv.t=Math.max(cv.t|0,pc.t|0);save("rq-carry",cv)}
   if(P.grants&&typeof P.grants==="object"){var L2=ledger();for(k in P.grants){var gr=P.grants[k];if(gr&&gr.n>0&&!(("adm:"+k) in L2.g)){L2.g["adm:"+k]=Math.min(20,gr.n|0);ch=true}}save("rq-coins",L2)}
+  if(P.handle&&P.handle.name&&P.handle.tag){var lh=handleGet();if(!lh||lh.key!==P.handle.key){save("rq-handle",P.handle);if(!P.handle.auto)save("rq-name",{n:P.handle.name});ch=true}}
   deriveStats();return ch};
 window.RQ_profileApplied=function(){streak();if(busy)return;var keep=st.g.length>0&&st.g.length<3;if(!keep){selectDay(day);render()}};
 function dayPayload(x){return {ids:x.ids,g:x.g,s:x.s,un:x.un||[],hu:x.hu||[0,0,0],pd:x.pd||0}}
@@ -2096,6 +2099,24 @@ function pullSync(){
 function rebuildStats(){deriveStats()}
 var SITE="roughly.gg/"+COUNTRY;
 function myName(){return cleanName((load("rq-name",{})||{}).n)}
+/* ===== Player names, e.g. "Sara #4821". The player picks the name (the same one friends see in groups and
+   challenges); a tag is added so names never clash. The pair is claimed once in Firestore handles/{name}_{tag}
+   (one small write when set or changed) and carried across devices by Google sign-in. No name yet = "Player #1234". */
+var BADW=["fuck","shit","bitch","cunt","nigg","fag","whore","slut","dick","pussy","asshole","porn","nazi","rape","admin","roughly","moderator","كس","زب","شرموط","قحب","منيك","نيك","طيز","عرص","خول","زامل"];
+function handleGet(){var h=load("rq-handle",null);return h&&h.name&&h.tag?h:null}
+function handleText(h){h=h||handleGet();return h?h.name+" #"+h.tag:""}
+function nameProblem(n){var AR=LANG==="ar";n=cleanName(n);if(n.length<2)return AR?"اكتب حرفين على الأقل.":"Use at least 2 letters.";
+  var l=n.toLowerCase().replace(/[\s._'-]/g,"");for(var i=0;i<BADW.length;i++)if(l.indexOf(BADW[i])>=0)return AR?"اختر اسماً آخر.":"Please pick a different name.";return ""}
+function openName(){var AR=LANG==="ar",g=function(i){return document.getElementById(i)},h=handleGet(),cur=h&&!h.auto?h.name:myName();
+  sheetShell(AR?"اسمك في اللعبة":"Your player name","<p class='sub'>"+(AR?"يراه أصدقاؤك في المجموعات والتحديات. نضيف رقماً حتى لا يتكرر اسمان.":"Friends see it in groups and challenges. We add a number so no two names clash.")+"</p>"+
+    "<input id='hn' class='inp' maxlength='20' autocomplete='off' placeholder='"+(AR?"مثلاً: سارة":"e.g. Sara")+"'><p class='err' id='he'></p>"+
+    "<button class='main' id='hs'>"+(AR?"حفظ":"Save")+"</button><button class='ghost' id='hb' style='width:100%;margin-top:10px'>"+(AR?"رجوع":"Back")+"</button>");
+  g("hn").value=cur||"";g("hb").onclick=openMenu;g("hn").oninput=function(){g("he").textContent=""};setTimeout(function(){try{g("hn").focus()}catch(e){}},250);
+  var go=function(){var n=cleanName(g("hn").value),pr=nameProblem(n);if(pr){g("he").textContent=pr;return}
+    if(!groupsOn()){g("he").textContent=AR?"غير متاح الآن. جرّب بعد قليل.":"Not available right now. Try again in a moment.";return}
+    g("hs").disabled=true;g("he").textContent="";
+    window.RQGroups.claimHandle(n).then(function(nh){openMenu();toast((AR?"اسمك الآن ":"You’re now ")+handleText(nh))},function(e){g("hs").disabled=false;g("he").textContent=(e&&e.message)||(AR?"تعذّر الحفظ. جرّب مرة أخرى.":"Couldn’t save. Try again.")})};
+  g("hs").onclick=go;g("hn").onkeydown=function(e){if(e.key==="Enter")go()}}
 function chLink(){if(bonus)return "https://"+SITE;var n=myName();return "https://"+SITE+"?c="+chEnc(day+"."+st.s.join("-")+(n?"."+n:""))}
 function shareText(tot){
   if(bonus)return LANG==="ar"?"لعبت جولة إضافية في Roughly "+COUNTRY+". تظن تقدر تتغلب عليّ؟\n"+chLink():"I just played a bonus round of Roughly "+COUNTRY+". Think you can beat me?\n"+chLink();
@@ -2635,16 +2656,32 @@ if(!firebaseConfig||!firebaseConfig.apiKey){
       if(cloud&&window.RQ_applyProfile&&window.RQ_applyProfile(cloud)&&window.RQ_profileApplied)window.RQ_profileApplied();
       if(u.isAnonymous)return;
       const P=window.RQ_profile(),nm=gClean(u.displayName||gName()||"Player")||"Player";
-      const base={name:nm,nameLower:nm.toLowerCase(),email:u.email||"",emailLower:(u.email||"").toLowerCase(),coins:P.coins,carry:P.carry,upd:serverTimestamp()};
+      const base={name:nm,nameLower:nm.toLowerCase(),email:u.email||"",emailLower:(u.email||"").toLowerCase(),coins:P.coins,carry:P.carry,upd:serverTimestamp()};if(P.handle)base.handle=P.handle;
       if(!cloud||!cloud.days){const body=Object.assign({},base,{days:P.days});if(!cloud){body.created=serverTimestamp();await setDoc(ref,body);}else await updateDoc(ref,body);return;}
       const upd=Object.assign({},base);for(const d in P.days)if(cloud.days[d]!==P.days[d])upd["days."+d]=P.days[d];
       if(fromA){upd.mergedFrom=fromA;upd.merged=arrayUnion(fromA);}
       try{await updateDoc(ref,upd);}
       catch(e){const t=Math.floor(Date.now()/864e5),keep={};for(const k in upd){const m=/^days\.(\d+)$/.exec(k);if(k!=="merged"&&k!=="mergedFrom"&&(!m||Math.abs(+m[1]-t)<=1))keep[k]=upd[k];}
         try{await updateDoc(ref,keep);}catch(x){}}}
+    // ---- Player names: claim handles/{namelower}_{tag}. The rules only allow creating a free one, for yourself.
+    const hKey=(n,t)=>gClean(n).toLowerCase()+"_"+t;
+    function hLocal(){try{const h=JSON.parse(localStorage.getItem("rq-handle")||"null");return h&&h.name&&h.tag?h:null;}catch(e){return null;}}
+    async function claimHandle(name,auto){await ready;name=gClean(name);if(name.length<2)throw new Error("Use at least 2 letters.");
+      const u=uid(),old=hLocal();if(old&&!old.auto&&!auto&&old.name===name)return old;
+      for(let i=0;i<12;i++){const t=String(i<8?1000+Math.floor(Math.random()*9000):10000+Math.floor(Math.random()*90000)),key=hKey(name,t);
+        try{await setDoc(doc(db,"handles",key),{uid:u,name,nameLower:name.toLowerCase(),tag:t,at:serverTimestamp()});}catch(e){continue;}
+        const h={name,tag:t,key,auto:!!auto};try{localStorage.setItem("rq-handle",JSON.stringify(h));if(!auto)localStorage.setItem("rq-name",JSON.stringify({n:name}));localStorage.removeItem("rq-hchk");}catch(e){}
+        if(old&&old.key&&old.key!==key){try{await deleteDoc(doc(db,"handles",old.key));}catch(e){}}
+        if(!auto){for(const id of gList()){try{await setDoc(doc(db,"groups",id,"members",u),{name},{merge:true});}catch(e){}}dropGroupCache();}
+        pushProfile();return h;}
+      throw new Error("Couldn’t save. Try again.");}
+    // Once a day: is our name still ours (an admin can reset a bad one)? If not, fall back to "Player #1234".
+    async function checkHandle(){const h=hLocal();if(!h)return;try{if(Date.now()-(+localStorage.getItem("rq-hchk")||0)<86400000)return;}catch(e){}
+      try{const sn=await getDoc(doc(db,"handles",h.key));try{localStorage.setItem("rq-hchk",String(Date.now()));}catch(e){}
+        if(!sn.exists()||sn.data().uid!==uid()){try{localStorage.removeItem("rq-handle");}catch(e){}await claimHandle("Player",true);}}catch(e){}}
     let pushT=null,pushDays={};
     function pushProfile(day){if(!isG())return;if(day)pushDays[day]=1;clearTimeout(pushT);
-      pushT=setTimeout(async()=>{const u=auth.currentUser;if(!u||u.isAnonymous)return;const P=window.RQ_profile(),upd={coins:P.coins,carry:P.carry,upd:serverTimestamp()};
+      pushT=setTimeout(async()=>{const u=auth.currentUser;if(!u||u.isAnonymous)return;const P=window.RQ_profile(),upd={coins:P.coins,carry:P.carry,upd:serverTimestamp()};if(P.handle)upd.handle=P.handle;
         for(const d in pushDays)if(P.days[d])upd["days."+d]=P.days[d];pushDays={};
         try{await updateDoc(doc(db,"players",u.uid),upd);}catch(e){try{await syncProfile();}catch(x){}}},1500);}
     // An anonymous player signed in to a Google account that already exists: move its group seats and this week's
@@ -2677,6 +2714,8 @@ if(!firebaseConfig||!firebaseConfig.apiKey){
       enabled:true, ready,
       user(){const u=auth.currentUser;return u?{uid:u.uid,anon:u.isAnonymous,email:u.email||"",name:u.displayName||gName()}:null;},
       pushProfile,
+      claimHandle(name){return claimHandle(name,false);},
+      async ensureHandle(){if(hLocal())return hLocal();const n=gName();return claimHandle(n&&n.length>=2?n:"Player",!(n&&n.length>=2));},
       async signIn(){await ready;const prov=new GoogleAuthProvider();try{prov.setCustomParameters({prompt:"select_account"});}catch(e){}
         const a=auth.currentUser;let from=null;
         try{await linkWithPopup(a,prov);}   // same user id: nothing moves, the device history uploads once
@@ -2686,7 +2725,11 @@ if(!firebaseConfig||!firebaseConfig.apiKey){
           const app2=A.initializeApp(firebaseConfig,"rq-handover-"+Date.now()),auth2=AU.getAuth(app2),db2=FS.getFirestore(app2);
           try{await updateCurrentUser(auth2,a);}catch(x){}
           await signInWithCredential(auth,cred);const g=auth.currentUser.uid;
-          if(a&&a.uid!==g){from=a.uid;try{await setDoc(doc(db2,"aliases",a.uid),{to:g,at:serverTimestamp()});}catch(x){}await handover(a.uid,g);}
+          if(a&&a.uid!==g){from=a.uid;try{await setDoc(doc(db2,"aliases",a.uid),{to:g,at:serverTimestamp()});}catch(x){}await handover(a.uid,g);
+            const lh=hLocal();let cloudH=null;try{const ps=await getDoc(doc(db,"players",g));cloudH=ps.exists()&&ps.data().handle||null;}catch(x){}
+            if(lh&&lh.key){try{await deleteDoc(doc(db2,"handles",lh.key));}catch(x){}}
+            if(cloudH&&cloudH.key){try{localStorage.setItem("rq-handle",JSON.stringify(cloudH));if(!cloudH.auto)localStorage.setItem("rq-name",JSON.stringify({n:cloudH.name}));}catch(x){}}
+            else if(lh){try{localStorage.removeItem("rq-handle");}catch(x){}try{await claimHandle(lh.name,!!lh.auto);}catch(x){}}}
           try{await AU.signOut(auth2);await A.deleteApp(app2);}catch(x){}}
         try{localStorage.setItem(UKEY,auth.currentUser.uid);}catch(e){}
         try{await syncProfile(from);}catch(e){}const t=gTodayAvg();if(t)APIg.submitDay(gToday(),t,true);
@@ -2704,14 +2747,14 @@ if(!firebaseConfig||!firebaseConfig.apiKey){
       async createGroup(name){await ready;name=gClean(name);if(!name)throw new Error("Give the group a name");const id=gGenId(),u=uid();
         await setDoc(doc(db,"groups",id),{name,ownerUid:u,memberUids:[u],createdAt:serverTimestamp()});
         await setDoc(doc(db,"groups",id,"members",u),{name:gName()||"Player",joinedAt:serverTimestamp()});
-        gRemember(id);dropGroupCache();try{window.ga&&window.ga("group_create");}catch(e){}await writeToday(id);try{localStorage.removeItem("rq-gok-"+gToday());}catch(e){}
+        gRemember(id);dropGroupCache();try{window.ga&&window.ga("group_create");}catch(e){}await writeToday(id);const h0=hLocal();if((!h0||h0.auto)&&gName().length>=2)claimHandle(gName(),false).catch(()=>{});try{localStorage.removeItem("rq-gok-"+gToday());}catch(e){}
         return {id,name};},
       async groupMeta(id){await ready;if(!GID_RE.test(id))throw new Error("That code doesn’t look right");const s=await getDoc(doc(db,"groups",id));if(!s.exists())throw new Error("No group with that code");const d=s.data();return {id,name:d.name,isMember:(d.memberUids||[]).indexOf(uid())>=0,removed:(d.removed||[]).indexOf(uid())>=0,members:(d.memberUids||[]).length};},
       async joinGroup(id,name,known){await ready;const meta=known&&known.id===id?known:await this.groupMeta(id),u=uid();
         if(meta.removed)throw new Error("The group’s creator removed you from this group");dropGroupCache(id);
         if(!meta.isMember)await updateDoc(doc(db,"groups",id),{memberUids:arrayUnion(u)});
         await setDoc(doc(db,"groups",id,"members",u),{name:gClean(name)||gName()||"Player",joinedAt:serverTimestamp()});
-        gRemember(id);try{if(!meta.isMember&&window.ga)window.ga("group_join");}catch(e){}await writeToday(id,name);try{localStorage.removeItem("rq-gok-"+gToday());}catch(e){}
+        gRemember(id);try{if(!meta.isMember&&window.ga)window.ga("group_join");}catch(e){}await writeToday(id,name);const h1=hLocal();if((!h1||h1.auto)&&gName().length>=2)claimHandle(gName(),false).catch(()=>{});try{localStorage.removeItem("rq-gok-"+gToday());}catch(e){}
         return {id,name:meta.name};},
       async leaveGroup(id){await ready;dropGroupCache(id);const u=uid();await updateDoc(doc(db,"groups",id),{memberUids:arrayRemove(u)});gForget(id);try{await deleteDoc(doc(db,"groups",id,"members",u));}catch(e){}return true;},
       listGroups(){if(LG&&Date.now()-LG.t<60000)return LG.p;const p=APIg._listGroups();LG={t:Date.now(),p};p.catch(()=>{LG=null;});return p;},
@@ -2799,6 +2842,7 @@ if(!firebaseConfig||!firebaseConfig.apiKey){
       try{const y=window.RQ_dayAvg?window.RQ_dayAvg(gToday()-1):0;if(y&&!gok(gToday()-1))APIg.submitDay(gToday()-1,y,true);}catch(e){}
       try{const pd=+localStorage.getItem("rq-sgp");if(pd&&pd>=gToday()-1)APIg.submitGame(pd);}catch(e){}
       try{const last=+localStorage.getItem("rq-pchk")||0;if(Date.now()-last>(isG()?600000:86400000))syncProfile();}catch(e){}
+      checkHandle();
       });
   }catch(e){window.RQGroups={enabled:false};}
 }

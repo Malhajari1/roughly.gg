@@ -43,7 +43,7 @@ function apply(cur,data,merge){const out=merge?JSON.parse(JSON.stringify(cur||{}
     if(v&&v.__u){o[last]=(o[last]||[]).slice();v.__u.forEach(x=>{if(o[last].indexOf(x)<0)o[last].push(x)});}else if(v&&v.__r){o[last]=(o[last]||[]).filter(x=>v.__r.indexOf(x)<0);}else if(v&&v.__ts){o[last]=Date.now();}else o[last]=v;}
   return out;}
 export async function getDoc(r){return snap(r.path,(await kv("get",{path:r.path})).v);}
-export async function setDoc(r,data,o){const cur=(await kv("get",{path:r.path})).v;await kv("set",{path:r.path,v:apply(cur,data,o&&o.merge)});window.__fsw.push(r.path);}
+export async function setDoc(r,data,o){const cur=(await kv("get",{path:r.path})).v;if(r.path.indexOf("handles/")===0&&cur!=null)throw Object.assign(new Error("Missing or insufficient permissions."),{code:"permission-denied"});await kv("set",{path:r.path,v:apply(cur,data,o&&o.merge)});window.__fsw.push(r.path);}
 export async function updateDoc(r,data){const cur=(await kv("get",{path:r.path})).v;if(cur==null)throw Object.assign(new Error("No document to update"),{code:"not-found"});await kv("set",{path:r.path,v:apply(cur,data,true)});window.__fsw.push(r.path);}
 export async function deleteDoc(r){await kv("del",{path:r.path});}
 export async function getDocs(q){window.__gd.push(q.cpath);const all=(await kv("list",{prefix:q.cpath+"/"})).v||{},out=[];

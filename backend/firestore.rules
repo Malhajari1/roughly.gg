@@ -7,6 +7,7 @@ rules_version = '2';
 //   groups/{gid}/scores/{day}__{uid} { uid, name, day, avg, from? }
 //   players/{uid}                    Google-linked profile: { name, nameLower, email, emailLower, days:{day: "…"},
 //                                     coins:{…}, carry:{…}, merged:[uid…], mergedFrom, created, upd } + grants:{id:{n,reason,at,by}} (admins only)
+//   handles/{namelower}_{tag}        { uid, name, nameLower, tag, at }  player names like "Sara #4821"; one owner each
 //   aliases/{anonUid}                { to: googleUid, at }  written once by the anonymous user when it hands over to a Google account
 //   admins/{uid}                     created by hand in the console; never writable from the app
 //   gifts/{id}                       { n, reason, by, at, claimedBy, claimedAt }  made by admins, claimed once
@@ -134,10 +135,10 @@ service cloud.firestore {
       // The player's own profile (Google accounts only). `grants` is never theirs to write.
       allow create: if google() && uid == me()
         && !('grants' in request.resource.data)
-        && request.resource.data.keys().hasOnly(['name', 'nameLower', 'email', 'emailLower', 'days', 'coins', 'carry', 'merged', 'mergedFrom', 'created', 'upd']);
+        && request.resource.data.keys().hasOnly(['name', 'nameLower', 'email', 'emailLower', 'days', 'coins', 'carry', 'merged', 'mergedFrom', 'created', 'upd', 'handle']);
       allow update: if google() && uid == me()
         && !changed().hasAny(['grants'])
-        && changed().hasOnly(['name', 'nameLower', 'email', 'emailLower', 'days', 'coins', 'carry', 'merged', 'mergedFrom', 'created', 'upd'])
+        && changed().hasOnly(['name', 'nameLower', 'email', 'emailLower', 'days', 'coins', 'carry', 'merged', 'mergedFrom', 'created', 'upd', 'handle'])
         && daysOk();
       // New finished days only for today (±1 for time zones), except: the first upload, or one merge from an
       // anonymous account that handed over to this one (proved by its alias).
@@ -156,6 +157,23 @@ service cloud.firestore {
       allow create: if isAdmin() && request.resource.data.keys().hasOnly(['grants']);
       allow update: if isAdmin() && changed().hasOnly(['grants']);
       allow delete: if false;
+    }
+
+    // Player names. Anyone signed in can claim a FREE name+tag for themselves (create fails if it exists);
+    // only the owner or an admin can release it. The ID must match the name and tag, so lookups are exact.
+    match /handles/{h} {
+      allow get: if signedIn();
+      allow list: if isAdmin();
+      allow create: if signedIn()
+        && request.resource.data.keys().hasOnly(['uid', 'name', 'nameLower', 'tag', 'at'])
+        && request.resource.data.uid == me()
+        && request.resource.data.name is string
+        && request.resource.data.name.size() >= 2 && request.resource.data.name.size() <= 24
+        && request.resource.data.nameLower == request.resource.data.name.lower()
+        && request.resource.data.tag is string && request.resource.data.tag.matches('^[0-9]{4,5}$')
+        && h == request.resource.data.nameLower + '_' + request.resource.data.tag;
+      allow delete: if signedIn() && (resource.data.uid == me() || isAdmin());
+      allow update: if false;
     }
 
     match /aliases/{a} {

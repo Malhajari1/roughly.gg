@@ -200,3 +200,11 @@ No test suite in the repo. Previously verified with jsdom smoke tests and Playwr
 - Rules: `backend/firestore.rules` rewritten (players, aliases, admins, gifts, adminLog; group updates limited to the exact fields each action needs). Publish rules BEFORE deploying the site. Setup steps + Rules Playground table: `backend/FIREBASE-SETUP.md`.
 - Tested with a fake Firebase shared across browser profiles (`qa-report/tests/fakefb2.js`, `p123-test.js`, `p4-test.js`): 45 + 16 checks. NOT tested: real Firebase rules (no emulator by choice), real Google popup, real phones.
 - Menu "Dev" row (19 Nov 2026, build 2026-11-19.1): shown only to signed-in Google accounts listed in Firestore `admins/{uid}` (`adminCheck` -> `RQGroups.isAdmin()`, one read per session), opens `dev.html` (same Firebase sign-in carries over). Partner's console checklist: `backend/GO-LIVE-FIREBASE.md`.
+
+## Player names (23 Nov 2026, build 2026-11-23.1)
+- Menu shows "Player name  Sara #4821  Edit  Copy" (Copy copies exactly that). Name = the player's chosen name (also `rq-name`, used in groups/challenges); tag = 4 random digits (5 if a name gets crowded), claimed in Firestore `handles/{namelower}_{tag}` `{uid,name,nameLower,tag}` (rules: create only if free and for yourself; owner or admin can delete). Local copy `rq-handle` `{name,tag,key,auto}`.
+- No name yet: "Player #1234" (`auto:true`), claimed the first time the menu opens (`ensureHandle`). A name typed when joining/creating a group becomes the player name if they had none. Renaming updates their member name in every group.
+- Names: 2-20 chars (`cleanName`), short EN+AR blocked-words list (`BADW`, also blocks "admin"/"roughly").
+- Google: the profile stores `handle`; signing in to an existing account adopts that account's name and releases the device's old one (deleted via the anonymous session); a new link keeps the device's name.
+- Daily check (`checkHandle`, `rq-hchk`): if an admin reset the name (deleted the doc) the player falls back to "Player #…". Dev page searches "Name #1234" exactly or by name prefix, and has Reset name (logged as `reset_name`).
+- Needs the updated `backend/firestore.rules` (handles + players.handle) published BEFORE this build goes live.

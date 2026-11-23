@@ -67,22 +67,28 @@ function shell(){
 
 /* ---------- players and coins */
 function players(){
-  $("tab").innerHTML=`<div class="card"><h2>Find a player</h2><div class="row"><input id="q" placeholder="Player ID (from their menu), Google email, or name"><button class="b" id="go">Search</button></div>
-    <p class="note">Signed-in players can be found by email or name. Anonymous players: ask them to tap Copy next to "Player ID" in the menu and send it to you.</p><p class="err" id="qe"></p><div id="res"></div></div>`;
+  $("tab").innerHTML=`<div class="card"><h2>Find a player</h2><div class="row"><input id="q" placeholder="Player name like Sara #4821, Google email, or name"><button class="b" id="go">Search</button></div>
+    <p class="note">Ask the player to tap Copy next to their player name in the menu and send it to you (e.g. <b>Sara #4821</b>). Signed-in players can also be found by email.</p><p class="err" id="qe"></p><div id="res"></div></div>`;
   $("go").onclick=search;$("q").onkeydown=e=>{if(e.key==="Enter")search()};}
-async function search(){const q=$("q").value.trim(),out=$("res");$("qe").textContent="";out.innerHTML="<p class='note'>Searching…</p>";const found={};
+async function search(){const q=$("q").value.trim(),out=$("res");$("qe").textContent="";out.innerHTML="<p class='note'>Searching…</p>";const found={},hs={};
   try{
+    const hm=/^(.+?)\s*#\s*(\d{4,5})$/.exec(q);
+    if(hm){const key=hm[1].trim().toLowerCase()+"_"+hm[2],s=await getDoc(doc(db,"handles",key));if(s.exists())hs[s.data().uid]=Object.assign({key},s.data());}
+    else if(q.length>=2&&!q.includes("@")){const l=q.toLowerCase();(await getDocs(query(collection(db,"handles"),orderBy("nameLower"),startAt(l),endAt(l+"\uf8ff"),limit(15)))).forEach(d=>{hs[d.data().uid]=Object.assign({key:d.id},d.data())});}
+    for(const u in hs){const s=await getDoc(doc(db,"players",u));found[u]=s.exists()?s.data():{};}
     if(/^[A-Za-z0-9]{20,40}$/.test(q)){const s=await getDoc(doc(db,"players",q));found[q]=s.exists()?s.data():{};}
     else if(q.includes("@")){(await getDocs(query(collection(db,"players"),where("emailLower","==",q.toLowerCase()),limit(10)))).forEach(d=>found[d.id]=d.data());}
     else if(/^[A-Za-z0-9]{6,12}$/.test(q)){(await getDocs(query(collection(db,"players"),orderBy(FS.documentId()),startAt(q),endAt(q+""),limit(10)))).forEach(d=>found[d.id]=d.data());}
     if(q.length>=2&&!q.includes("@")){const l=q.toLowerCase();(await getDocs(query(collection(db,"players"),orderBy("nameLower"),startAt(l),endAt(l+""),limit(10)))).forEach(d=>found[d.id]=d.data());}
   }catch(e){$("qe").textContent=(e&&e.message)||"Search failed";}
   const ids=Object.keys(found);if(!ids.length){out.innerHTML="<p class='note'>No player found. Anonymous players only have a record once they've been granted coins, so search them by their full Player ID.</p>";return}
-  out.innerHTML=ids.map(id=>{const p=found[id],b=bal(p.coins),gr=p.grants||{},gk=Object.keys(gr);
-    return `<div class="card" style="background:var(--bg)"><b>${esc(p.name||"Anonymous player")}</b> ${p.email?"· "+esc(p.email):""}<p class="note">Player ID <code>${esc(id)}</code></p>
+  out.innerHTML=ids.map(id=>{const p=found[id],b=bal(p.coins),gr=p.grants||{},gk=Object.keys(gr),h=hs[id]||(p.handle&&p.handle.key?{key:p.handle.key,name:p.handle.name,tag:p.handle.tag}:null);
+    return `<div class="card" style="background:var(--bg)"><b>${esc(h?h.name+" #"+h.tag:(p.name||"Player"))}</b> ${p.email?"· "+esc(p.email):""}${h?` <button class="g" data-rn="${esc(h.key)}" data-ru="${esc(id)}" style="float:right;padding:5px 10px;font-size:.8rem">Reset name</button>`:""}<p class="note">Account ID <code>${esc(id)}</code></p>
       <p class="note">${b==null?"Coin balance: kept on the player's device (not signed in). Grants below reach them within a day.":"Synced coin balance: <b>"+b+"</b>"}${p.days?" · finished days: "+Object.keys(p.days).length:""}</p>
       ${gk.length?"<table><tr><th>Granted</th><th>Coins</th><th>Reason</th></tr>"+gk.sort().reverse().map(k=>`<tr><td>${esc(when(gr[k].at))}</td><td>${esc(gr[k].n)}</td><td>${esc(gr[k].reason)}</td></tr>`).join("")+"</table>":"<p class='note'>No grants yet.</p>"}
       <h3>Grant coins</h3><div class="row"><select data-n="${esc(id)}">${[1,2,3,5,10,20].map(n=>`<option>${n}</option>`).join("")}</select><input data-r="${esc(id)}" placeholder="Reason (required, e.g. bug report)" maxlength="200"><button class="b" data-g="${esc(id)}">Grant</button></div><p class="note" data-m="${esc(id)}"></p></div>`}).join("");
+  out.querySelectorAll("[data-rn]").forEach(btn=>btn.onclick=async()=>{if(!confirm("Reset this player's name? They become \"Player #…\" and can pick a new one."))return;btn.disabled=true;
+    try{await FS.deleteDoc(doc(db,"handles",btn.dataset.rn));await log("reset_name",{uid:btn.dataset.ru,reason:btn.dataset.rn});btn.textContent="Name reset";}catch(e){btn.disabled=false;alert((e&&e.message)||"Couldn't reset")}});
   out.querySelectorAll("[data-g]").forEach(btn=>btn.onclick=async()=>{const id=btn.dataset.g,n=+out.querySelector(`[data-n="${id}"]`).value,reason=out.querySelector(`[data-r="${id}"]`).value.trim(),m=out.querySelector(`[data-m="${id}"]`);
     if(!reason){m.textContent="Add a reason first.";return}btn.disabled=true;
     try{const gid=Date.now()+"_"+rid(4);await setDoc(doc(db,"players",id),{grants:{[gid]:{n,reason,at:serverTimestamp(),by:me.uid}}},{merge:true});await log("grant",{uid:id,n,reason});m.innerHTML=`<span class="ok">Granted ${n} coin${n===1?"":"s"}. The player gets them next time they open Roughly (signed-in players at once, others within a day).</span>`;}

@@ -42,7 +42,7 @@ await fetch("http://127.0.0.1:8772/__reset");
 const d1=await dev({clock:DOHA("2026-11-20T10:00:00")});await play(d1.p);await ready(d1.p);
 await d1.p.evaluate(()=>window.RQGroups.createGroup("Doha Crew"));const gid=(await kv("list",{prefix:"groups/"})).v;const GID=Object.keys(gid).find(k=>k.split("/").length===2).split("/")[1];
 const uidA=await d1.p.evaluate(()=>window.RQGroups.user().uid);
-await d1.p.evaluate(()=>openMenu());await d1.p.waitForTimeout(300);ok(/Player ID/.test(await d1.p.textContent("#sheet")),"menu shows Player ID");
+await d1.p.evaluate(()=>openMenu());await d1.p.waitForTimeout(300);ok(/Player name/.test(await d1.p.textContent("#sheet")),"menu shows the player name");
 await d1.p.click("[data-act=signin]");await d1.p.waitForTimeout(300);await d1.p.screenshot({path:"t-signin-sheet.png"});
 await d1.p.click("#sgo");await d1.p.waitForSelector("#sd",{timeout:8000});await d1.p.waitForTimeout(400);
 let prof=(await kv("get",{path:"players/"+uidA})).v;ok(prof&&prof.email==="gee@example.com"&&Object.keys(prof.days).length===1&&prof.coins,"link a new Google account: same ID, profile created with history and coins",{uid:uidA,days:prof&&Object.keys(prof.days)});
